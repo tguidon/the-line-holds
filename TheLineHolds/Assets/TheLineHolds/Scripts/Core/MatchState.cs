@@ -6,7 +6,7 @@ namespace TheLineHolds
     public enum MatchPhase { Preparation, Combat, Victory, Defeat }
     public sealed class EnemyState
     {
-        public int Id; public EnemyDefinition Definition; public float Health, Distance; public bool Resolved;
+        public int Id; public EnemyDefinition Definition; public float Health, Distance, LateralOffset; public bool Resolved;
         public Vector3 Position;
     }
     public sealed class TowerState

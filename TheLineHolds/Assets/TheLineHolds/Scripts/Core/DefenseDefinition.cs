@@ -1,6 +1,7 @@
 using UnityEngine;
 namespace TheLineHolds
 {
+    public enum TargetPriority { First, Armor, Cluster }
     [CreateAssetMenu(menuName = "The Line Holds/Defense")]
     public sealed class DefenseDefinition : ScriptableObject
     {
@@ -12,6 +13,9 @@ namespace TheLineHolds
         [Min(.1f)] public float damage = 6;
         [Min(0)] public float splashRadius;
         [Min(.01f)] public float flightTime = .12f;
+        [Min(0)] public float infantryDamageMultiplier = 1;
+        [Min(0)] public float armorDamageMultiplier = 1;
+        public TargetPriority priority;
         public GameObject prefab;
         public int SellValue => cost / 2;
     }

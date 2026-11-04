@@ -1,5 +1,17 @@
 # Prototype validation
 
+## November 4 combat checkpoint
+
+The sparse baseline below has been superseded by squad combat. The opening-gun regression reproduced the old issue: 8 kills, 0 escapes, peak concurrency 1, and only 1.6 m travelled. The revised opening produces 4 kills / 14 escapes with 15 concurrent enemies.
+
+- Authored unit counts are now 18, 24, 28, 43, 58 (171 total), with 0, 0, 4, 7, 10 tanks. Six soldiers per squad retain separate health, lane positions, rewards, and escape accounting.
+- Focused checks pass for squad spawn totals/formation, armor damage and target priority, mortar cluster selection, actual single-target versus six-target splash hits, and the existing economy, pause, outcome, and exactly-once reward rules.
+- `CheckBalance.All` passes: mixed layouts win with 18 and 20 lives in 283 and 243 seconds of combat; MG-only and no-reinvestment layouts lose on wave 5; a lone opening gun loses on wave 2. No health, income, or wave cheats are used.
+- Live Play Mode lifecycle checks pass. Actual gameplay capture shows 11 concurrent individual infantry and readable formation lanes; verification logs confirm advancing frames.
+- Camera controls and refreshed standalone builds are the next checkpoint. Historical standalone evidence below applies to the preceding baseline only.
+
+## Previous baseline (November 3)
+
 Checked on Apple silicon macOS, November 3, 2026, using Unity 6000.6.7f1, URP 17.6.0, Blender 5.2.3, and Unity Pipeline 0.10.0-exp.1. Editor operations, captures, build commands, and Player verification used the Unity CLI. No computer-use automation is required to reproduce these checks.
 
 ## Passed

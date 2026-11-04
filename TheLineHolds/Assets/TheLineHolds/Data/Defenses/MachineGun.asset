@@ -13,11 +13,14 @@ MonoBehaviour:
   m_Name: MachineGun
   m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.DefenseDefinition
   displayName: Machine-gun nest
-  description: Rapid fire / short range
+  description: Single infantry / weak vs armor
   cost: 75
-  range: 3.7
-  interval: 0.23
-  damage: 6
+  range: 3.3
+  interval: 0.3
+  damage: 8
   splashRadius: 0
   flightTime: 0.12
+  infantryDamageMultiplier: 1
+  armorDamageMultiplier: 0.15
+  priority: 0
   prefab: {fileID: 2428180657874920360, guid: ad86b3cc2802f442da509543cd16c084, type: 3}

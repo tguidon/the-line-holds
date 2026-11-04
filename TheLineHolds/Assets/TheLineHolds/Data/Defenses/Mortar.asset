@@ -13,11 +13,14 @@ MonoBehaviour:
   m_Name: Mortar
   m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.DefenseDefinition
   displayName: Mortar
-  description: Explosive / area damage
+  description: Targets clusters / splash damage
   cost: 150
   range: 4.8
-  interval: 3.1
-  damage: 32
-  splashRadius: 1.65
+  interval: 3.8
+  damage: 42
+  splashRadius: 1.4
   flightTime: 0.95
+  infantryDamageMultiplier: 1
+  armorDamageMultiplier: 0.35
+  priority: 2
   prefab: {fileID: 428005552416271594, guid: 1b448e76ab9a8421e8c41e793d795861, type: 3}

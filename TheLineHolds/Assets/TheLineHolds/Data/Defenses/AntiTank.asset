@@ -13,11 +13,14 @@ MonoBehaviour:
   m_Name: AntiTank
   m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.DefenseDefinition
   displayName: Anti-tank gun
-  description: Heavy shot / long range
+  description: Armor priority / single target
   cost: 125
   range: 5.8
-  interval: 2.3
-  damage: 64
+  interval: 2
+  damage: 95
   splashRadius: 0
   flightTime: 0.35
+  infantryDamageMultiplier: 0.6
+  armorDamageMultiplier: 1
+  priority: 1
   prefab: {fileID: 655834955413257380, guid: d81ca551944a44c3fa65d24e80d49001, type: 3}

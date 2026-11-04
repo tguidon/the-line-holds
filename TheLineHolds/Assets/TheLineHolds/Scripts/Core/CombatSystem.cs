@@ -8,12 +8,29 @@ namespace TheLineHolds
         public static EnemyState Target(MatchState match, TowerState tower)
         {
             EnemyState best = null;
+            int bestScore = -1;
             foreach (var enemy in match.Enemies)
-                if (!enemy.Resolved && FlatDistance(enemy.Position, match.Pads[tower.Pad]) <= tower.Definition.range &&
-                    (best == null || enemy.Distance > best.Distance || (enemy.Distance == best.Distance && enemy.Id < best.Id)))
-                    best = enemy;
+            {
+                if (enemy.Resolved || FlatDistance(enemy.Position, match.Pads[tower.Pad]) > tower.Definition.range) continue;
+                int score = 0;
+                if (tower.Definition.priority == TargetPriority.Armor) score = enemy.Definition.armored ? 1 : 0;
+                if (tower.Definition.priority == TargetPriority.Cluster)
+                {
+                    var impact = PredictedPosition(match, enemy, tower.Definition.flightTime);
+                    foreach (var other in match.Enemies)
+                        if (!other.Resolved && FlatDistance(PredictedPosition(match, other, tower.Definition.flightTime), impact) <= tower.Definition.splashRadius)
+                            score++;
+                }
+                if (best == null || score > bestScore || (score == bestScore &&
+                    (enemy.Distance > best.Distance || (enemy.Distance == best.Distance && enemy.Id < best.Id))))
+                { best = enemy; bestScore = score; }
+            }
             return best;
         }
+        static Vector3 PredictedPosition(MatchState match, EnemyState enemy, float seconds) =>
+            match.Route.Position(enemy.Distance + enemy.Definition.speed * seconds, enemy.LateralOffset);
+        public static float DamageFor(DefenseDefinition defense, EnemyDefinition enemy) =>
+            defense.damage * (enemy.armored ? defense.armorDamageMultiplier : defense.infantryDamageMultiplier);
         static float FlatDistance(Vector3 a, Vector3 b)
         {
             a.y = b.y = 0;
@@ -32,7 +49,7 @@ namespace TheLineHolds
                 var origin = match.Pads[tower.Pad] + Vector3.up * .65f;
                 match.Shots.Add(new ShotState {
                     Id = ++shotId, Definition = tower.Definition, Target = target,
-                    Origin = origin, Destination = target.Position + Vector3.up * .4f
+                    Origin = origin, Destination = (tower.Definition.splashRadius > 0 ? PredictedPosition(match, target, tower.Definition.flightTime) : target.Position) + Vector3.up * .4f
                 });
                 match.Emit("fire", origin);
             }
@@ -49,9 +66,9 @@ namespace TheLineHolds
                 {
                     for (int j = match.Enemies.Count - 1; j >= 0; j--)
                         if (FlatDistance(match.Enemies[j].Position, shot.Destination) <= shot.Definition.splashRadius)
-                            Damage(match, match.Enemies[j], shot.Definition.damage);
+                            Damage(match, match.Enemies[j], DamageFor(shot.Definition, match.Enemies[j].Definition));
                 }
-                else Damage(match, shot.Target, shot.Definition.damage);
+                else Damage(match, shot.Target, DamageFor(shot.Definition, shot.Target.Definition));
             }
         }
         static void Damage(MatchState match, EnemyState enemy, float amount)

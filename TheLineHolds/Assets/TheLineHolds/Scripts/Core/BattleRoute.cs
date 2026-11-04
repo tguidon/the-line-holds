@@ -21,6 +21,14 @@ namespace TheLineHolds
                 if (distance <= cumulative[i]) return Vector3.Lerp(Points[i-1], Points[i], Mathf.InverseLerp(cumulative[i-1], cumulative[i], distance));
             return Points[Points.Length-1];
         }
+        public Vector3 Position(float distance, float lateralOffset)
+        {
+            var position = Position(distance);
+            var direction = Position(Mathf.Min(Length, distance + .1f)) - Position(Mathf.Max(0, distance - .1f));
+            position += Vector3.Cross(Vector3.up, direction).normalized * lateralOffset;
+            position.y = Ground(position.x) + .035f;
+            return position;
+        }
         public static float Ground(float x) => .25f + .7f * Mathf.InverseLerp(-4, -2, x) + .7f * Mathf.InverseLerp(4, 6, x);
         public static Vector3 OnGround(float x, float z) => new Vector3(x, Ground(x) + .035f, z);
         public static Vector3[] DefaultPoints => new[] {

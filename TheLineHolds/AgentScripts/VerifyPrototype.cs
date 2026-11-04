@@ -15,8 +15,8 @@ public static class VerifyPrototype
     {
         var report=new StringBuilder(); var d=Defenses;
         Check(Waves.All(w=>w!=null),"all five waves exist");
-        Check(Waves.Select(w=>w.spawns.Length).SequenceEqual(new[]{8,12,10,19,25}),"authored wave counts");
-        Check(Waves.Select(w=>w.spawns.Count(s=>s.enemy.health==200)).SequenceEqual(new[]{0,0,2,3,5}),"authored armor composition");
+        Check(Waves.Select(w=>w.UnitCount).SequenceEqual(new[]{18,24,28,43,58}),"authored wave counts");
+        Check(Waves.Select(w=>w.spawns.Where(s=>s.enemy.armored).Sum(s=>s.UnitCount)).SequenceEqual(new[]{0,0,4,7,10}),"authored armor composition");
         var m=New(); Check(m.Funds==300 && m.Lives==20 && m.Wave==0 && m.Enemies.Count==0,"fresh state");
         Check(m.Build(0,d[0]),"purchase");Check(m.Funds==225,"cost exactly once");Check(!m.Build(0,d[1]) && m.Funds==225,"occupied pad rejects purchase");
         Check(m.Build(1,d[2]),"mortar purchase");Check(!m.Build(2,d[1]) && m.Funds==75,"unaffordable purchase rejects");
@@ -26,7 +26,7 @@ public static class VerifyPrototype
         Check(m.Enemies[0].Distance==distance && left==m.Remaining && (m.Shots.Count==0 || age==m.Shots[0].Age),"pause freezes movement spawning projectiles");
         report.AppendLine("PASS economy, invalid purchases, sale rounding, paused orders, wave overlap and pause freeze");
         m=New();m.StartWave();for(int i=0;i<20000 && m.Phase==MatchPhase.Combat;i++)m.Step(1f/60);
-        Check(m.Escaped==8 && m.Killed==0 && m.Lives==12 && m.Funds==350 && m.CompletedWaves==1,"escapes cost lives, grant no reward, wave grants 50");
+        Check(m.Escaped==18 && m.Killed==0 && m.Lives==2 && m.Funds==350 && m.CompletedWaves==1,"escapes cost lives, grant no reward, wave grants 50");
         m.StartWave();for(int i=0;i<20000 && !m.Ended;i++)m.Step(1f/60);
         Check(m.Phase==MatchPhase.Defeat && m.Lives==0 && m.Escaped==20 && m.CompletedWaves==1,"neglect loses immediately");
         int escapes=m.Escaped;m.Step(1000);Check(m.Escaped==escapes && m.Shots.Count==0 && !m.StartWave(),"ended state frozen");
@@ -38,35 +38,49 @@ public static class VerifyPrototype
         Check(m.Phase==MatchPhase.Defeat && m.CompletedWaves==0 && m.Funds==300,"defeat priority on last final escape");UnityEngine.Object.DestroyImmediate(one);
         report.AppendLine("PASS final-escape defeat priority");
         var pair=ScriptableObject.CreateInstance<WaveDefinition>();pair.spawns=new[]{new SpawnEntry(Waves[0].spawns[0].enemy,0),new SpawnEntry(Waves[0].spawns[0].enemy,0)};
-        var testGun=ScriptableObject.CreateInstance<DefenseDefinition>();testGun.cost=1;testGun.damage=40;testGun.range=10;testGun.interval=10;testGun.flightTime=.1f;testGun.splashRadius=2;
+        var testGun=ScriptableObject.CreateInstance<DefenseDefinition>();testGun.cost=1;testGun.damage=80;testGun.range=10;testGun.interval=10;testGun.flightTime=.1f;testGun.splashRadius=2;
         m=new MatchState(new[]{pair},new BattleRoute(new[]{Vector3.zero,Vector3.forward*100}),new[]{Vector3.right,Vector3.left});m.Build(0,testGun);m.Build(1,testGun);m.StartWave();m.Step(.01f);
         Check(m.Target(m.Towers[0]).Id==1,"equal-distance targeting chooses stable first ID");
-        m.Step(.2f);Check(m.Killed==2 && m.Funds==368 && m.Enemies.Count==0,"overlapping splash shots reward each kill exactly once");
+        m.Step(.2f);Check(m.Killed==2 && m.Funds==356 && m.Enemies.Count==0,"overlapping splash shots reward each kill exactly once");
         int funds=m.Funds;m.Step(50);Check(m.Funds==funds,"completed wave rewards exactly once");
         UnityEngine.Object.DestroyImmediate(pair);UnityEngine.Object.DestroyImmediate(testGun);
         report.AppendLine("PASS stable targeting, splash damage, simultaneous lethal shots, exactly-once kill and wave rewards");
-        report.AppendLine(PlayLayout(0));report.AppendLine(PlayLayout(1));
+        CheckRoles(report);
         Debug.Log("[Verification]\n"+report);return report.ToString();
     }
-    static string PlayLayout(int layout)
+    static void CheckRoles(StringBuilder report)
     {
-        var m=New();var d=Defenses;float seconds=0;
-        if(layout==0){m.Build(3,d[0]);m.Build(4,d[0]);m.Build(6,d[2]);}
-        else {m.Build(4,d[1]);m.Build(6,d[0]);m.Build(0,d[0]);}
-        while(!m.Ended && seconds<1000)
+        var d=Defenses;var infantry=Waves[0].spawns[0].enemy;var tank=Waves[2].spawns.First(s=>s.enemy.armored).enemy;
+        Check(CombatSystem.DamageFor(d[0],tank)<CombatSystem.DamageFor(d[0],infantry)*.2f,"armor resists machine guns");
+        Check(CombatSystem.DamageFor(d[1],tank)>CombatSystem.DamageFor(d[1],infantry),"anti-tank damage profile");
+        var squad=ScriptableObject.CreateInstance<WaveDefinition>();squad.spawns=new[]{new SpawnEntry(infantry,0,6,.2f)};
+        var route=new BattleRoute(new[]{BattleRoute.OnGround(0,0),BattleRoute.OnGround(0,100)});
+        var m=new MatchState(new[]{squad},route,new[]{Vector3.zero});m.StartWave();
+        Check(m.Remaining==6,"remaining counts every squad member before spawn");
+        m.Step(.01f);Check(m.Enemies.Count==1 && m.Remaining==6,"first squad member preserves total");
+        for(int i=0;i<65;i++)m.Step(1f/60);
+        Check(m.Enemies.Count==6 && m.Enemies.Select(e=>e.LateralOffset).Distinct().Count()==2,"six independently targetable soldiers in two road lanes");
+        Check(m.Enemies.Max(e=>e.Distance)-m.Enemies.Min(e=>e.Distance)<1.6f,"squad stays compact");
+        m=new MatchState(new[]{squad},route,new[]{Vector3.zero});m.Build(0,d[1]);
+        var lead=new EnemyState{Id=1,Definition=infantry,Health=80,Distance=3,Position=route.Position(3)};
+        var armor=new EnemyState{Id=2,Definition=tank,Health=360,Distance=1,Position=route.Position(1)};
+        m.Enemies.Add(lead);m.Enemies.Add(armor);
+        Check(m.Target(m.Towers[0])==armor,"anti-tank prioritizes armor over leading infantry");
+        m=new MatchState(new[]{squad},route,new[]{Vector3.zero});m.Build(0,d[2]);
+        m.Enemies.Add(lead);
+        for(int i=0;i<3;i++)m.Enemies.Add(new EnemyState{Id=3+i,Definition=infantry,Health=80,Distance=1+i*.2f,Position=route.Position(1+i*.2f)});
+        Check(m.Target(m.Towers[0])!=lead,"mortar chooses dense squad over isolated leader");
+        // Actual projectile resolution: one gun wounds one soldier; one mortar wounds all six.
+        foreach(int type in new[]{0,2})
         {
-            if(m.Phase==MatchPhase.Preparation)
-            {
-                // Spend earned funds between waves in a clear authored strategy; no income cheats.
-                int[] order=layout==0?new[]{7,8,1,5,9,2,0}:new[]{7,3,8,5,1,9,2};
-                foreach(int pad in order) { int type=pad==7||pad==8?1:pad==5?2:0; if(m.Towers[pad]==null)m.Build(pad,d[type]); }
-                Check(m.StartWave(),"start next wave");
-            }
-            m.Step(1f/60);seconds+=1f/60;
+            m=new MatchState(new[]{squad},route,new[]{route.Position(2)+Vector3.right});m.Build(0,d[type]);m.StartWave();
+            m.Towers[0].Cooldown=1.1f;
+            for(int i=0;i<130;i++)m.Step(1f/60);
+            int wounded=m.Enemies.Count(e=>e.Health<e.Definition.health);
+            Check(type==0?wounded==1:wounded==6,"single-target versus splash affects individual squad members: type="+type+", wounded="+wounded);
         }
-        Check(m.Phase==MatchPhase.Victory,"layout "+layout+" must win: lives="+m.Lives+", wave="+m.Wave);
-        Check(m.Killed+m.Escaped==74 && m.CompletedWaves==5,"exact resolution totals");
-        return $"PASS layout {layout}: {m.Stars} stars, {m.Lives} lives, {m.Killed} kills, {m.Escaped} escapes, {seconds:0}s combat";
+        UnityEngine.Object.DestroyImmediate(squad);
+        report.AppendLine("PASS squad totals/formation, armor resistance/priority, cluster targeting, actual single-target and multi-target projectile damage");
     }
     public static string RuntimeState()
     {

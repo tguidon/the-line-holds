@@ -9,7 +9,7 @@ namespace TheLineHolds
             {
                 var enemy = match.Enemies[i];
                 enemy.Distance += enemy.Definition.speed * dt;
-                enemy.Position = match.Route.Position(enemy.Distance);
+                enemy.Position = match.Route.Position(enemy.Distance, enemy.LateralOffset);
                 if (enemy.Distance < match.Route.Length) continue;
                 match.ResolveEscape(enemy);
                 if (match.Ended) return false;

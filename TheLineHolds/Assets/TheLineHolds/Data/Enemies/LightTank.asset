@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: LightTank
   m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.EnemyDefinition
   displayName: Light tank
-  health: 200
-  speed: 0.63
-  reward: 30
+  armored: 1
+  health: 360
+  speed: 0.9
+  reward: 16
   prefab: {fileID: 7481327880319199643, guid: 9bf6beda9ef4e4dbaa2011d35b5ae44f, type: 3}

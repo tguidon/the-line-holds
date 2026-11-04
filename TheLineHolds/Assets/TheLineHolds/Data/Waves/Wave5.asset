@@ -12,55 +12,69 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef4e2bbb5e5c345089f78a010b68cf65, type: 3}
   m_Name: Wave5
   m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.WaveDefinition
-  briefing: Final assault. Hold every approach.
+  briefing: 8 squads + 10 tanks. Hold the combined assault.
   spawns:
   - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
     delay: 1
-  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 1.2
-  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 1.2
+    count: 6
+    interval: 0.2
   - enemy: {fileID: 11400000, guid: 397cb81e283a649929f50f14a1d1fe75, type: 2}
     delay: 1.2
+    count: 2
+    interval: 1.4
   - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 1.2
-  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 13.2
-  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 1.2
+    delay: 2.8
+    count: 6
+    interval: 0.2
   - enemy: {fileID: 11400000, guid: 397cb81e283a649929f50f14a1d1fe75, type: 2}
     delay: 1.2
+    count: 2
+    interval: 1.4
   - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 1.2
-  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 1.2
-  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 13.2
+    delay: 2.8
+    count: 6
+    interval: 0.2
   - enemy: {fileID: 11400000, guid: 397cb81e283a649929f50f14a1d1fe75, type: 2}
     delay: 1.2
+    count: 1
+    interval: 1.4
   - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 1.2
-  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 1.2
-  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 1.2
-  - enemy: {fileID: 11400000, guid: 397cb81e283a649929f50f14a1d1fe75, type: 2}
-    delay: 13.2
-  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 1.2
-  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 1.2
-  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 1.2
+    delay: 2.8
+    count: 6
+    interval: 0.2
   - enemy: {fileID: 11400000, guid: 397cb81e283a649929f50f14a1d1fe75, type: 2}
     delay: 1.2
+    count: 1
+    interval: 1.4
   - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
-    delay: 13.2
-  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
+    delay: 2.8
+    count: 6
+    interval: 0.2
+  - enemy: {fileID: 11400000, guid: 397cb81e283a649929f50f14a1d1fe75, type: 2}
     delay: 1.2
+    count: 1
+    interval: 1.4
   - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
+    delay: 2.8
+    count: 6
+    interval: 0.2
+  - enemy: {fileID: 11400000, guid: 397cb81e283a649929f50f14a1d1fe75, type: 2}
     delay: 1.2
+    count: 1
+    interval: 1.4
   - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
+    delay: 2.8
+    count: 6
+    interval: 0.2
+  - enemy: {fileID: 11400000, guid: 397cb81e283a649929f50f14a1d1fe75, type: 2}
     delay: 1.2
+    count: 1
+    interval: 1.4
   - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
+    delay: 2.8
+    count: 6
+    interval: 0.2
+  - enemy: {fileID: 11400000, guid: 397cb81e283a649929f50f14a1d1fe75, type: 2}
     delay: 1.2
+    count: 1
+    interval: 1.4

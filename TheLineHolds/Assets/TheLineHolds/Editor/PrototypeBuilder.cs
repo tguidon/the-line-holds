@@ -22,20 +22,10 @@ namespace TheLineHolds.Editor
             foreach(var dir in new[]{"Data/Enemies","Data/Defenses","Data/Waves","Art/Materials","Prefabs","Scenes","Audio","UI"}) Directory.CreateDirectory(Root+"/"+dir);
             AssetDatabase.Refresh();
             SetupMaterials(); fieldFont=BuildFont();
-            var infantry=Enemy("Infantry",40,1.05f,10); var tank=Enemy("LightTank",200,.63f,30);
-            var mg=Defense("MachineGun","Machine-gun nest","Rapid fire / short range",75,3.7f,.23f,6,0,.12f);
-            var at=Defense("AntiTank","Anti-tank gun","Heavy shot / long range",125,5.8f,2.3f,64,0,.35f);
-            var mortar=Defense("Mortar","Mortar","Explosive / area damage",150,4.8f,3.1f,32,1.65f,.95f);
-            var waves=new WaveDefinition[5]; int[] counts={8,12,8,16,20}, tanks={0,0,2,3,5};
-            float[] spacing={2.8f,2.5f,2.5f,1.65f,1.2f};
-            string[] briefings={"Eight infantry. Establish road coverage.","Twelve infantry. Hold a sustained advance.","Armor sighted. Prepare heavy guns.","Mixed column. Cover the bends.","Final assault. Hold every approach."};
-            for(int w=0;w<5;w++)
-            {
-                var wave=Asset<WaveDefinition>($"Data/Waves/Wave{w+1}"); wave.briefing=briefings[w];
-                var list=new List<SpawnEntry>(); int total=counts[w]+tanks[w], added=0;
-                for(int i=0;i<total;i++) { bool armor=tanks[w]>0 && added<tanks[w] && i%4==3; if(total-i<=tanks[w]-added) armor=true; if(armor) added++; list.Add(new SpawnEntry(armor?tank:infantry,i==0?1:spacing[w]+(i%(w<3?4:5)==0?12:0))); }
-                wave.spawns=list.ToArray(); EditorUtility.SetDirty(wave); waves[w]=wave;
-            }
+            var waves=TuneCombat();
+            var mg=Asset<DefenseDefinition>("Data/Defenses/MachineGun");
+            var at=Asset<DefenseDefinition>("Data/Defenses/AntiTank");
+            var mortar=Asset<DefenseDefinition>("Data/Defenses/Mortar");
             var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
             var terrain=new GameObject("Layered countryside diorama").transform;
             BuildTerrain(terrain); BuildRoad(terrain);
@@ -68,6 +58,38 @@ namespace TheLineHolds.Editor
             EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene(Root+"/Scenes/Countryside.unity",true)};
             AssetDatabase.SaveAssets(); Debug.Log("[Builder] Countryside saved: 10 pads, 5 waves, 3 defenses, 2 enemies; URP HDR and camera postprocessing enabled.");
         }
+        // Apply balance without rebuilding the map, materials, prefabs, or audio.
+        [MenuItem("The Line Holds/Apply Combat Tuning")]
+        public static WaveDefinition[] TuneCombat()
+        {
+            if(EditorApplication.isPlaying) throw new InvalidOperationException("Stop Play Mode before tuning assets.");
+            var infantry=Enemy("Infantry",80,1.4f,4);
+            var tank=Enemy("LightTank",360,.9f,16); tank.armored=true;
+            var mg=Defense("MachineGun","Machine-gun nest","Single infantry / weak vs armor",75,3.3f,.3f,8,0,.12f);
+            mg.priority=TargetPriority.First; mg.infantryDamageMultiplier=1; mg.armorDamageMultiplier=.15f;
+            var at=Defense("AntiTank","Anti-tank gun","Armor priority / single target",125,5.8f,2,95,0,.35f);
+            at.priority=TargetPriority.Armor; at.infantryDamageMultiplier=.6f; at.armorDamageMultiplier=1;
+            var mortar=Defense("Mortar","Mortar","Targets clusters / splash damage",150,4.8f,3.8f,42,1.4f,.95f);
+            mortar.priority=TargetPriority.Cluster; mortar.infantryDamageMultiplier=1; mortar.armorDamageMultiplier=.35f;
+            var waves=new WaveDefinition[5];
+            int[] squads={3,4,4,6,8}, tanks={0,0,4,7,10};
+            float[] gaps={5,4.5f,4,3.5f,2.8f};
+            string[] briefings={"3 infantry squads. Build overlapping coverage.","4 squads. Mortars break up tight formations.","4 squads + 4 tanks. Anti-tank guns prioritize armor.","6 squads + 7 tanks. Layer infantry and armor defenses.","8 squads + 10 tanks. Hold the combined assault."};
+            for(int w=0;w<5;w++)
+            {
+                var wave=Asset<WaveDefinition>($"Data/Waves/Wave{w+1}"); wave.briefing=briefings[w];
+                var list=new List<SpawnEntry>();
+                for(int squad=0;squad<squads[w];squad++)
+                {
+                    list.Add(new SpawnEntry(infantry,list.Count==0?1:gaps[w],6,.2f));
+                    int armor=tanks[w]/squads[w]+(squad<tanks[w]%squads[w]?1:0);
+                    if(armor>0) list.Add(new SpawnEntry(tank,1.2f,armor,1.4f));
+                }
+                wave.spawns=list.ToArray(); EditorUtility.SetDirty(wave); waves[w]=wave;
+            }
+            AssetDatabase.SaveAssets();
+            return waves;
+        }
         static T Asset<T>(string path) where T:ScriptableObject
         {
             string p=Root+"/"+path+".asset"; var a=AssetDatabase.LoadAssetAtPath<T>(p); if(a) return a;
@@ -75,11 +97,11 @@ namespace TheLineHolds.Editor
         }
         static EnemyDefinition Enemy(string name,float hp,float speed,int reward)
         {
-            var d=Asset<EnemyDefinition>("Data/Enemies/"+name); d.displayName=name=="LightTank"?"Light tank":"Infantry"; d.health=hp;d.speed=speed;d.reward=reward;d.prefab=Prefab(name);EditorUtility.SetDirty(d);return d;
+            var d=Asset<EnemyDefinition>("Data/Enemies/"+name); d.displayName=name=="LightTank"?"Light tank":"Infantry"; d.health=hp;d.speed=speed;d.reward=reward;d.armored=false;d.prefab=AssetDatabase.LoadAssetAtPath<GameObject>(Root+"/Prefabs/"+name+".prefab") ?? Prefab(name);EditorUtility.SetDirty(d);return d;
         }
         static DefenseDefinition Defense(string name,string title,string description,int cost,float range,float interval,float damage,float splash,float flight)
         {
-            var d=Asset<DefenseDefinition>("Data/Defenses/"+name);d.displayName=title;d.description=description;d.cost=cost;d.range=range;d.interval=interval;d.damage=damage;d.splashRadius=splash;d.flightTime=flight;d.prefab=Prefab(name);EditorUtility.SetDirty(d);return d;
+            var d=Asset<DefenseDefinition>("Data/Defenses/"+name);d.displayName=title;d.description=description;d.cost=cost;d.range=range;d.interval=interval;d.damage=damage;d.splashRadius=splash;d.flightTime=flight;d.prefab=AssetDatabase.LoadAssetAtPath<GameObject>(Root+"/Prefabs/"+name+".prefab") ?? Prefab(name);EditorUtility.SetDirty(d);return d;
         }
         static GameObject Prefab(string name)
         {

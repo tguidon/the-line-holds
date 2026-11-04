@@ -13,9 +13,11 @@ while(!game.Match.Ended)
 {
     if(game.Match.Phase==MatchPhase.Preparation)
     {
-        foreach(int pad in new[]{7,8,1,5,9,2,0})
+        int[] pads={3,4,6,7,5,1,8,2,9,0}, types={0,0,2,1,2,0,1,2,0,0};
+        for(int i=0;i<pads.Length;i++)
         {
-            int type=pad==7||pad==8?1:pad==5?2:0;
+            int pad=pads[i],type=types[i];
+            if(game.Match.Towers[pad]==null && game.Match.Funds<game.defenses[type].cost)break;
             if(game.Match.Towers[pad]==null && game.Match.Funds>=game.defenses[type].cost) { game.Choose(type);game.ClickPad(pad); }
         }
         game.Cancel();game.StartNextWave();
@@ -23,6 +25,6 @@ while(!game.Match.Ended)
     await Wait.Until(()=>game.Match.Ended || game.Match.Phase==MatchPhase.Preparation,timeoutMs:180000,because:"wave should resolve");
 }
 Check(game.Match.Phase==MatchPhase.Victory,"The match must finish in victory.");
-Check(game.Match.CompletedWaves==5 && game.Match.Killed+game.Match.Escaped==74,"All waves and units resolve once.");
+Check(game.Match.CompletedWaves==5 && game.Match.Killed+game.Match.Escaped==171,"All waves and units resolve once.");
 Debug.Log($"[Standalone verification] Victory: {game.Match.Stars} stars, {game.Match.Lives} lives, {game.Match.Killed} kills, {game.Match.Escaped} escaped, {Time.realtimeSinceStartup-started:0}s real time, {Time.frameCount-matchFrames} rendered frames.");
 return $"Victory; stars={game.Match.Stars}; lives={game.Match.Lives}; killed={game.Match.Killed}; escaped={game.Match.Escaped}; seconds={Time.realtimeSinceStartup-started:0}; frames={Time.frameCount-matchFrames}";

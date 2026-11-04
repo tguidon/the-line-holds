@@ -136,7 +136,7 @@ namespace TheLineHolds
                     healthViews[e.Id]=bar.transform;
                 }
                 view.transform.position=e.Position;
-                var direction=Match.Route.Position(e.Distance+.1f)-e.Position;
+                var direction=Match.Route.Position(e.Distance+.1f,e.LateralOffset)-e.Position;
                 if(direction.sqrMagnitude>.00001f) view.transform.rotation=Quaternion.LookRotation(direction);
                 healthViews[e.Id].localScale=new Vector3(.65f*Mathf.Clamp01(e.Health/e.Definition.health),.055f,.07f);
             }

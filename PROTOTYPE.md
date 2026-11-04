@@ -35,22 +35,22 @@ Use two ground enemy types. Both follow the same route and have health, movement
 
 | Enemy | Role | Starting health | Speed | Kill reward |
 | --- | --- | --- | --- | --- |
-| Infantry | Common, lightly protected target | 40 | Normal | 10 |
-| Light tank | Slower, tougher target | 200 | 60% of infantry | 30 |
+| Infantry | Six-soldier squads; each soldier has its own health | 80 | 1.4 m/s | 4 |
+| Light tank | Armored target; resists light weapons and mortar fragments | 360 | 0.9 m/s | 16 |
 
-- No enemy attacks, special abilities, or resistance system initially. Enemies threaten the player by reaching the exit.
+- Simple armor multipliers distinguish weapon roles. No enemy attacks or special abilities. Enemies threaten the player by reaching the exit.
 - Every escaped enemy costs one life and is removed. Escapes grant no kill reward.
 - No flying enemies, bosses, or physics-based vehicle simulation.
 
 ## Three defenses
 
-Defenses occupy one build pad each. All three are available from the start, have circular range, and automatically prioritize the enemy furthest along the route within range.
+Defenses occupy one build pad each. All three are available from the start, have circular range, and use deterministic targeting within circular range. Equal priorities favor the enemy furthest along the route, then its stable ID.
 
 | Defense | Role | Starting cost | Behavior |
 | --- | --- | --- | --- |
-| Machine-gun nest | Affordable infantry control | 75 | Rapid, low-damage single-target fire; short range |
-| Anti-tank gun | Tough single targets | 125 | Slow, high-damage single-target fire; long range |
-| Mortar | Groups of enemies | 150 | Slow explosive shots with a small splash radius; medium range |
+| Machine-gun nest | Affordable infantry control | 75 | 8 damage every 0.3 s; 3.3 m range; single-target; 15% damage against armor |
+| Anti-tank gun | Tough single targets | 125 | 95 damage every 2 s; 5.8 m range; prioritizes armor; 60% damage against infantry |
+| Mortar | Groups of enemies | 150 | 42 damage every 3.8 s; 4.8 m range; targets the densest predicted cluster; 1.4 m splash; 35% damage against armor |
 
 - Show placement previews, cost, and range before purchase. Reject occupied pads and purchases the player cannot afford without spending funds.
 - Let the player select a defense to see its type and range, or sell it for 50% of its purchase cost, rounded down.
@@ -61,19 +61,19 @@ Defenses occupy one build pad each. All three are available from the start, have
 
 - Start with **300 funds** and **20 lives**. No passive income or spending lives for currency.
 - Award **50 funds** after each completed wave. Funds persist only within the match.
-- Each wave uses an authored spawn list, with units spaced apart. Later waves increase pressure through numbers, composition, and tighter spacing rather than hidden health scaling.
+- Each wave uses an authored squad/vehicle list. Six infantry enter in two lanes, 0.2 seconds apart; every member is independently targetable and costs one life if it escapes. Mortars can damage multiple members; guns hit one member per shot. Squads are separated by short gaps, shrinking from 5 to 2.8 seconds. Later waves increase pressure through numbers, composition, and tighter spacing rather than hidden health scaling.
 
 | Wave | Starting composition | Purpose |
 | --- | --- | --- |
-| 1 | 8 infantry | Learn placement and basic combat |
-| 2 | 12 infantry | Test sustained coverage |
-| 3 | 8 infantry, 2 light tanks | Introduce durable enemies |
-| 4 | 16 infantry, 3 light tanks | Test mixed defenses and splash damage |
-| 5 | 20 infantry, 5 light tanks | Final combined test |
+| 1 | 3 squads (18 infantry) | Establish overlapping coverage |
+| 2 | 4 squads (24 infantry) | Reward splash and sustained coverage |
+| 3 | 4 squads, 4 light tanks | Introduce armor priority |
+| 4 | 6 squads, 7 light tanks | Demand layered mixed defenses |
+| 5 | 8 squads, 10 light tanks | Final combined assault |
 
 - The first wave waits for player input. Each subsequent wave also waits for a **Start Wave** click, with no preparation timer.
 - A wave ends only after its entire spawn list has appeared and every enemy has been killed or escaped. Waves do not overlap.
-- Adjust health, costs, fire rates, range, counts, and spacing until multiple sensible defense layouts can finish the map.
+- Multiple mixed layouts must win. A lone opening gun, an all-machine-gun layout, and a starting layout that never reinvests must lose. Keep these outcomes in a repeatable balance check.
 
 ## Win, loss, and results
 
