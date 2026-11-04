@@ -1,0 +1,14 @@
+using TheLineHolds;
+using UnityEngine;
+using Unity.Pipeline.Scripting;
+var game=Object.FindAnyObjectByType<BattleController>();
+game.NewMatch();game.Choose(0);game.ClickPad(3);game.ClickPad(4);game.Choose(2);game.ClickPad(6);game.Cancel();
+Time.timeScale=8;game.StartNextWave();
+await Wait.Until(()=>game.Match.Phase==MatchPhase.Preparation,timeoutMs:30000);
+game.Choose(1);game.ClickPad(7);game.Cancel();game.StartNextWave();
+await Wait.Until(()=>game.Match.Killed>=10,timeoutMs:30000);
+Time.timeScale=1;game.ClickPad(4);
+await System.Threading.Tasks.Task.Delay(150);
+string capture=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"the-line-holds-combat.png");
+ScreenCapture.CaptureScreenshot(capture);
+return capture;

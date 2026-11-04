@@ -1,0 +1,53 @@
+# The Line Holds
+
+A single-map WWII tower defense prototype built with Unity **6000.6.7f1**, URP 17.6, C#, and original Blender miniatures.
+
+To play without the Unity Editor, unzip `TheLineHolds/Builds/Packages/The-Line-Holds-macOS.zip` and open **The Line Holds.app**. The unpackaged local app is also available at `TheLineHolds/Builds/macOS/The Line Holds.app`. Choose **Deploy** to begin. This is the current macOS prototype; Windows testing will use a Windows VM when you are ready.
+
+Open `TheLineHolds/` in Unity. The playable scene is `Assets/TheLineHolds/Scenes/Countryside.unity`. Press Play, then **Deploy**. Buy a defense from the supply bar and click a numbered emplacement. Start each wave when ready. Click an occupied emplacement to inspect its range or sell it for half its price. Right-click cancels placement; Escape cancels placement first, otherwise pauses; the mouse wheel zooms.
+
+The match starts with 300 funds and 20 lives. Kill rewards and 50 funds per completed wave pay for more defenses. Survive all five waves to win. Every escape costs one life. Victory earns three stars at 18–20 lives, two at 10–17, and one at 1–9.
+
+## Project structure
+
+- `Scripts/Core`: editable unit/wave definitions, authored route, and deterministic match simulation. Small `Economy`, `WaveSpawner`, `RouteMovement`, and `CombatSystem` classes handle their respective rules; `MatchState` coordinates their order and owns outcomes.
+- `Scripts/Presentation`: world views, mouse controls, uGUI/TMP menus/HUD, and sound cues.
+- `Data`: enemy, defense, and spawn-list assets; tune these directly in the Inspector.
+- `Prefabs` and `Art/Models`: reusable miniatures and Blender FBX exports, imported at metre scale.
+- `Editor/PrototypeBuilder.cs`: repeatable scene, asset, sound, and platform build generation.
+- `AgentScripts/VerifyPrototype.cs`: focused checks against the actual simulation and authored data.
+- `Tools/Blender/generate_assets.py` and `miniatures.blend`: original editable model sources.
+
+## Repeatable commands
+
+From the repository root, with Unity CLI installed:
+
+```sh
+unity open "$PWD/TheLineHolds"
+unity status --until-ready --project-path "$PWD/TheLineHolds"
+unity command editor set_auto_tick --project-path "$PWD/TheLineHolds" --enabled true
+unity command script eval --project-path "$PWD/TheLineHolds" 'TheLineHolds.Editor.PrototypeBuilder.Build();'
+unity command script run --project-path "$PWD/TheLineHolds" --file AgentScripts/VerifyPrototype.cs --entry VerifyPrototype.All
+unity command script eval --project-path "$PWD/TheLineHolds" 'TheLineHolds.Editor.PrototypeBuilder.BuildMac();'
+unity command script eval --project-path "$PWD/TheLineHolds" 'TheLineHolds.Editor.PrototypeBuilder.BuildWindows();'
+```
+
+Launch the existing Mac release without rebuilding:
+
+```sh
+unity build run "$PWD/TheLineHolds" --build-path "$PWD/TheLineHolds/Builds/macOS/The Line Holds.app"
+```
+
+Build commands also appear under **The Line Holds → Build** in Unity. Outputs are separated under `TheLineHolds/Builds/macOS/` and `TheLineHolds/Builds/Windows/`. Windows requires its desktop build module/toolchain. The current prototype evaluation platform is macOS; Windows runtime testing is deferred and does not block prototype completion. Confirm a full match on Windows before a Windows release or treating that platform as verified.
+
+Regenerate the models:
+
+```sh
+/Applications/Blender.app/Contents/MacOS/Blender --background --python Tools/Blender/generate_assets.py -- "$PWD"
+```
+
+Then run **The Line Holds → Rebuild Prototype** to update the material assignments, prefabs, data, and scene. Rebuild resets authored tuning to the defaults in the builder; commit custom tuning first. Runtime restarting creates a fresh match and removes enemies, towers, projectiles, effects, and audio from the preceding attempt.
+
+Git LFS tracks Blender, FBX, audio, font, and image binaries. Unity caches and build output are ignored. No cloud service is needed for the prototype.
+
+Verification scripts and the Windows playtest checklist are in `Tools/Validation/`. Run `python3 Tools/Validation/package_builds.py` after successful builds to create shareable ZIPs under `TheLineHolds/Builds/Packages/`; Windows backup/symbol folders are excluded. See `VALIDATION.md` for the recorded results and deferred Windows check.
