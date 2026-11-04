@@ -18,7 +18,7 @@ Build one complete, replayable WWII tower defense level to test placement, tower
 - One fixed route, following authored waypoints. Towers never block or change the route.
 - Two or three terrain tiers connected by gentle road ramps, with roughly 10 fixed build pads distributed along the route.
 - Tiering creates the miniature landscape and placement choices. Height grants no damage or range bonuses in the prototype; terrain and props do not block shots.
-- Fixed elevated three-quarter camera with limited zoom. Keep the whole battlefield visible at the default zoom; omit camera rotation and panning initially.
+- Elevated three-quarter overview with full 360-degree orbit, orthographic zoom from 5.5 to 18 (default 13.5), and bounded ground-plane panning. Keep the whole battlefield visible at the default view; provide a reset action. Labels and health bars remain readable while rotating.
 - Keep enemies and build pads readable: avoid trees, cliffs, or buildings obscuring the road from this camera angle.
 
 ## Visual direction
@@ -87,7 +87,7 @@ Defenses occupy one build pad each. All three are available from the start, have
 
 - Start menu: game title, **Play**, and **Quit**.
 - HUD: lives, funds, wave number out of five, enemy count remaining in the current wave, three defense buttons with costs, and **Start Wave**.
-- Mouse: select a defense type, click a pad to place it, or click an existing defense to inspect/sell it. Right-click cancels placement; mouse wheel controls limited zoom.
+- Mouse: select a defense type, click a pad to place it, or click an existing defense to inspect/sell it. Right-click cancels placement; mouse wheel zooms. Middle-drag or Q/E rotates; Shift+middle-drag or WASD pans; R restores the overview. On-screen rotate, zoom, and reset buttons provide mouse-only access. Scrolling over UI does not move the camera.
 - Escape cancels placement first; otherwise toggles pause. Pause freezes combat, movement, spawning, and projectiles.
 - Pause menu: **Resume**, **Restart**, and **Main Menu**.
 - Include brief on-screen instructions and distinct placement, firing, impact, escape, and result sounds. A full settings menu and soundtrack can wait.

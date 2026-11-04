@@ -28,12 +28,14 @@ namespace TheLineHolds
         GameObject preview;
         LineRenderer ring;
         int hover = -1, previewType = -1;
-        float zoom = 13.5f;
+        public MapCameraControls CameraControls { get; private set; }
         void Start()
         {
             Application.targetFrameRate=60;
             ring = new GameObject("Range preview").AddComponent<LineRenderer>(); ring.transform.SetParent(dynamicRoot);
             ring.sharedMaterial=rangeMaterial; ring.positionCount=97; ring.loop=false; ring.widthMultiplier=.055f; ring.useWorldSpace=true;
+            CameraControls=battleCamera.gameObject.AddComponent<MapCameraControls>();
+            CameraControls.Initialize(battleCamera,this);
             hud.Initialize(this); MainMenu();
         }
         public void NewMatch()
@@ -41,7 +43,7 @@ namespace TheLineHolds
             ClearViews(); audioPlayer.ResetAudio(); InMenu=false; Placement=SelectedPad=-1;
             Match=new MatchState(waves,new BattleRoute(BattleRoute.DefaultPoints),BattleRoute.DefaultPads);
             Match.Cue += OnCue;
-            zoom=13.5f; battleCamera.orthographicSize=zoom; Notice="Deploy your defenses. Wave 1 waits for your order.";
+            CameraControls.ResetView(); Notice="Deploy your defenses. Wave 1 waits for your order.";
         }
         public void MainMenu()
         {
@@ -86,7 +88,6 @@ namespace TheLineHolds
                 if(Mouse.current.rightButton.wasPressedThisFrame) Cancel();
                 if(!InMenu && Match!=null && !Match.Paused && !Match.Ended)
                 {
-                    zoom=Mathf.Clamp(zoom-Mouse.current.scroll.ReadValue().y*.008f,12.5f,15); battleCamera.orthographicSize=zoom;
                     var mouse=Mouse.current.position.ReadValue(); hover=FindPad(mouse);
                     if(Mouse.current.leftButton.wasPressedThisFrame && !(EventSystem.current && EventSystem.current.IsPointerOverGameObject())) ClickPad(hover);
                 }
@@ -138,6 +139,7 @@ namespace TheLineHolds
                 view.transform.position=e.Position;
                 var direction=Match.Route.Position(e.Distance+.1f,e.LateralOffset)-e.Position;
                 if(direction.sqrMagnitude>.00001f) view.transform.rotation=Quaternion.LookRotation(direction);
+                healthViews[e.Id].rotation=battleCamera.transform.rotation;
                 healthViews[e.Id].localScale=new Vector3(.65f*Mathf.Clamp01(e.Health/e.Definition.health),.055f,.07f);
             }
             RemoveMissing(enemyViews,active,healthViews);

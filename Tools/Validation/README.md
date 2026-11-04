@@ -19,7 +19,7 @@ Record the returned job ID and use `unity job status <job-id> --runtime 'The Lin
 
 `CheckUI.cs` verifies menu/HUD screen raycasts and their pointer-click callbacks. This checks that the overlay, button hierarchy, EventSystem, and button listeners are connected. It does not claim to simulate OS mouse focus. Native pointer injection into an unfocused player can be discarded by Unity's input focus handling.
 
-`CheckInput.cs` is an Editor Pipeline `script run` check that injects mouse/keyboard device events across actual Play Mode frames. It verifies the full Input System path through the HUD and world controls without invoking their callbacks directly. It temporarily isolates hardware devices and restores devices/settings in `finally`. Run it after entering Play Mode:
+`CheckInput.cs` is an Editor Pipeline `script run` check that injects mouse/keyboard device events across actual Play Mode frames. It verifies the full Input System path through the HUD, world placement, 360-degree map orbit, zoom limits, panning, view reset, and placement from the changed camera without invoking their callbacks directly. It temporarily isolates hardware devices and restores devices/settings in `finally`. Run it after entering Play Mode:
 
 ```sh
 unity command script run --project-path "$PWD/TheLineHolds" --file AgentScripts/CheckInput.cs --entry CheckInput.All

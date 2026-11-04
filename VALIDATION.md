@@ -8,7 +8,8 @@ The sparse baseline below has been superseded by squad combat. The opening-gun r
 - Focused checks pass for squad spawn totals/formation, armor damage and target priority, mortar cluster selection, actual single-target versus six-target splash hits, and the existing economy, pause, outcome, and exactly-once reward rules.
 - `CheckBalance.All` passes: mixed layouts win with 18 and 20 lives in 283 and 243 seconds of combat; MG-only and no-reinvestment layouts lose on wave 5; a lone opening gun loses on wave 2. No health, income, or wave cheats are used.
 - Live Play Mode lifecycle checks pass. Actual gameplay capture shows 11 concurrent individual infantry and readable formation lanes; verification logs confirm advancing frames.
-- Camera controls and refreshed standalone builds are the next checkpoint. Historical standalone evidence below applies to the preceding baseline only.
+- Camera controls: frame-driven mouse/keyboard checks pass for wheel limits 5.5–18, Q/E and middle-drag orbit, Shift+middle-drag and WASD pan, R/button reset, on-screen rotation/zoom, UI scroll isolation, and placement after rotating/zooming. World labels follow orbit and health bars face the view. Inspected the overview and a 135-degree, zoomed view.
+- Refreshed standalone builds are the next checkpoint. Historical standalone evidence below applies to the preceding baseline only.
 
 ## Previous baseline (November 3)
 

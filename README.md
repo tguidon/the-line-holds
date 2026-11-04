@@ -4,9 +4,11 @@ A single-map WWII tower defense prototype built with Unity **6000.6.7f1**, URP 1
 
 To play without the Unity Editor, unzip `TheLineHolds/Builds/Packages/The-Line-Holds-macOS.zip` and open **The Line Holds.app**. The unpackaged local app is also available at `TheLineHolds/Builds/macOS/The Line Holds.app`. Choose **Deploy** to begin. This is the current macOS prototype; Windows testing will use a Windows VM when you are ready.
 
-Open `TheLineHolds/` in Unity. The playable scene is `Assets/TheLineHolds/Scenes/Countryside.unity`. Press Play, then **Deploy**. Buy a defense from the supply bar and click a numbered emplacement. Start each wave when ready. Click an occupied emplacement to inspect its range or sell it for half its price. Right-click cancels placement; Escape cancels placement first, otherwise pauses; the mouse wheel zooms.
+Open `TheLineHolds/` in Unity. The playable scene is `Assets/TheLineHolds/Scenes/Countryside.unity`. Press Play, then **Deploy**. Buy a defense from the supply bar and click a numbered emplacement. Start each wave when ready. Click an occupied emplacement to inspect its range or sell it for half its price. Right-click cancels placement; Escape cancels placement first, otherwise pauses; the mouse wheel zooms from a close view to the full map. Middle-drag or Q/E rotates through 360 degrees; Shift+middle-drag or WASD pans; R restores the overview. The view strip also has rotate, zoom, and reset buttons.
 
-The match starts with 300 funds and 20 lives. Kill rewards and 50 funds per completed wave pay for more defenses. Survive all five waves to win. Every escape costs one life. Victory earns three stars at 18–20 lives, two at 10–17, and one at 1–9.
+Enemies arrive as compact six-soldier squads, with individual health and rewards. Machine guns pick off infantry; anti-tank guns prioritize armor; mortars lead moving clusters and damage multiple soldiers. Armor resists machine guns and mortar fragments. Later waves add tank sections and shorter gaps.
+
+The match starts with 300 funds and 20 lives. Infantry pay 4 funds and tanks pay 16; each completed wave pays another 50. Reinvest in overlapping coverage and mixed defenses—one early tower cannot hold the map. Survive all five waves to win. Every escape costs one life. Victory earns three stars at 18–20 lives, two at 10–17, and one at 1–9.
 
 ## Project structure
 
@@ -28,6 +30,7 @@ unity status --until-ready --project-path "$PWD/TheLineHolds"
 unity command editor set_auto_tick --project-path "$PWD/TheLineHolds" --enabled true
 unity command script eval --project-path "$PWD/TheLineHolds" 'TheLineHolds.Editor.PrototypeBuilder.Build();'
 unity command script run --project-path "$PWD/TheLineHolds" --file AgentScripts/VerifyPrototype.cs --entry VerifyPrototype.All
+unity command script run --project-path "$PWD/TheLineHolds" --file AgentScripts/CheckBalance.cs --entry CheckBalance.All
 unity command script eval --project-path "$PWD/TheLineHolds" 'TheLineHolds.Editor.PrototypeBuilder.BuildMac();'
 unity command script eval --project-path "$PWD/TheLineHolds" 'TheLineHolds.Editor.PrototypeBuilder.BuildWindows();'
 ```

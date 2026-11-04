@@ -9,7 +9,7 @@ namespace TheLineHolds
     {
         public TMP_FontAsset font;
         BattleController game;
-        GameObject top, bottom, modal, sell, help, starRow;
+        GameObject top, bottom, modal, sell, help, starRow, viewControls;
         readonly StarGraphic[] ratingStars=new StarGraphic[3];
         TextMeshProUGUI status, notice, waveInfo, selection, modalTitle, modalSubtitle, modalStats;
         UnityEngine.UI.Button startWave, resume, retry, menu, play, quit;
@@ -33,9 +33,17 @@ namespace TheLineHolds
             startWave=Button(bottom.transform,"START WAVE  1  >",new Vector2(-280,28),new Vector2(256,68),()=>game.StartNextWave(),true,true);
             notice=Label(bottom.transform,"",new Vector2(24,104),new Vector2(1140,32),17,paper,true);
             waveInfo=Label(bottom.transform,"",new Vector2(900,20),new Vector2(365,75),16,paper,true);
+            viewControls=Panel("Map controls",transform,Vector2.zero,new Vector2(1,0),new Vector2(24,170),new Vector2(-24,208),new Color(.08f,.1f,.09f,.9f));
+            Label(viewControls.transform,"VIEW   MMB drag: rotate   /   Shift+MMB or WASD: pan   /   Wheel: zoom   /   Q/E: rotate   /   R: reset",new Vector2(12,-8),new Vector2(1030,24),13,paper);
+            Button(viewControls.transform,"<",new Vector2(-360,-3),new Vector2(44,32),()=>game.CameraControls.Rotate(-45),true);
+            Button(viewControls.transform,">",new Vector2(-310,-3),new Vector2(44,32),()=>game.CameraControls.Rotate(45),true);
+            Button(viewControls.transform,"-",new Vector2(-250,-3),new Vector2(44,32),()=>game.CameraControls.Zoom(1),true);
+            Button(viewControls.transform,"+",new Vector2(-200,-3),new Vector2(44,32),()=>game.CameraControls.Zoom(-1),true);
+            var resetView=Button(viewControls.transform,"RESET VIEW",new Vector2(-144,-3),new Vector2(132,32),()=>game.CameraControls.ResetView(),true);
+            resetView.GetComponentInChildren<TextMeshProUGUI>().fontSize=14;
             help=Panel("Field guide",transform,new Vector2(0,1),new Vector2(0,1),new Vector2(24,-222),new Vector2(399,-110),new Color(.08f,.1f,.09f,.86f));
             Label(help.transform,"HOLD THE ROAD",new Vector2(16,-12),new Vector2(340,25),18,accent);
-            Label(help.transform,"Build on numbered pads. Guns fire automatically.\nRight-click: cancel  •  Wheel: zoom  •  Esc: pause",new Vector2(16,-44),new Vector2(345,59),14,paper);
+            Label(help.transform,"Build overlapping defenses on numbered pads.\nRight-click: cancel  /  Esc: pause",new Vector2(16,-44),new Vector2(345,59),14,paper);
             sell=Panel("Inspection",transform,new Vector2(1,1),new Vector2(1,1),new Vector2(-360,-280),new Vector2(-24,-120),ink);
             selection=Label(sell.transform,"",new Vector2(18,-12),new Vector2(300,66),18,paper);
             Button(sell.transform,"SELL",new Vector2(18,-91),new Vector2(298,48),()=>game.SellSelected());
@@ -62,6 +70,7 @@ namespace TheLineHolds
         public void Refresh()
         {
             var m=game.Match; bool inMatch=!game.InMenu && m!=null;
+            viewControls.SetActive(inMatch && !m.Paused && !m.Ended);
             top.SetActive(inMatch); bottom.SetActive(inMatch); help.SetActive(inMatch && m.Wave==0 && !m.Paused);
             bool inspect=inMatch && game.SelectedPad>=0 && m.Towers[game.SelectedPad]!=null && !m.Ended && !m.Paused;
             sell.SetActive(inspect);

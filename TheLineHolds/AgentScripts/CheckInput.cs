@@ -22,9 +22,9 @@ public static class CheckInput
         Vector2 pointer = Vector2.zero;
         void Check(bool condition, string message) { if (!condition) throw new Exception("FAILED: " + message); }
         Task Frame() => Task.Delay(80);
-        void MouseEvent(ushort buttons = 0, float scroll = 0)
+        void MouseEvent(ushort buttons = 0, float scroll = 0, Vector2? delta = null)
         {
-            InputSystem.QueueStateEvent(mouse, new MouseState { position = pointer, buttons = buttons, scroll = new Vector2(0, scroll) });
+            InputSystem.QueueStateEvent(mouse, new MouseState { position = pointer, buttons = buttons, delta = delta ?? Vector2.zero, scroll = new Vector2(0, scroll) });
         }
         async Task Click(Vector2 position, ushort button = 1)
         {
@@ -65,10 +65,38 @@ public static class CheckInput
             await Click(Pad(1), 2); Check(game.Placement == -1, "right-click cancels placement");
             await Button("Shop Anti"); await Key(UnityEngine.InputSystem.Key.Escape);
             Check(game.Placement == -1 && !game.Match.Paused, "Escape cancels placement before pausing");
+            pointer = new Vector2(Screen.width*.5f,Screen.height*.5f); MouseEvent(); await Frame();
+            var homePosition=game.battleCamera.transform.position;var homeRotation=game.battleCamera.transform.rotation;
+            var label=UnityEngine.Object.FindObjectsByType<TMPro.TextMeshPro>().First();var labelRotation=label.transform.rotation;
             float zoom = game.battleCamera.orthographicSize;
             MouseEvent(0, 120); await Frame(); Check(game.battleCamera.orthographicSize < zoom, "wheel zooms");
-            MouseEvent(0, 4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, 12.5f), "zoom minimum clamps");
-            MouseEvent(0, -4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, 15), "zoom maximum clamps");
+            MouseEvent(0, 4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, MapCameraControls.MinimumZoom), "close zoom minimum clamps");
+            MouseEvent(0, -4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, MapCameraControls.MaximumZoom), "zoom maximum clamps");
+            await Key(UnityEngine.InputSystem.Key.R);
+            Check(Vector3.Distance(homePosition,game.battleCamera.transform.position)<.001f && Mathf.Approximately(game.battleCamera.orthographicSize,MapCameraControls.OverviewZoom), "R resets overview");
+            await Key(UnityEngine.InputSystem.Key.E); Check(Quaternion.Angle(homeRotation,game.battleCamera.transform.rotation)>1,"E rotates map");
+            await Key(UnityEngine.InputSystem.Key.Q);
+            var rotation=game.battleCamera.transform.rotation;
+            MouseEvent(4); await Frame(); MouseEvent(4,delta:new Vector2(120,0)); await Frame(); MouseEvent(); await Frame();
+            Check(Quaternion.Angle(rotation,game.battleCamera.transform.rotation)>20,"middle drag rotates map");
+            Check(Quaternion.Angle(labelRotation,label.transform.rotation)>20,"world labels follow camera orbit");
+            var panPosition=game.battleCamera.transform.position;rotation=game.battleCamera.transform.rotation;
+            InputSystem.QueueStateEvent(keyboard,new KeyboardState(UnityEngine.InputSystem.Key.LeftShift));
+            MouseEvent(4); await Frame(); MouseEvent(4,delta:new Vector2(80,50)); await Frame();MouseEvent();
+            InputSystem.QueueStateEvent(keyboard,new KeyboardState());await Frame();
+            Check(Vector3.Distance(panPosition,game.battleCamera.transform.position)>.3f && Quaternion.Angle(rotation,game.battleCamera.transform.rotation)<.01f,"Shift-middle drag pans without rotating");
+            panPosition=game.battleCamera.transform.position;await Key(UnityEngine.InputSystem.Key.W);
+            Check(Vector3.Distance(panPosition,game.battleCamera.transform.position)>.1f,"WASD pans");
+            await Button("RESET VIEW");Check(Vector3.Distance(homePosition,game.battleCamera.transform.position)<.001f && Quaternion.Angle(homeRotation,game.battleCamera.transform.rotation)<.01f,"reset button restores view");
+            await Button(">");Check(Quaternion.Angle(homeRotation,game.battleCamera.transform.rotation)>40,"rotate button works");
+            await Button("+");Check(game.battleCamera.orthographicSize<MapCameraControls.OverviewZoom,"zoom button works");
+            await Button("Shop Machine");await Click(Pad(4));
+            Check(game.Match.Towers[4]!=null && game.Match.Funds==37,"world placement works after rotation and zoom");
+            await Button("-");zoom=game.battleCamera.orthographicSize;MouseEvent(0,120);await Frame();
+            Check(Mathf.Approximately(zoom,game.battleCamera.orthographicSize),"scroll over UI does not zoom map");
+            await Button("RESET VIEW");
+            Check(game.Match.Wave==0 && game.Match.Killed==0 && game.Match.Enemies.Count==0,"camera controls do not advance combat or alter the match");
+            await Click(new Vector2(Screen.width*.5f,Screen.height*.5f),2);
             await Button("START WAVE"); Check(game.Match.Phase == MatchPhase.Combat, "mouse starts wave");
             await Key(UnityEngine.InputSystem.Key.Escape); Check(game.Match.Paused, "Escape pauses combat");
             await Button("RESUME"); Check(!game.Match.Paused, "mouse resumes combat");
@@ -76,7 +104,7 @@ public static class CheckInput
             Check(game.Match.Wave == 0 && game.Match.Funds == 300 && game.Match.Lives == 20, "pause Restart resets match");
             await Key(UnityEngine.InputSystem.Key.Escape); await Button("MAIN MENU");
             Check(game.InMenu && game.Match == null, "pause Main Menu clears match");
-            const string result = "PASS frame-driven mouse placement/inspection/selling, rejected purchases, right-click, Escape priority, wheel limits, wave start, pause/resume/restart/menu";
+            const string result = "PASS frame-driven mouse placement/inspection/selling, rejected purchases, right-click, Escape priority, close zoom limits, orbit/drag/pan/reset buttons and keys, rotated placement, UI scroll isolation, wave start, pause/resume/restart/menu";
             Debug.Log("[Input verification] " + result);
             return result;
         }
