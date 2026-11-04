@@ -19,7 +19,7 @@ namespace TheLineHolds
         public void Initialize(Camera camera, BattleController controller)
         {
             view=camera; game=controller;
-            labels=Object.FindObjectsByType<TMPro.TextMeshPro>(FindObjectsSortMode.None);
+            labels=Object.FindObjectsByType<TMPro.TextMeshPro>();
             labelRotations=new Quaternion[labels.Length];
             for(int i=0;i<labels.Length;i++)labelRotations[i]=labels[i].transform.rotation;
             homeRotation=transform.rotation;

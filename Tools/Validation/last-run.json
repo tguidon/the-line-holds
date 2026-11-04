@@ -1,103 +1,174 @@
 {
-  "date": "2026-11-03",
+  "date": "2026-11-04",
   "unity": "6000.6.7f1",
   "urp": "17.6.0",
-  "runtime_source_sha256": "3575ce785cf060ed7ee025d0a006bc889acd66ebf5615f0054929bc4035e8814",
-  "focused_checks": "Passed economy, placement, pause, wave gates, defeat priority, rating boundaries, stable targeting, splash and exactly-once rewards",
+  "unity_cli": "1.0.0-beta.16",
+  "runtime_source_sha256": "f1a2ffd99b84eb8aba40a55b5a3b31b4c77ebadaa394042946981e79559498de",
+  "source_hash_method": "Sorted paths relative to Assets/TheLineHolds/Scripts, each UTF-8 path followed by file bytes",
+  "checkpoints": {
+    "combat": "b011b67",
+    "camera": "c5d943e"
+  },
+  "focused_checks": "Passed economy, invalid orders, pause, wave gates, terminal freeze, defeat priority, ratings, stable targeting, exactly-once rewards, squad totals/lanes, armor profiles/priority, cluster selection, and actual single-target/splash damage",
+  "authored_waves": {
+    "units": [
+      18,
+      24,
+      28,
+      43,
+      58
+    ],
+    "tanks": [
+      0,
+      0,
+      4,
+      7,
+      10
+    ],
+    "total_units": 171,
+    "infantry_per_squad": 6
+  },
+  "opening_gun_regression": {
+    "before": {
+      "kills": 8,
+      "escapes": 0,
+      "peakEnemies": 1,
+      "furthestMetres": 1.6
+    },
+    "after": {
+      "kills": 4,
+      "escapes": 14,
+      "peakEnemies": 15
+    }
+  },
   "balance_layouts": [
     {
-      "combatSeconds": 317,
-      "lives": 20,
-      "kills": 74,
-      "escapes": 0
+      "strategy": "Mixed bends",
+      "outcome": "Victory",
+      "lives": 18,
+      "kills": 169,
+      "escapes": 2,
+      "combatSeconds": 283
     },
     {
-      "combatSeconds": 286,
+      "strategy": "Mixed entrance/middle",
+      "outcome": "Victory",
       "lives": 20,
-      "kills": 74,
-      "escapes": 0
+      "kills": 171,
+      "escapes": 0,
+      "combatSeconds": 243
+    },
+    {
+      "strategy": "Machine guns only",
+      "outcome": "Defeat",
+      "wave": 5,
+      "lives": 0,
+      "kills": 150,
+      "escapes": 20,
+      "combatSeconds": 336
+    },
+    {
+      "strategy": "Lone opening gun",
+      "outcome": "Defeat",
+      "wave": 2,
+      "lives": 0,
+      "kills": 9,
+      "escapes": 20,
+      "combatSeconds": 94
+    },
+    {
+      "strategy": "Never reinvest",
+      "outcome": "Defeat",
+      "wave": 5,
+      "lives": 0,
+      "kills": 135,
+      "escapes": 20,
+      "combatSeconds": 314
     }
   ],
-  "standalone_mac_normal_speed": {
-    "combatSeconds": 317,
-    "renderedFrames": 18950,
-    "stars": 3,
-    "lives": 20,
-    "kills": 74,
-    "escapes": 0
-  },
-  "final_standalone_mac_regression": {
-    "timeScale": 8,
-    "realSeconds": 40,
-    "renderedFrames": 2379,
-    "stars": 3,
-    "lives": 20,
-    "kills": 74,
-    "escapes": 0,
-    "errorEntries": 0,
-    "uiRaycastsAndCallbacks": "Passed",
-    "lifecycle": "Passed"
-  },
-  "builds": {
-    "macOS": {
-      "result": "Succeeded",
-      "totalErrors": 0,
-      "totalWarnings": 0,
-      "totalSizeBytes": 80875836,
-      "buildTimeMs": 8036
-    },
-    "Windows": {
-      "result": "Succeeded",
-      "totalErrors": 0,
-      "totalWarnings": 0,
-      "totalSizeBytes": 107486989,
-      "buildTimeMs": 7438
-    },
-    "macOS-QA": {
-      "result": "Succeeded",
-      "totalErrors": 0,
-      "totalWarnings": 0,
-      "totalSizeBytes": 187813322,
-      "buildTimeMs": 12599
-    }
-  },
-  "windows_runtime": "Deferred by user; cross-build succeeded, runtime unverified",
   "frame_driven_input_check": {
     "mode": "Editor Play Mode",
     "eventSource": "Temporary Input System mouse and keyboard devices, queued across real frames",
     "passed": [
       "menu play",
       "shop selection",
-      "world placement",
-      "occupied-pad inspection",
+      "placement",
+      "same-frame shop-to-pad placement",
+      "inspection",
       "sell refund",
-      "unaffordable rejection",
-      "right-click cancellation",
-      "Escape placement priority",
-      "mouse-wheel zoom",
-      "zoom limits",
-      "wave start",
-      "pause",
-      "resume",
-      "pause restart",
-      "pause main menu",
-      "shop-to-pad movement and placement in a single input frame"
+      "invalid purchase rejection",
+      "right-click cancel",
+      "Escape priority",
+      "wheel zoom 5.5\u201318",
+      "Q/E orbit",
+      "middle-drag orbit",
+      "Shift-middle-drag pan",
+      "WASD pan",
+      "R reset",
+      "view buttons",
+      "label orbit",
+      "placement after rotation/zoom",
+      "UI scroll isolation",
+      "start wave",
+      "pause/resume",
+      "restart",
+      "main menu"
     ],
     "temporaryDevicesAndSettingsRestored": true
   },
+  "standalone_mac_normal_speed": {
+    "status": "Passed",
+    "timeScale": 1,
+    "combatSeconds": 283,
+    "renderedFrames": 16883,
+    "stars": 3,
+    "lives": 18,
+    "kills": 169,
+    "escapes": 2,
+    "errorEntries": 0,
+    "escape_wave": 3,
+    "escape_type": "Light tank"
+  },
+  "standalone_ui_and_lifecycle": "Passed menu/shop/camera/start/pause/resume raycasts and callbacks; cancellation priority, freeze, resume, restart, menu cleanup",
+  "builds": {
+    "macOS": {
+      "result": "Succeeded",
+      "totalErrors": 0,
+      "totalWarnings": 0,
+      "totalSizeBytes": 80878416,
+      "buildTimeMs": 5954
+    },
+    "Windows": {
+      "result": "Succeeded",
+      "totalErrors": 0,
+      "totalWarnings": 0,
+      "totalSizeBytes": 107489569,
+      "buildTimeMs": 7483
+    },
+    "macOS-QA": {
+      "result": "Succeeded",
+      "totalErrors": 0,
+      "totalWarnings": 0,
+      "totalSizeBytes": 187817414,
+      "buildTimeMs": 7088
+    }
+  },
+  "packages": {
+    "macOS": "CRC verified, 28.6 MiB",
+    "Windows": "CRC verified, 38.3 MiB",
+    "debug_and_backup_files_excluded": true
+  },
+  "release_pipeline_server_and_compiler_assemblies_absent": true,
+  "windows_runtime": "Deferred by user; refreshed cross-build succeeded, runtime unverified; future Windows VM",
   "evaluation_scope": {
     "current_platform": "macOS",
     "windows_runtime_testing": "Deferred until Windows becomes a release goal",
-    "blocks_prototype_completion": false,
-    "decision_date": "2026-11-03",
-    "future_windows_test_environment": "Windows VM, when the user is ready"
+    "blocks_prototype_completion": false
   },
   "mac_release_startup_smoke": {
     "passed": true,
     "player_process_alive": true,
     "startup_exception_or_compile_error_lines": 0,
-    "scope": "Release startup only; complete matches are separately recorded above",
     "left_open_for_playtesting": true
-  },
-  "prototype_implementation_commit": "d55d9ec"
+  }
 }
