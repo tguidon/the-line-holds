@@ -7,6 +7,7 @@
 - Use Git with Git LFS for large binary assets. Configure tracking before committing assets, and ignore Unity-generated folders such as `Library/`, `Temp/`, and build output.
 
 ## Development workflow
+- Commit work at validated checkpoints as development progresses, using small, logically grouped commits with clear messages. Keep each Unity asset with its `.meta` file, review the staged diff, and exclude generated files, local settings, secrets, and build output before committing. Do not wait until the entire prototype or feature is finished to record its history.
 - Prefer the installed Unity CLI and agent skills for project setup, editor automation, tests, and builds.
 - Install the Unity Pipeline package when creating the project and verify the live editor connection with `unity status`.
 - Drive a connected editor through the CLI; do not hand-edit scene, prefab, or asset YAML while it is open.

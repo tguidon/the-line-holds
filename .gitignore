@@ -1,0 +1,65 @@
+# Unity-generated caches, local settings, captures, and player/build output.
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+MemoryCaptures/
+Recordings/
+CrashReports/
+
+# IDE configuration and Unity-generated solutions/projects.
+.vs/
+.vscode/
+.idea/
+.consulo/
+*.csproj
+*.sln
+*.slnx
+*.user
+*.userprefs
+*.DotSettings.user
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+*.suo
+*.tmp
+*.log
+
+# Python tooling and Blender backup files; retain .py and editable .blend sources.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.blend[0-9]
+*.blend[0-9][0-9]
+
+# OS-generated files.
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Local credentials and environment overrides. Keep documented templates.
+.env
+.env.*
+!.env.example
+!.env.template
+*.p12
+*.pfx
+*.keystore
+*.jks
+
+# Pipeline's transient build assets and local server descriptors/tokens.
+**/Assets/Settings/Pipeline/Resources/RuntimePipelineConfig.asset*
+**/Assets/Settings/Pipeline/Resources/RuntimePipelineBuildInfo.asset*
+**/.unity-pipeline-port
+**/.unity-pipeline-runtime-port
