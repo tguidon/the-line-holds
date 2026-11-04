@@ -58,8 +58,11 @@ $RECYCLE.BIN/
 *.keystore
 *.jks
 
-# Pipeline's transient build assets and local server descriptors/tokens.
-**/Assets/Settings/Pipeline/Resources/RuntimePipelineConfig.asset*
-**/Assets/Settings/Pipeline/Resources/RuntimePipelineBuildInfo.asset*
+# Pipeline creates this Assets folder only for transient build instrumentation.
+# Authored Pipeline configuration under ProjectSettings remains versioned.
+**/Assets/Settings/Pipeline/
+**/Assets/Settings/Pipeline.meta
+
+# Local Pipeline server descriptors/tokens.
 **/.unity-pipeline-port
 **/.unity-pipeline-runtime-port
