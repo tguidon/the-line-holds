@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07bc0a4d61dce4c42b00552797dbff75, type: 3}
+  m_Name: Mortar
+  m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.DefenseDefinition
+  displayName: Mortar
+  description: Explosive / area damage
+  cost: 150
+  range: 4.8
+  interval: 3.1
+  damage: 32
+  splashRadius: 1.65
+  flightTime: 0.95
+  prefab: {fileID: 428005552416271594, guid: 1b448e76ab9a8421e8c41e793d795861, type: 3}

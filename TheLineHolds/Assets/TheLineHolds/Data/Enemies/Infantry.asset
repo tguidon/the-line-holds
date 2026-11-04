@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 769d371ce75084085a2455795b1eff98, type: 3}
+  m_Name: Infantry
+  m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.EnemyDefinition
+  displayName: Infantry
+  health: 40
+  speed: 1.05
+  reward: 10
+  prefab: {fileID: 7563923182228393798, guid: d79df0ed0b5294088bc6eb4ecad150a2, type: 3}
