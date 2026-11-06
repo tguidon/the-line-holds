@@ -16,6 +16,13 @@ Fix readability issues throughout all five steps. Use the polished section from 
 
 ## Progress log
 
-November 5, 2026: Round 1 feedback received. Implementing modifier-drag rotation, road surface repair, responsive HUD regions, tank spacing, round funds, and a harder baseline. The next hands-on round remains pending.
+November 5, 2026: Round 1 feedback implemented in `a12aa99` and `92b5610`. Camera shortcuts, road clipping, UI overlap, tank spacing, round funds, and baseline difficulty are updated. Regression checks cover each change. See [VALIDATION.md](VALIDATION.md) for the evidence.
+
+| Playtest round | Status | Next action |
+| --- | --- | --- |
+| 1 | Feedback implemented | Confirm the changes in the next round. |
+| 2 | Pending | User plays the updated build and reports placement, tower roles, spending, pressure, pacing, and remaining bugs. |
+
+Keep step 1 In progress until round 2 findings and any resulting changes are recorded.
 
 For each update, record the date, step number, work completed, playtest or visual findings, and related commits.

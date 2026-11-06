@@ -1,174 +1,244 @@
 {
-  "date": "2026-11-04",
+  "date": "2026-11-05",
   "unity": "6000.6.7f1",
   "urp": "17.6.0",
-  "unity_cli": "1.0.0-beta.16",
-  "runtime_source_sha256": "f1a2ffd99b84eb8aba40a55b5a3b31b4c77ebadaa394042946981e79559498de",
-  "source_hash_method": "Sorted paths relative to Assets/TheLineHolds/Scripts, each UTF-8 path followed by file bytes",
+  "unity_cli": "1.0.0-beta.17",
+  "runtime_source_sha256": "1abada8df9d15747ed23e7282048d7c34ad2ae2e428c7afa21c549e5884796f5",
+  "source_hash_method": "Sorted UTF-8 paths relative to Assets/TheLineHolds/Scripts, each followed by file bytes",
   "checkpoints": {
-    "combat": "b011b67",
-    "camera": "c5d943e"
+    "usability": "a12aa99",
+    "baseline_and_spacing": "92b5610"
   },
-  "focused_checks": "Passed economy, invalid orders, pause, wave gates, terminal freeze, defeat priority, ratings, stable targeting, exactly-once rewards, squad totals/lanes, armor profiles/priority, cluster selection, and actual single-target/splash damage",
+  "road_regression": {
+    "before_minimum_clearance_m": -0.0484,
+    "after_minimum_clearance_m": 0.045,
+    "triangle_interiors_sampled": true,
+    "split_at_terrain_slope_boundaries": true
+  },
+  "camera_modifier": {
+    "macOS": "Command + left drag",
+    "Windows": "Ctrl + left drag",
+    "middle_drag_retained": true,
+    "modifier_drag_does_not_purchase": true,
+    "macOS_injected_input": "Passed",
+    "Windows_runtime": "Deferred"
+  },
+  "hud_regression": {
+    "before": "Counters/Pause and briefing/Start overlapped at narrow canvas widths",
+    "logical_widths_passed": [
+      1100,
+      1200,
+      1386,
+      1600,
+      2000
+    ],
+    "counters_and_briefings_not_truncated": true
+  },
+  "tank_spacing": {
+    "model_bounds_m": [
+      1.29,
+      0.96,
+      2.0
+    ],
+    "old_minimum_centre_distance_m": 0.73,
+    "new_minimum_centre_distance_m": 2.77,
+    "minimum_route_gap_m": 4.8,
+    "section_interval_seconds": 5.5,
+    "compressed_spawn_stress": "Passed"
+  },
+  "round_bonuses": [
+    70,
+    80,
+    90,
+    100,
+    110
+  ],
   "authored_waves": {
     "units": [
       18,
-      24,
-      28,
-      43,
-      58
+      30,
+      40,
+      56,
+      72
     ],
     "tanks": [
       0,
       0,
       4,
-      7,
-      10
+      8,
+      12
     ],
-    "total_units": 171,
+    "total_units": 216,
     "infantry_per_squad": 6
   },
-  "opening_gun_regression": {
-    "before": {
-      "kills": 8,
-      "escapes": 0,
-      "peakEnemies": 1,
-      "furthestMetres": 1.6
-    },
-    "after": {
-      "kills": 4,
-      "escapes": 14,
-      "peakEnemies": 15
-    }
-  },
+  "focused_checks": "Passed economy and bonuses, invalid orders, sale rounding, pause, wave gates, terminal freeze, defeat priority, ratings, stable targeting, exactly-once rewards, squad formation, armor profiles/priority, cluster selection, actual single-target/splash damage",
   "balance_layouts": [
     {
       "strategy": "Mixed bends",
       "outcome": "Victory",
-      "lives": 18,
-      "kills": 169,
-      "escapes": 2,
-      "combatSeconds": 283
+      "lives": 20,
+      "kills": 216,
+      "escapes": 0,
+      "combatSeconds": 315,
+      "final_wave_route_percent": 92,
+      "rear_shots": 87
     },
     {
       "strategy": "Mixed entrance/middle",
       "outcome": "Victory",
-      "lives": 20,
-      "kills": 171,
-      "escapes": 0,
-      "combatSeconds": 243
+      "lives": 19,
+      "kills": 215,
+      "escapes": 1,
+      "combatSeconds": 296,
+      "final_wave_route_percent": 100,
+      "rear_shots": 106
+    },
+    {
+      "strategy": "Five MG, three cannons, two mortars",
+      "outcome": "Victory",
+      "lives": 3,
+      "kills": 199,
+      "escapes": 17,
+      "combatSeconds": 314,
+      "final_wave_route_percent": 86,
+      "rear_shots": 28
     },
     {
       "strategy": "Machine guns only",
       "outcome": "Defeat",
       "wave": 5,
       "lives": 0,
-      "kills": 150,
+      "kills": 188,
       "escapes": 20,
-      "combatSeconds": 336
+      "combatSeconds": 310
     },
     {
       "strategy": "Lone opening gun",
       "outcome": "Defeat",
       "wave": 2,
       "lives": 0,
-      "kills": 9,
+      "kills": 8,
       "escapes": 20,
-      "combatSeconds": 94
+      "combatSeconds": 84
     },
     {
       "strategy": "Never reinvest",
       "outcome": "Defeat",
-      "wave": 5,
+      "wave": 3,
       "lives": 0,
-      "kills": 135,
+      "kills": 65,
       "escapes": 20,
-      "combatSeconds": 314
+      "combatSeconds": 138
     }
   ],
+  "mixed_layout_acceptance": "Ten pads filled before wave 5, at least 75% final-wave route depth and five rear-defense shots",
   "frame_driven_input_check": {
     "mode": "Editor Play Mode",
-    "eventSource": "Temporary Input System mouse and keyboard devices, queued across real frames",
     "passed": [
       "menu play",
-      "shop selection",
+      "shop",
       "placement",
-      "same-frame shop-to-pad placement",
+      "same-frame shop-to-pad",
       "inspection",
-      "sell refund",
-      "invalid purchase rejection",
-      "right-click cancel",
+      "selling",
+      "invalid orders",
+      "cancellation",
       "Escape priority",
-      "wheel zoom 5.5\u201318",
-      "Q/E orbit",
-      "middle-drag orbit",
-      "Shift-middle-drag pan",
-      "WASD pan",
-      "R reset",
+      "zoom limits",
+      "middle drag",
+      "Command drag",
+      "modifier drag over build pad preserves funds/selection",
+      "pan",
+      "reset",
       "view buttons",
-      "label orbit",
-      "placement after rotation/zoom",
+      "rotated placement",
       "UI scroll isolation",
-      "start wave",
+      "wave start",
       "pause/resume",
       "restart",
-      "main menu"
+      "menu"
     ],
-    "temporaryDevicesAndSettingsRestored": true
+    "temporary_devices_and_settings_restored": true,
+    "editor_only_focus_routing_temporarily_overridden": true
+  },
+  "native_resize": {
+    "passed_sizes": [
+      [
+        1600,
+        900
+      ],
+      [
+        1200,
+        1000
+      ],
+      [
+        1024,
+        768
+      ],
+      [
+        1920,
+        1080
+      ]
+    ],
+    "zoom": 5.5,
+    "orbit_degrees": 135,
+    "ui_overlap_or_truncation": false,
+    "narrow_hud_and_close_road_visually_inspected": true
   },
   "standalone_mac_normal_speed": {
     "status": "Passed",
     "timeScale": 1,
-    "combatSeconds": 283,
-    "renderedFrames": 16883,
+    "combatSeconds": 315,
+    "renderedFrames": 18837,
     "stars": 3,
-    "lives": 18,
-    "kills": 169,
-    "escapes": 2,
+    "lives": 20,
+    "kills": 216,
+    "escapes": 0,
     "errorEntries": 0,
-    "escape_wave": 3,
-    "escape_type": "Light tank"
+    "final_wave_route_depth": 0.921,
+    "rear_shots": 85
   },
-  "standalone_ui_and_lifecycle": "Passed menu/shop/camera/start/pause/resume raycasts and callbacks; cancellation priority, freeze, resume, restart, menu cleanup",
+  "standalone_ui_and_lifecycle": "Passed menu/shop/camera/start/pause/resume raycasts and callbacks, cancellation, freeze, restart and cleanup",
   "builds": {
     "macOS": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 80878416,
-      "buildTimeMs": 5954
+      "totalSizeBytes": 80913476,
+      "buildTimeMs": 5283
     },
     "Windows": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 107489569,
-      "buildTimeMs": 7483
+      "totalSizeBytes": 107524629,
+      "buildTimeMs": 6699
     },
     "macOS-QA": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 187817414,
-      "buildTimeMs": 7088
+      "totalSizeBytes": 187853114,
+      "buildTimeMs": 12239
     }
   },
   "packages": {
-    "macOS": "CRC verified, 28.6 MiB",
-    "Windows": "CRC verified, 38.3 MiB",
+    "macOS": "CRC OK, 28.6 MiB",
+    "Windows": "CRC OK, 38.3 MiB",
     "debug_and_backup_files_excluded": true
   },
   "release_pipeline_server_and_compiler_assemblies_absent": true,
-  "windows_runtime": "Deferred by user; refreshed cross-build succeeded, runtime unverified; future Windows VM",
-  "evaluation_scope": {
-    "current_platform": "macOS",
-    "windows_runtime_testing": "Deferred until Windows becomes a release goal",
-    "blocks_prototype_completion": false
+  "windows_runtime": "Deferred by user; cross-build succeeded; future Windows VM",
+  "roadmap": {
+    "step_1": "In progress",
+    "round_1": "Feedback implemented",
+    "round_2": "Pending user playtest",
+    "steps_2_through_5": "Pending"
   },
   "mac_release_startup_smoke": {
     "passed": true,
     "player_process_alive": true,
     "startup_exception_or_compile_error_lines": 0,
-    "left_open_for_playtesting": true
+    "left_open_for_round_2": true
   }
 }
