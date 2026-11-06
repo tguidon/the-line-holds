@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.EnemyDefinition
   displayName: Infantry
   armored: 0
+  spawnSeparation: 0
   health: 80
-  speed: 1.4
+  speed: 1.5
   reward: 4
   prefab: {fileID: 7563923182228393798, guid: d79df0ed0b5294088bc6eb4ecad150a2, type: 3}

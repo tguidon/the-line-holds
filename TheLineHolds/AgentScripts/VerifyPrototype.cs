@@ -15,8 +15,9 @@ public static class VerifyPrototype
     {
         var report=new StringBuilder(); var d=Defenses;
         Check(Waves.All(w=>w!=null),"all five waves exist");
-        Check(Waves.Select(w=>w.UnitCount).SequenceEqual(new[]{18,24,28,43,58}),"authored wave counts");
-        Check(Waves.Select(w=>w.spawns.Where(s=>s.enemy.armored).Sum(s=>s.UnitCount)).SequenceEqual(new[]{0,0,4,7,10}),"authored armor composition");
+        Check(Waves.Select(w=>w.UnitCount).SequenceEqual(new[]{18,30,40,56,72}),"authored wave counts");
+        Check(Waves.Select(w=>w.spawns.Where(s=>s.enemy.armored).Sum(s=>s.UnitCount)).SequenceEqual(new[]{0,0,4,8,12}),"authored armor composition");
+        Check(Enumerable.Range(1,5).Select(MatchState.WaveReward).SequenceEqual(new[]{70,80,90,100,110}),"modest increasing round rewards");
         var m=New(); Check(m.Funds==300 && m.Lives==20 && m.Wave==0 && m.Enemies.Count==0,"fresh state");
         Check(m.Build(0,d[0]),"purchase");Check(m.Funds==225,"cost exactly once");Check(!m.Build(0,d[1]) && m.Funds==225,"occupied pad rejects purchase");
         Check(m.Build(1,d[2]),"mortar purchase");Check(!m.Build(2,d[1]) && m.Funds==75,"unaffordable purchase rejects");
@@ -26,7 +27,7 @@ public static class VerifyPrototype
         Check(m.Enemies[0].Distance==distance && left==m.Remaining && (m.Shots.Count==0 || age==m.Shots[0].Age),"pause freezes movement spawning projectiles");
         report.AppendLine("PASS economy, invalid purchases, sale rounding, paused orders, wave overlap and pause freeze");
         m=New();m.StartWave();for(int i=0;i<20000 && m.Phase==MatchPhase.Combat;i++)m.Step(1f/60);
-        Check(m.Escaped==18 && m.Killed==0 && m.Lives==2 && m.Funds==350 && m.CompletedWaves==1,"escapes cost lives, grant no reward, wave grants 50");
+        Check(m.Escaped==18 && m.Killed==0 && m.Lives==2 && m.Funds==370 && m.CompletedWaves==1,"escapes cost lives, grant no reward, wave grants 70");
         m.StartWave();for(int i=0;i<20000 && !m.Ended;i++)m.Step(1f/60);
         Check(m.Phase==MatchPhase.Defeat && m.Lives==0 && m.Escaped==20 && m.CompletedWaves==1,"neglect loses immediately");
         int escapes=m.Escaped;m.Step(1000);Check(m.Escaped==escapes && m.Shots.Count==0 && !m.StartWave(),"ended state frozen");
@@ -41,7 +42,7 @@ public static class VerifyPrototype
         var testGun=ScriptableObject.CreateInstance<DefenseDefinition>();testGun.cost=1;testGun.damage=80;testGun.range=10;testGun.interval=10;testGun.flightTime=.1f;testGun.splashRadius=2;
         m=new MatchState(new[]{pair},new BattleRoute(new[]{Vector3.zero,Vector3.forward*100}),new[]{Vector3.right,Vector3.left});m.Build(0,testGun);m.Build(1,testGun);m.StartWave();m.Step(.01f);
         Check(m.Target(m.Towers[0]).Id==1,"equal-distance targeting chooses stable first ID");
-        m.Step(.2f);Check(m.Killed==2 && m.Funds==356 && m.Enemies.Count==0,"overlapping splash shots reward each kill exactly once");
+        m.Step(.2f);Check(m.Killed==2 && m.Funds==376 && m.Enemies.Count==0,"overlapping splash shots reward each kill exactly once");
         int funds=m.Funds;m.Step(50);Check(m.Funds==funds,"completed wave rewards exactly once");
         UnityEngine.Object.DestroyImmediate(pair);UnityEngine.Object.DestroyImmediate(testGun);
         report.AppendLine("PASS stable targeting, splash damage, simultaneous lethal shots, exactly-once kill and wave rewards");
@@ -63,7 +64,7 @@ public static class VerifyPrototype
         Check(m.Enemies.Max(e=>e.Distance)-m.Enemies.Min(e=>e.Distance)<1.6f,"squad stays compact");
         m=new MatchState(new[]{squad},route,new[]{Vector3.zero});m.Build(0,d[1]);
         var lead=new EnemyState{Id=1,Definition=infantry,Health=80,Distance=3,Position=route.Position(3)};
-        var armor=new EnemyState{Id=2,Definition=tank,Health=360,Distance=1,Position=route.Position(1)};
+        var armor=new EnemyState{Id=2,Definition=tank,Health=tank.health,Distance=1,Position=route.Position(1)};
         m.Enemies.Add(lead);m.Enemies.Add(armor);
         Check(m.Target(m.Towers[0])==armor,"anti-tank prioritizes armor over leading infantry");
         m=new MatchState(new[]{squad},route,new[]{Vector3.zero});m.Build(0,d[2]);

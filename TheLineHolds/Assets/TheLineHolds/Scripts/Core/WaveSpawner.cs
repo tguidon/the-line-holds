@@ -20,6 +20,13 @@ namespace TheLineHolds
             while (next < wave.spawns.Length && clock <= 0)
             {
                 var entry = wave.spawns[next];
+                // Delay the whole following column rather than releasing a catch-up burst.
+                // This applies across authored entries as well as within a vehicle section.
+                bool blocked=false;
+                if(entry.enemy.spawnSeparation>0)
+                    foreach(var active in match.Enemies)
+                        if(active.Definition==entry.enemy && active.Distance<entry.enemy.spawnSeparation) { blocked=true;break; }
+                if(blocked) { clock=0;return; }
                 float lane = entry.enemy.armored ? 0 : (member % 2 == 0 ? -.27f : .27f);
                 match.Enemies.Add(new EnemyState {
                     Id = ++enemyId, Definition = entry.enemy, Health = entry.enemy.health,

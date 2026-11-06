@@ -63,18 +63,18 @@ namespace TheLineHolds.Editor
         public static WaveDefinition[] TuneCombat()
         {
             if(EditorApplication.isPlaying) throw new InvalidOperationException("Stop Play Mode before tuning assets.");
-            var infantry=Enemy("Infantry",80,1.4f,4);
-            var tank=Enemy("LightTank",360,.9f,16); tank.armored=true;
-            var mg=Defense("MachineGun","Machine-gun nest","Single infantry / weak vs armor",75,3.3f,.3f,8,0,.12f);
+            var infantry=Enemy("Infantry",80,1.5f,4);
+            var tank=Enemy("LightTank",650,1.05f,16); tank.armored=true; tank.spawnSeparation=4.8f;
+            var mg=Defense("MachineGun","Machine-gun nest","Single infantry / weak vs armor",75,3.3f,.32f,8,0,.12f);
             mg.priority=TargetPriority.First; mg.infantryDamageMultiplier=1; mg.armorDamageMultiplier=.15f;
             var at=Defense("AntiTank","Anti-tank gun","Armor priority / single target",125,5.8f,2,95,0,.35f);
             at.priority=TargetPriority.Armor; at.infantryDamageMultiplier=.6f; at.armorDamageMultiplier=1;
             var mortar=Defense("Mortar","Mortar","Targets clusters / splash damage",150,4.8f,3.8f,42,1.4f,.95f);
             mortar.priority=TargetPriority.Cluster; mortar.infantryDamageMultiplier=1; mortar.armorDamageMultiplier=.35f;
             var waves=new WaveDefinition[5];
-            int[] squads={3,4,4,6,8}, tanks={0,0,4,7,10};
-            float[] gaps={5,4.5f,4,3.5f,2.8f};
-            string[] briefings={"3 infantry squads. Build overlapping coverage.","4 squads. Mortars break up tight formations.","4 squads + 4 tanks. Anti-tank guns prioritize armor.","6 squads + 7 tanks. Layer infantry and armor defenses.","8 squads + 10 tanks. Hold the combined assault."};
+            int[] squads={3,5,6,8,10}, tanks={0,0,4,8,12};
+            float[] gaps={5,3.6f,2.8f,1.4f,.8f};
+            string[] briefings={"3 infantry squads. Build overlapping coverage.","5 squads. Mortars break up tight formations.","6 squads + 4 tanks. Anti-tank guns prioritize armor.","8 squads + 8 tanks. Layer infantry and armor defenses.","10 squads + 12 tanks. Hold the combined assault."};
             for(int w=0;w<5;w++)
             {
                 var wave=Asset<WaveDefinition>($"Data/Waves/Wave{w+1}"); wave.briefing=briefings[w];
@@ -83,7 +83,7 @@ namespace TheLineHolds.Editor
                 {
                     list.Add(new SpawnEntry(infantry,list.Count==0?1:gaps[w],6,.2f));
                     int armor=tanks[w]/squads[w]+(squad<tanks[w]%squads[w]?1:0);
-                    if(armor>0) list.Add(new SpawnEntry(tank,1.2f,armor,1.4f));
+                    if(armor>0) list.Add(new SpawnEntry(tank,1.2f,armor,5.5f));
                 }
                 wave.spawns=list.ToArray(); EditorUtility.SetDirty(wave); waves[w]=wave;
             }
@@ -97,7 +97,7 @@ namespace TheLineHolds.Editor
         }
         static EnemyDefinition Enemy(string name,float hp,float speed,int reward)
         {
-            var d=Asset<EnemyDefinition>("Data/Enemies/"+name); d.displayName=name=="LightTank"?"Light tank":"Infantry"; d.health=hp;d.speed=speed;d.reward=reward;d.armored=false;d.prefab=AssetDatabase.LoadAssetAtPath<GameObject>(Root+"/Prefabs/"+name+".prefab") ?? Prefab(name);EditorUtility.SetDirty(d);return d;
+            var d=Asset<EnemyDefinition>("Data/Enemies/"+name); d.displayName=name=="LightTank"?"Light tank":"Infantry"; d.health=hp;d.speed=speed;d.reward=reward;d.armored=false;d.spawnSeparation=0;d.prefab=AssetDatabase.LoadAssetAtPath<GameObject>(Root+"/Prefabs/"+name+".prefab") ?? Prefab(name);EditorUtility.SetDirty(d);return d;
         }
         static DefenseDefinition Defense(string name,string title,string description,int cost,float range,float interval,float damage,float splash,float flight)
         {

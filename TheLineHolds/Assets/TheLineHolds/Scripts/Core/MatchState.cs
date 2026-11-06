@@ -21,7 +21,8 @@ namespace TheLineHolds
     // Coordinates the small simulation systems and owns match outcomes. Views never award rewards or damage.
     public sealed class MatchState
     {
-        public const int StartingFunds = 300, StartingLives = 20, WaveReward = 50;
+        public const int StartingFunds = 300, StartingLives = 20;
+        public static int WaveReward(int wave) => 60 + 10 * Mathf.Clamp(wave,1,5);
         public int Funds => economy.Funds;
         public int Lives { get; private set; } = StartingLives;
         public int Wave { get; private set; }
@@ -85,7 +86,7 @@ namespace TheLineHolds
             if (!spawner.Complete || Enemies.Count != 0) return;
             Shots.Clear();
             CompletedWaves++;
-            economy.Credit(WaveReward);
+            economy.Credit(WaveReward(Wave));
             Journal?.Invoke($"Wave {Wave} complete; lives={Lives}, kills={Killed}, escapes={Escaped}, funds={Funds}");
             if (Wave == waves.Length) Finish(MatchPhase.Victory);
             else { Phase = MatchPhase.Preparation; Emit("wave", Vector3.zero); }

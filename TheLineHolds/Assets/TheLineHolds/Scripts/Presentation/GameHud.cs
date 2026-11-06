@@ -83,7 +83,7 @@ namespace TheLineHolds
                 string divider=layoutWidth<1500?"\n":"     •     ";
                 status.text=$"LIVES  {m.Lives:00}     •     FUNDS  ${m.Funds}{divider}WAVE  {m.Wave} / 5     •     HOSTILES  {m.Remaining}";
                 notice.text=game.Notice;
-                waveInfo.text=m.Phase==MatchPhase.Preparation?"ORDERS REQUIRED\n"+game.waves[Mathf.Min(m.Wave,4)].briefing:"ENGAGEMENT IN PROGRESS\nBuild and sell during combat.";
+                waveInfo.text=m.Phase==MatchPhase.Preparation?(m.Wave==0?"ORDERS REQUIRED\n":$"ROUND BONUS +${MatchState.WaveReward(m.Wave)} / ORDERS REQUIRED\n")+game.waves[Mathf.Min(m.Wave,4)].briefing:"ENGAGEMENT IN PROGRESS\nBuild and sell during combat.";
                 startWave.interactable=m.Phase==MatchPhase.Preparation && !m.Paused;
                 startWave.GetComponentInChildren<TextMeshProUGUI>().text=m.Phase==MatchPhase.Combat?"WAVE IN PROGRESS":$"START WAVE  {Mathf.Min(m.Wave+1,5)}  >";
                 for(int i=0;i<3;i++)
