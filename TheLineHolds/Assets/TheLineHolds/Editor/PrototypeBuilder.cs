@@ -153,16 +153,17 @@ namespace TheLineHolds.Editor
         }
         static void BuildRoad(Transform parent)
         {
-            var route=new BattleRoute(BattleRoute.DefaultPoints); int n=Mathf.CeilToInt(route.Length/.2f);var vertices=new Vector3[(n+1)*2];var triangles=new int[n*6];
-            for(int i=0;i<=n;i++)
-            {
-                float d=route.Length*i/n;var p=route.Position(d);var direction=route.Position(Mathf.Min(route.Length,d+.1f))-route.Position(Mathf.Max(0,d-.1f));var side=Vector3.Cross(Vector3.up,direction).normalized*.62f;
-                for(int j=0;j<2;j++){var v=p+(j==0?side:-side);v.y=BattleRoute.Ground(v.x)+.045f;vertices[i*2+j]=v;}
-                if(i<n){int a=i*2,k=i*6;triangles[k]=a;triangles[k+1]=a+1;triangles[k+2]=a+2;triangles[k+3]=a+1;triangles[k+4]=a+3;triangles[k+5]=a+2;}
-            }
-            var mesh=new Mesh{vertices=vertices,triangles=triangles};mesh.RecalculateNormals();SaveMesh(mesh,"RoadMesh");
+            var route=new BattleRoute(BattleRoute.DefaultPoints);
+            SaveMesh(RoadSurfaceBuilder.Create(route),"RoadMesh");
             var go=new GameObject("Authored winding road",typeof(MeshFilter),typeof(MeshRenderer));go.transform.SetParent(parent);go.GetComponent<MeshFilter>().sharedMesh=AssetDatabase.LoadAssetAtPath<Mesh>(Root+"/Art/Materials/RoadMesh.asset");go.GetComponent<MeshRenderer>().sharedMaterial=materials["Road"];go.GetComponent<MeshRenderer>().shadowCastingMode=ShadowCastingMode.Off;
             Marker("ENEMY ENTRY",route.Points[0],parent,new Color(.8f,.35f,.18f));Marker("DEFENDED EXIT",route.Points[route.Points.Length-1],parent,new Color(.74f,.8f,.52f));
+        }
+        [MenuItem("The Line Holds/Repair Road Surface")]
+        public static void RepairRoadSurface()
+        {
+            if(EditorApplication.isPlaying)throw new InvalidOperationException("Stop Play Mode before repairing the road.");
+            SaveMesh(RoadSurfaceBuilder.Create(new BattleRoute(BattleRoute.DefaultPoints)),"RoadMesh");
+            AssetDatabase.SaveAssets();
         }
         static Transform Pad(Vector3 p,int index,Transform parent)
         {

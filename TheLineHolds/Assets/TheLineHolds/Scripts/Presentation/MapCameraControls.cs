@@ -15,7 +15,12 @@ namespace TheLineHolds
         TMPro.TextMeshPro[] labels;
         Quaternion[] labelRotations;
         float yaw;
-        bool dragging;
+        bool dragging, modifierDrag;
+        public bool IsRotatingPointer => dragging;
+        public static bool RotationModifier(Keyboard keyboard) => keyboard!=null &&
+            (Application.platform==RuntimePlatform.OSXPlayer || Application.platform==RuntimePlatform.OSXEditor
+                ? keyboard.leftMetaKey.isPressed || keyboard.rightMetaKey.isPressed
+                : keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed);
         public void Initialize(Camera camera, BattleController controller)
         {
             view=camera; game=controller;
@@ -69,12 +74,13 @@ namespace TheLineHolds
             if(mouse==null)return;
             bool overUI=EventSystem.current && EventSystem.current.IsPointerOverGameObject();
             if(!overUI) Zoom(-mouse.scroll.ReadValue().y*.008f);
-            if(mouse.middleButton.wasPressedThisFrame) dragging=!overUI;
-            if(!mouse.middleButton.isPressed) dragging=false;
+            if(mouse.middleButton.wasPressedThisFrame) { dragging=!overUI; modifierDrag=false; }
+            if(mouse.leftButton.wasPressedThisFrame && RotationModifier(keyboard)) { dragging=!overUI; modifierDrag=true; }
+            if(dragging && (modifierDrag ? !mouse.leftButton.isPressed || !RotationModifier(keyboard) : !mouse.middleButton.isPressed)) dragging=false;
             if(dragging)
             {
                 var delta=mouse.delta.ReadValue();
-                bool pan=keyboard!=null && (keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed);
+                bool pan=!modifierDrag && keyboard!=null && (keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed);
                 if(pan) Pan(-delta*(2*view.orthographicSize/Screen.height));
                 else Rotate(delta.x*.25f);
             }

@@ -11,7 +11,8 @@ namespace TheLineHolds
         BattleController game;
         GameObject top, bottom, modal, sell, help, starRow, viewControls;
         readonly StarGraphic[] ratingStars=new StarGraphic[3];
-        TextMeshProUGUI status, notice, waveInfo, selection, modalTitle, modalSubtitle, modalStats;
+        TextMeshProUGUI status, notice, waveInfo, selection, modalTitle, modalSubtitle, modalStats, brandTitle, brandSubtitle, cameraHelp;
+        float layoutWidth=-1;
         UnityEngine.UI.Button startWave, resume, retry, menu, play, quit;
         readonly UnityEngine.UI.Button[] shops=new UnityEngine.UI.Button[3];
         readonly Color ink=new Color(.085f,.105f,.095f,.97f), paper=new Color(.88f,.85f,.73f), accent=new Color(.78f,.67f,.36f);
@@ -24,8 +25,8 @@ namespace TheLineHolds
             gameObject.AddComponent<UnityEngine.UI.GraphicRaycaster>();
             if(!EventSystem.current) { var events=new GameObject("EventSystem",typeof(EventSystem),typeof(InputSystemUIInputModule)); }
             top=Panel("Command header",transform,new Vector2(0,1),new Vector2(1,1),new Vector2(0,-98),Vector2.zero,ink);
-            Label(top.transform,"THE LINE HOLDS",new Vector2(24,-14),new Vector2(300,32),26,accent);
-            Label(top.transform,"NORMANDY  /  FIELD OPERATIONS  /  1944",new Vector2(25,-53),new Vector2(430,24),13,paper);
+            brandTitle=Label(top.transform,"THE LINE HOLDS",new Vector2(24,-14),new Vector2(300,32),26,accent);
+            brandSubtitle=Label(top.transform,"NORMANDY  /  FIELD OPERATIONS  /  1944",new Vector2(25,-53),new Vector2(430,24),13,paper);
             status=Label(top.transform,"",new Vector2(490,-22),new Vector2(810,44),23,paper);
             Button(top.transform,"II   PAUSE",new Vector2(-150,-23),new Vector2(130,48),()=>game.Pause(),true);
             bottom=Panel("Supply bar",transform,Vector2.zero,new Vector2(1,0),Vector2.zero,new Vector2(0,160),ink);
@@ -34,7 +35,8 @@ namespace TheLineHolds
             notice=Label(bottom.transform,"",new Vector2(24,104),new Vector2(1140,32),17,paper,true);
             waveInfo=Label(bottom.transform,"",new Vector2(900,20),new Vector2(365,75),16,paper,true);
             viewControls=Panel("Map controls",transform,Vector2.zero,new Vector2(1,0),new Vector2(24,170),new Vector2(-24,208),new Color(.08f,.1f,.09f,.9f));
-            Label(viewControls.transform,"VIEW   MMB drag: rotate   /   Shift+MMB or WASD: pan   /   Wheel: zoom   /   Q/E: rotate   /   R: reset",new Vector2(12,-8),new Vector2(1030,24),13,paper);
+            string modifier=Application.platform==RuntimePlatform.OSXPlayer || Application.platform==RuntimePlatform.OSXEditor?"Cmd":"Ctrl";
+            cameraHelp=Label(viewControls.transform,$"Rotate: MMB / {modifier}+drag / Q E   Pan: Shift+MMB / WASD   Zoom: wheel   Reset: R",new Vector2(12,-8),new Vector2(1030,24),13,paper);
             Button(viewControls.transform,"<",new Vector2(-360,-3),new Vector2(44,32),()=>game.CameraControls.Rotate(-45),true);
             Button(viewControls.transform,">",new Vector2(-310,-3),new Vector2(44,32),()=>game.CameraControls.Rotate(45),true);
             Button(viewControls.transform,"-",new Vector2(-250,-3),new Vector2(44,32),()=>game.CameraControls.Zoom(1),true);
@@ -69,6 +71,7 @@ namespace TheLineHolds
         }
         public void Refresh()
         {
+            LayoutHud();
             var m=game.Match; bool inMatch=!game.InMenu && m!=null;
             viewControls.SetActive(inMatch && !m.Paused && !m.Ended);
             top.SetActive(inMatch); bottom.SetActive(inMatch); help.SetActive(inMatch && m.Wave==0 && !m.Paused);
@@ -77,7 +80,8 @@ namespace TheLineHolds
             if(inspect) { var d=m.Towers[game.SelectedPad].Definition; selection.text=$"{d.displayName}\nRange {d.range:0.0} m  /  Sell ${d.SellValue}"; }
             if(inMatch)
             {
-                status.text=$"LIVES  {m.Lives:00}     •     FUNDS  ${m.Funds}     •     WAVE  {m.Wave} / 5     •     HOSTILES  {m.Remaining}";
+                string divider=layoutWidth<1500?"\n":"     •     ";
+                status.text=$"LIVES  {m.Lives:00}     •     FUNDS  ${m.Funds}{divider}WAVE  {m.Wave} / 5     •     HOSTILES  {m.Remaining}";
                 notice.text=game.Notice;
                 waveInfo.text=m.Phase==MatchPhase.Preparation?"ORDERS REQUIRED\n"+game.waves[Mathf.Min(m.Wave,4)].briefing:"ENGAGEMENT IN PROGRESS\nBuild and sell during combat.";
                 startWave.interactable=m.Phase==MatchPhase.Preparation && !m.Paused;
@@ -124,6 +128,42 @@ namespace TheLineHolds
                 modalStats.text=$"LIVES REMAINING   {m.Lives} / 20      WAVES HELD   {m.CompletedWaves} / 5\nENEMIES KILLED    {m.Killed}       ESCAPED    {m.Escaped}\n18+ lives: 3 stars  •  10–17: 2 stars  •  1–9: 1 star";
             }
             else { modalTitle.text="ORDERS ON HOLD."; modalSubtitle.text="Combat is paused."; modalStats.text="Take a breath. Inspect the battlefield.\nResume when you are ready."; }
+        }
+        // Reserve disjoint regions at every canvas width, including tall/narrow resized windows.
+        void LayoutHud()
+        {
+            float width=((RectTransform)transform).rect.width;
+            if(width<=0 || Mathf.Abs(width-layoutWidth)<.5f)return;
+            layoutWidth=width;
+            float headerLeft=Mathf.Clamp(width*.3f,240,450);
+            brandTitle.rectTransform.sizeDelta=new Vector2(headerLeft-48,32);
+            brandSubtitle.rectTransform.sizeDelta=new Vector2(headerLeft-48,24);
+            Fit(brandTitle,16,26);Fit(brandSubtitle,9,13);
+            var sr=status.rectTransform;sr.anchorMin=new Vector2(0,1);sr.anchorMax=Vector2.one;
+            sr.offsetMin=new Vector2(headerLeft,-82);sr.offsetMax=new Vector2(-170,-14);
+            status.alignment=TextAlignmentOptions.MidlineLeft;Fit(status,16,23);
+            float column=(width-48-36)/4;
+            for(int i=0;i<3;i++)
+            {
+                Place((RectTransform)shops[i].transform,new Vector2(24+i*(column+12),16),new Vector2(column,68));
+                var label=shops[i].GetComponentInChildren<TextMeshProUGUI>();label.enableAutoSizing=true;label.fontSizeMin=13;label.fontSizeMax=18;
+            }
+            Place((RectTransform)startWave.transform,new Vector2(24+3*(column+12),16),new Vector2(column,68));
+            Fit(startWave.GetComponentInChildren<TextMeshProUGUI>(),13,18);
+            Place(notice.rectTransform,new Vector2(24,128),new Vector2(width-48,26));Fit(notice,13,17);
+            Place(waveInfo.rectTransform,new Vector2(24,88),new Vector2(width-48,36));
+            waveInfo.fontSize=15;waveInfo.textWrappingMode=TextWrappingModes.NoWrap;
+            cameraHelp.rectTransform.sizeDelta=new Vector2(Mathf.Max(100,width-440),24);Fit(cameraHelp,10,13);
+        }
+        static void Fit(TextMeshProUGUI label,int minimum,int maximum)
+        {
+            label.enableAutoSizing=true;label.fontSizeMin=minimum;label.fontSizeMax=maximum;
+            label.textWrappingMode=TextWrappingModes.NoWrap;label.overflowMode=TextOverflowModes.Ellipsis;
+        }
+        static void Place(RectTransform rect,Vector2 position,Vector2 size)
+        {
+            rect.anchorMin=rect.anchorMax=rect.pivot=Vector2.zero;
+            rect.anchoredPosition=position;rect.sizeDelta=size;
         }
         void Quit()
         {

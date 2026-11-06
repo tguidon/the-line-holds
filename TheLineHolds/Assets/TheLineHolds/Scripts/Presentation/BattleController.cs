@@ -89,7 +89,7 @@ namespace TheLineHolds
                 if(!InMenu && Match!=null && !Match.Paused && !Match.Ended)
                 {
                     var mouse=Mouse.current.position.ReadValue(); hover=FindPad(mouse);
-                    if(Mouse.current.leftButton.wasPressedThisFrame && !(EventSystem.current && EventSystem.current.IsPointerOverGameObject())) ClickPad(hover);
+                    if(Mouse.current.leftButton.wasPressedThisFrame && !CameraControls.IsRotatingPointer && !MapCameraControls.RotationModifier(Keyboard.current) && !(EventSystem.current && EventSystem.current.IsPointerOverGameObject())) ClickPad(hover);
                 }
             }
             if(Match!=null)

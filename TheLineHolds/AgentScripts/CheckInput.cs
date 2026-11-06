@@ -16,6 +16,7 @@ public static class CheckInput
         if (!Application.isPlaying || game == null) throw new Exception("Enter prototype Play Mode first.");
         var settings = InputSystem.settings;
         var background = settings.backgroundBehavior;
+        var editorRouting = settings.editorInputBehaviorInPlayMode;
         var originals = InputSystem.devices.Where(d => d is Mouse || d is Keyboard).Select(d => (device:d, enabled:d.enabled)).ToArray();
         Mouse mouse = null;
         Keyboard keyboard = null;
@@ -47,6 +48,7 @@ public static class CheckInput
         try
         {
             settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+            settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
             foreach (var original in originals) if (original.enabled) InputSystem.DisableDevice(original.device);
             mouse = InputSystem.AddDevice<Mouse>("PrototypeInputCheckMouse");
             keyboard = InputSystem.AddDevice<Keyboard>("PrototypeInputCheckKeyboard");
@@ -80,6 +82,18 @@ public static class CheckInput
             MouseEvent(4); await Frame(); MouseEvent(4,delta:new Vector2(120,0)); await Frame(); MouseEvent(); await Frame();
             Check(Quaternion.Angle(rotation,game.battleCamera.transform.rotation)>20,"middle drag rotates map");
             Check(Quaternion.Angle(labelRotation,label.transform.rotation)>20,"world labels follow camera orbit");
+            await Button("RESET VIEW");await Button("Shop Machine");
+            pointer=Pad(4);MouseEvent();await Frame();
+            int fundsBeforeDrag=game.Match.Funds;
+            var modifier=Application.platform==RuntimePlatform.OSXEditor?UnityEngine.InputSystem.Key.LeftMeta:UnityEngine.InputSystem.Key.LeftCtrl;
+            InputSystem.QueueStateEvent(keyboard,new KeyboardState(modifier));await Frame();
+            rotation=game.battleCamera.transform.rotation;
+            MouseEvent(1);await Frame();MouseEvent(1,delta:new Vector2(120,0));await Frame();MouseEvent();
+            InputSystem.QueueStateEvent(keyboard,new KeyboardState());await Frame();
+            Check(Quaternion.Angle(rotation,game.battleCamera.transform.rotation)>20,"platform modifier plus left-drag rotates");
+            Check(game.Match.Funds==fundsBeforeDrag && game.Match.Towers[4]==null,"modifier drag over an empty pad never places a tower");
+            Check(game.Placement==0,"modifier drag preserves build selection");
+            await Click(new Vector2(Screen.width*.5f,Screen.height*.5f),2);
             var panPosition=game.battleCamera.transform.position;rotation=game.battleCamera.transform.rotation;
             InputSystem.QueueStateEvent(keyboard,new KeyboardState(UnityEngine.InputSystem.Key.LeftShift));
             MouseEvent(4); await Frame(); MouseEvent(4,delta:new Vector2(80,50)); await Frame();MouseEvent();
@@ -104,7 +118,7 @@ public static class CheckInput
             Check(game.Match.Wave == 0 && game.Match.Funds == 300 && game.Match.Lives == 20, "pause Restart resets match");
             await Key(UnityEngine.InputSystem.Key.Escape); await Button("MAIN MENU");
             Check(game.InMenu && game.Match == null, "pause Main Menu clears match");
-            const string result = "PASS frame-driven mouse placement/inspection/selling, rejected purchases, right-click, Escape priority, close zoom limits, orbit/drag/pan/reset buttons and keys, rotated placement, UI scroll isolation, wave start, pause/resume/restart/menu";
+            const string result = "PASS frame-driven mouse placement/inspection/selling, rejected purchases, right-click, Escape priority, close zoom limits, orbit/modifier-drag/pan/reset buttons and keys, rotated placement, UI scroll isolation, wave start, pause/resume/restart/menu";
             Debug.Log("[Input verification] " + result);
             return result;
         }
@@ -114,6 +128,7 @@ public static class CheckInput
             if (keyboard != null) InputSystem.RemoveDevice(keyboard);
             foreach (var original in originals) if (original.enabled) InputSystem.EnableDevice(original.device);
             settings.backgroundBehavior = background;
+            settings.editorInputBehaviorInPlayMode = editorRouting;
             game.MainMenu();
         }
     }
