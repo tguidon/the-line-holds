@@ -85,6 +85,8 @@ namespace TheLineHolds.Editor
             Model("Crate",BattleRoute.OnGround(-3,6),.7f,20);Model("Crate",BattleRoute.OnGround(9.8f,4),.7f,-15);
             FoliageMaterials.Configure();
             DioramaVegetation.Build(environment);
+            AssetDatabase.DeleteAsset(DioramaSurface.Root+"/Hedgerow undergrowth.asset");
+            AssetDatabase.DeleteAsset(DioramaSurface.Root+"/Hedge foliage.mat");
             Lighting(game.battleCamera);
             PlayerSettings.defaultScreenWidth=1920;PlayerSettings.defaultScreenHeight=1080;PlayerSettings.fullScreenMode=FullScreenMode.Windowed;PlayerSettings.resizableWindow=true;
             // Existing players may have saved smaller Unity window preferences. Apply the new default once.

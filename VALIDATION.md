@@ -8,7 +8,7 @@ Steps 2a, 2b, and 2c are implemented. See `ART_DIRECTION.md`, `VISUAL_REVIEW.md`
 
 The terrain is now one smooth, textured meadow with 12,325 vertices. The road is painted into that surface, with worn edges and wheel ruts, so no visible road ribbon can intersect the hills. Road corners use gradual quadratic transitions; the maximum sampled turn is 20.1 degrees. Sampled mesh interiors deviate at most 0.0118 m from the movement surface. Ten level emplacement footprints blend into the hills. Pad labels lie above the stone surface.
 
-Rounded, irregular tree crowns replace cones; clustered blades, shrubs, and stones replace cube grass. Small vegetation combines into three meshes. The exposed earth has a continuous cut edge and pigment layers. Warm sunlight and cool sky fill use four persisted Volume overrides. Native grade-on/off captures differ by about 15.94, 13.19, and 15.93 RGB levels on average.
+Rounded, irregular tree crowns replace cones; clustered blades, shrubs, and stones replace cube grass. Small vegetation combines by material instead of hundreds of separate objects. The exposed earth has a continuous cut edge and pigment layers. Warm sunlight and cool sky fill use four persisted Volume overrides. Native grade-on/off captures differ by about 15.94, 13.19, and 15.93 RGB levels on average.
 
 The default window is 1920×1080, with a fitting size on smaller displays. Existing installations migrate their old saved window size once. Native startup was verified at 1920×1080 in Windowed mode.
 
@@ -52,3 +52,11 @@ The editor and QA session opened for validation are closed at handoff; generated
 - `beccf63`: refined enemy models/stride and native terrain tangent fix.
 
 Roadmap steps 1 and 2a–2c are complete. User visual review comes next, then step 3's authored map composition/detail. Later tower/enemy presentation passes and gameplay upgrades remain pending. Compact results are in `Tools/Validation/last-run.json`; commands are in `Tools/Validation/README.md`.
+
+## November 7 visual-review refinement
+
+Checkpoint `2a3a3c1` replaces open sandbag arcs with complete two-course rings. MG and mortar use 28 bags; cannon uses 32 with a slightly larger radius. Bags follow the wall tangent, alternate between courses, and remain fixed when the guns rotate. Cannon trails and mortar supplies fit inside the rings. `CheckFoliage.Assets` verifies count, radial placement, full-circle coverage, leaf UV/tangent data, and shared vein textures; `CheckDiorama.Towers` passes all three traverse/fixed-wall checks.
+
+Smooth bush/tree crown masses are replaced by individual ridged leaves, visible branches, three green tones, and original leaf-vein textures. Shrubs combine by material. Landscape renderers fell from 269 to 137. Leaf normals were corrected during the draft pass. The native probe uses vertex-attribute metadata for imported GPU-only meshes; it does not require readable duplicate mesh buffers. The corrected probe passes in a fresh standalone session, including a short combat sample at about 60 fps. This is a three-second sample, not a full-match performance benchmark. Runtime gameplay source is unchanged; the earlier full-match evidence remains above.
+
+New review captures: `leaf-detail.png`, `sandbag-rings.png`, `foliage-overview.png`, and `foliage-combat-close.png`. The leaf-detail capture uses a temporary closer review camera; the gameplay zoom limit remains unchanged. No gameplay tuning or new packages were added. Native macOS QA/release and Windows cross-builds are refreshed; Windows runtime verification remains deferred.

@@ -231,27 +231,27 @@
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 93276865,
-      "buildTimeMs": 8832
+      "totalSizeBytes": 99006065,
+      "buildTimeMs": 7330
     },
     "Windows": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 119885218,
-      "buildTimeMs": 4760
+      "totalSizeBytes": 125614418,
+      "buildTimeMs": 6146
     },
     "macOS-QA": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 200217851,
-      "buildTimeMs": 10812
+      "totalSizeBytes": 205947050,
+      "buildTimeMs": 6145
     }
   },
   "packages": {
-    "macOS": "CRC OK, 34.9 MiB",
-    "Windows": "CRC OK, 44.5 MiB"
+    "macOS": "CRC OK, 35.9 MiB",
+    "Windows": "CRC OK, 45.5 MiB"
   },
   "windows_runtime": "Deferred by user; cross-build succeeded; future Windows VM",
   "roadmap": {
@@ -271,5 +271,23 @@
     "one_release_process": true,
     "startup_errors": 0,
     "left_at_main_menu": true
+  },
+  "foliage_and_sandbag_refinement": {
+    "checkpoint": "2a3a3c1",
+    "complete_staggered_rings": {
+      "MachineGun": 28,
+      "AntiTank": 32,
+      "Mortar": 28
+    },
+    "leaf_geometry_and_vein_texture": "Passed editor and native checks",
+    "traverse_with_fixed_walls": "Passed all three towers",
+    "native_check": "PASS native circular walls and leaf textures/UVs/tangents; 12 leaf renderers; 59.7 fps during combat; frames advanced 204",
+    "native_errors": 0,
+    "native_warnings": 0,
+    "sample_duration_seconds": 3,
+    "landscape_renderers": 137,
+    "previous_landscape_renderers": 269,
+    "runtime_gameplay_source_unchanged": true,
+    "old_cloud_shrub_assets_removed": true
   }
 }
