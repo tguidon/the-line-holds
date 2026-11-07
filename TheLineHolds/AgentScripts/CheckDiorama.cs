@@ -32,10 +32,29 @@ public static class CheckDiorama
         }
         Debug.Log("[Diorama check] PASS three tower traverse axes and stationary sandbags");return "PASS three tower traverse axes and stationary sandbags";
     }
+    public static string Units()
+    {
+        var prefab=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/TheLineHolds/Prefabs/Infantry.prefab");
+        var view=UnityEngine.Object.Instantiate(prefab);
+        try
+        {
+            var visual=view.GetComponent<InfantryVisual>();
+            var leg=view.GetComponentsInChildren<Transform>().First(t=>t.name.StartsWith("StrideLeft"));
+            visual.Pose(0,0);var first=leg.localRotation;var position=view.transform.position;
+            visual.Pose(.15f,0);
+            if(Quaternion.Angle(first,leg.localRotation)<10 || view.transform.position!=position)throw new Exception("Stride missing or changed simulation position");
+            var frozen=leg.localRotation;visual.Pose(.15f,0);
+            if(leg.localRotation!=frozen)throw new Exception("Stride moved at a fixed simulation distance");
+        }
+        finally{UnityEngine.Object.DestroyImmediate(view);}
+        Debug.Log("[Diorama check] PASS infantry stride responds to distance, freezes at fixed distance, and never moves unit root");
+        return "PASS infantry stride, fixed-distance freeze, unchanged unit root";
+    }
     public static string Map()
     {
         var root=GameObject.Find("Diorama landscape");if(!root)throw new Exception("Diorama missing");
         var mesh=AssetDatabase.LoadAssetAtPath<Mesh>("Assets/TheLineHolds/Art/Diorama/Meadow.asset");
+        if(mesh.tangents.Length!=mesh.vertexCount)throw new Exception("Textured terrain tangent basis missing; native Lit shading can corrupt");
         if(mesh.vertexCount<10000 || mesh.uv.Length!=mesh.vertexCount)throw new Exception("Continuous textured terrain missing");
         if(mesh.normals.Any(n=>n.y<.8f))throw new Exception("Terrain has a cliff or inverted face");
         foreach(var p in BattleRoute.DefaultPads)if(Mathf.Abs(p.y-BattleRoute.Ground(p.x,p.z)-.035f)>.001f)throw new Exception("Pad detached from terrain");

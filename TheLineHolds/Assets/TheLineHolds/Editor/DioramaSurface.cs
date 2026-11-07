@@ -21,7 +21,7 @@ namespace TheLineHolds.Editor
                 if(x==nx || z==nz)continue;
                 tris.AddRange(new[]{i,i+nx+1,i+1,i+1,i+nx+1,i+nx+2});
             }
-            var m=new Mesh{name="Rolling meadow"};m.vertices=v;m.uv=uv;m.SetTriangles(tris,0);m.RecalculateNormals();m.RecalculateBounds();return m;
+            var m=new Mesh{name="Rolling meadow"};m.vertices=v;m.uv=uv;m.SetTriangles(tris,0);m.RecalculateNormals();m.RecalculateTangents();m.RecalculateBounds();return m;
         }
         public static Texture2D Paint()
         {
@@ -81,7 +81,7 @@ namespace TheLineHolds.Editor
                 uv.Add(new Vector2(j/12f,0));uv.Add(new Vector2((j+1)/12f,0));uv.Add(new Vector2(j/12f,1));uv.Add(new Vector2((j+1)/12f,1));
                 t.AddRange(new[]{i,i+2,i+1,i+1,i+2,i+3});
             }
-            var m=new Mesh{name="Continuous earth cut"};m.SetVertices(v);m.SetUVs(0,uv);m.SetTriangles(t,0);m.RecalculateNormals();return m;
+            var m=new Mesh{name="Continuous earth cut"};m.SetVertices(v);m.SetUVs(0,uv);m.SetTriangles(t,0);m.RecalculateNormals();m.RecalculateTangents();return m;
         }
         public static Texture2D EarthPaint()
         {

@@ -38,18 +38,50 @@ def barrel(loc,length=.8,r=.045,angle=0):
 def tank():
  for x in [-.45,.45]:
   part('Track',(x,0,.24),(.15,.7,.19),'Dark')
-  for y in [-.45,-.15,.15,.45]: part('RoadWheel',(x*1.29,y,.24),(.12,.12,.065),'Steel','cylinder',(0,math.pi/2,0))
- part('Hull',(0,0,.46),(.43,.64,.23)); part('Turret',(0,.06,.78),(.29,.3,.18),'Olive','cylinder')
- part('Hatch',(0,.06,.98),(.16,.16,.035),'Steel','cylinder'); barrel((0,.72,.82),1)
- part('Muzzle',(0,1.21,.82),(.06,.09,.06),'Dark')
+  for y in [-.48,-.24,0,.24,.48]:
+   part('RoadWheel',(x*1.29,y,.24),(.115,.115,.065),'Steel','cylinder',(0,math.pi/2,0))
+   part('Wheel hub',(x*1.44,y,.24),(.045,.045,.02),'Edge','cylinder',(0,math.pi/2,0))
+  for y in [-.57,-.4,-.23,-.06,.11,.28,.45,.62]:
+   part('Tread shoe',(x,y,.426),(.15,.025,.016),'Steel')
+ part('Hull',(0,0,.46),(.43,.64,.21))
+ part('Sloped glacis',(0,.46,.57),(.405,.22,.12),'Edge',rot=(.28,0,0))
+ part('Turret',(0,.03,.77),(.29,.3,.17),'Olive','cylinder')
+ part('Mantlet',(0,.31,.8),(.14,.09,.11),'Edge','sphere')
+ part('Hatch',(0,.02,.96),(.15,.15,.025),'Steel','cylinder');barrel((0,.72,.82),1)
+ part('Muzzle',(0,1.21,.82),(.055,.07,.055),'Dark')
+ part('Hatch handle',(0,.02,1.005),(.07,.025,.018),'Dark')
+ for y in [-.53,-.46,-.39,-.32]:part('Engine grille',(0,y,.686),(.25,.012,.009),'Dark')
+ for x in [-.24,.24]:
+  part('Exhaust',(x,-.63,.54),(.045,.045,.12),'Steel','cylinder',(math.pi/2,0,0))
+  part('Headlight',(x,.635,.52),(.052,.025,.052),'Sand','sphere')
+ part('Stowage roll',(.28,-.4,.74),(.12,.17,.075),'Cloth','sphere')
+ for y in [-.49,-.32]:part('Stowage strap',(.28,y,.74),(.125,.015,.08),'Leather')
+
+def limb(name,objects,pivot):
+ node=bpy.data.objects.new(name,None);bpy.context.collection.objects.link(node);node.location=pivot
+ bpy.context.view_layer.update()
+ for obj in objects:
+  matrix=obj.matrix_world.copy();obj.parent=node;obj.matrix_world=matrix
 
 def infantry():
- for x in [-.1,.1]:
-  part('Boot',(x,.06,.08),(.075,.14,.07),'Dark'); part('Leg',(x,0,.27),(.07,.075,.17),'Cloth')
- part('Coat',(0,0,.56),(.18,.12,.2),'Cloth'); part('Belt',(0,0,.43),(.19,.13,.025),'Wood')
- part('Head',(0,0,.85),(.11,.1,.12),'Skin','sphere'); part('Helmet',(0,0,.94),(.15,.14,.075),'Olive','sphere')
- for x in [-.22,.22]:part('Arm',(x,.03,.61),(.055,.065,.18),'Cloth')
- part('Pack',(0,-.15,.59),(.13,.06,.14),'Sand'); barrel((.18,.24,.57),.55,.025)
+ for x,label in [(-.1,'StrideLeft'),(.1,'StrideRight')]:
+  boot=part('Boot',(x,.06,.08),(.075,.14,.07),'Dark')
+  leg=part('Trouser',(x,0,.27),(.075,.08,.18),'Cloth','sphere')
+  limb(label,[boot,leg],(x,0,.43))
+ part('Coat',(0,0,.56),(.185,.13,.22),'Cloth','sphere')
+ part('Coat hem',(0,0,.43),(.17,.12,.06),'Cloth')
+ part('Belt',(0,0,.46),(.185,.135,.022),'Leather')
+ part('Buckle',(0,.143,.46),(.035,.012,.025),'Sand')
+ part('Head',(0,.01,.85),(.105,.1,.115),'Skin','sphere')
+ part('Helmet brim',(0,0,.925),(.15,.14,.025),'Olive','sphere')
+ part('Helmet crown',(0,-.015,.96),(.135,.125,.075),'Olive','sphere')
+ for x in [-.22,.22]:
+  part('Sleeve',(x,.04,.62),(.066,.075,.15),'Cloth','sphere',(-.28,0,-x*.5))
+  part('Hand',(x,.1,.52),(.045,.05,.05),'Skin','sphere')
+ part('Pack',(0,-.155,.6),(.135,.07,.14),'Sand')
+ for x in [-.115,.115]:part('Pack strap',(x,.134,.6),(.018,.014,.14),'Leather',rot=(0,x,0))
+ for x in [-.12,.12]:part('Belt pouch',(x,.15,.46),(.05,.033,.05),'Sand')
+ part('Rifle stock',(.18,.16,.49),(.03,.16,.035),'Wood');barrel((.18,.32,.57),.48,.023)
 
 def bags():
  for row in range(2):

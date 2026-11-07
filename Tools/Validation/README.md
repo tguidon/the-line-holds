@@ -25,6 +25,8 @@ Record the returned job ID and use `unity job status <job-id> --runtime 'The Lin
 unity command script run --project-path "$PWD/TheLineHolds" --file AgentScripts/CheckInput.cs --entry CheckInput.All
 ```
 
-`CheckFeedback.cs` checks sampled road triangle clearance and five HUD widths. Run its `Geometry` entry in Edit Mode and its `Hud` entry in Play Mode. `CheckTankSpacing.All` checks actual tank dimensions against centre spacing through the entire route, including a compressed-spawn stress case.
+`CheckFeedback.cs` checks that the unified road/meadow mesh follows the shared movement surface within 2.5 cm and that the legacy road overlay is absent and five HUD widths. Run its `Geometry` entry in Edit Mode and its `Hud` entry in Play Mode. `CheckTankSpacing.All` checks actual tank dimensions against centre spacing through the entire route, including a compressed-spawn stress case.
 
 The balance check also requires all mixed layouts to fill ten pads before wave 5. Final-wave enemies must reach at least 75% of the route and trigger rear defenses. This prevents a win-only check from accepting a dull front-half clear.
+
+`CheckDiorama.Map` checks terrain density, normals, materials, grounded pad centres, smooth route turns, and default window settings in Edit Mode. `CheckDiorama.Towers` and `CheckDiorama.Units` run in Play Mode and verify imported traverse axes, fixed sandbags, distance-driven stride, and unchanged unit-root position. `ShowTowers.cs` and `ShowUnits.cs` stage temporary visual reviews in Play Mode; stop Play Mode to remove them. They are visual showcases, not gameplay evidence.

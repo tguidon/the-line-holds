@@ -1,10 +1,11 @@
 using TheLineHolds;
 using UnityEngine;
 var game=Object.FindAnyObjectByType<BattleController>();game.NewMatch();
+foreach(var name in new[]{"Tower visual review","Unit visual review"}){var old=GameObject.Find(name);if(old)Object.DestroyImmediate(old);}
 var showcase=new GameObject("Tower visual review");
 for(int i=0;i<3;i++)
 {
-    var p=new Vector3(-3.8f+i*2.4f,0,1.5f);p.y=BattleRoute.Ground(p.x,p.z)+.12f;
+    var p=new Vector3(-3.8f+i*2.4f,0,1.5f);p.y=BattleRoute.Ground(p.x,p.z)+.035f;
     var view=Object.Instantiate(game.defenses[i].prefab,p,Quaternion.identity,showcase.transform);
     view.GetComponent<TowerVisual>().Aim(new Vector3(-.3f,0,-1),0);
 }

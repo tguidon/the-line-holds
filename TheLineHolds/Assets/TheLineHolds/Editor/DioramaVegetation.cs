@@ -37,7 +37,7 @@ namespace TheLineHolds.Editor
                     var root=p+new Vector3((R()-.5f)*.2f,-.03f,(R()-.5f)*.2f);
                     float h=.09f+R()*.18f,w=.014f+R()*.012f;int index=grassV.Count;
                     grassV.Add(root-side*w);grassV.Add(root+side*w);grassV.Add(root+Vector3.up*h+side*.06f);
-                    grassT.AddRange(new[]{index,index+2,index+1,index+1,index+2,index});
+                    grassT.AddRange(new[]{index,index+2,index+1});
                     var color=Color.Lerp(DioramaSurface.Hex("61754A"),DioramaSurface.Hex("B4B47C"),R());grassColors.Add(color);grassColors.Add(color);grassColors.Add(color);
                 }
                 if(i%15==0 && RoadDistance(p)>1.35f)
@@ -54,7 +54,8 @@ namespace TheLineHolds.Editor
                 go.GetComponent<MeshFilter>().sharedMesh=DioramaBuilder.SaveMesh(mesh,name);go.GetComponent<MeshRenderer>().sharedMaterial=mat;
             }
             var grass=new Mesh{name="Meadow grass clusters"};grass.SetVertices(grassV);grass.SetTriangles(grassT,0);grass.SetColors(grassColors);grass.RecalculateNormals();
-            Display("Meadow grass clusters",grass,DioramaBuilder.Material("Grass blades","829564"));
+            var blades=DioramaBuilder.Material("Grass blades","829564");blades.SetFloat("_Cull",0);UnityEditor.EditorUtility.SetDirty(blades);
+            Display("Meadow grass clusters",grass,blades);
             var bushes=new Mesh{name="Hedgerow undergrowth",indexFormat=IndexFormat.UInt32};bushes.CombineMeshes(shrubs.ToArray());
             Display("Hedgerow undergrowth",bushes,DioramaBuilder.Material("Hedge foliage","61754A"));
             var rocks=new Mesh{name="Weathered field stones"};rocks.CombineMeshes(stones.ToArray());

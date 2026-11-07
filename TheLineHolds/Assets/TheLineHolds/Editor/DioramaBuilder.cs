@@ -25,7 +25,15 @@ namespace TheLineHolds.Editor
         public static Mesh SaveMesh(Mesh mesh,string name)
         {
             string path=DioramaSurface.Root+"/"+name+".asset";var old=AssetDatabase.LoadAssetAtPath<Mesh>(path);
-            if(old){EditorUtility.CopySerialized(mesh,old);UnityEngine.Object.DestroyImmediate(mesh);EditorUtility.SetDirty(old);return old;}
+            if(old)
+            {
+                // Assign channels explicitly so the renderer invalidates its cached vertex buffer.
+                old.Clear();old.indexFormat=mesh.indexFormat;old.vertices=mesh.vertices;old.normals=mesh.normals;old.uv=mesh.uv;old.colors=mesh.colors;old.tangents=mesh.tangents;
+                old.subMeshCount=mesh.subMeshCount;
+                for(int i=0;i<mesh.subMeshCount;i++)old.SetTriangles(mesh.GetTriangles(i),i);
+                old.RecalculateBounds();old.UploadMeshData(false);
+                UnityEngine.Object.DestroyImmediate(mesh);EditorUtility.SetDirty(old);return old;
+            }
             AssetDatabase.CreateAsset(mesh,path);return mesh;
         }
         static GameObject Surface(string name,Mesh mesh,Material mat)
@@ -93,6 +101,7 @@ namespace TheLineHolds.Editor
                     var authored=AssetDatabase.LoadAssetAtPath<Material>(Root+"/Art/Materials/"+m.name.Replace(" (Instance)","")+".mat");
                     return authored?authored:Material(m.name,ExtraColor(m.name));
                 }).ToArray();
+                if(name=="Infantry")go.AddComponent<InfantryVisual>();
                 if(name=="MachineGun" || name=="AntiTank" || name=="Mortar")go.AddComponent<TowerVisual>();
                 PrefabUtility.SaveAsPrefabAsset(go,Root+"/Prefabs/"+name+".prefab");UnityEngine.Object.DestroyImmediate(go);
             }

@@ -137,6 +137,7 @@ namespace TheLineHolds
                     healthViews[e.Id]=bar.transform;
                 }
                 view.transform.position=e.Position;
+                view.GetComponent<InfantryVisual>()?.Pose(e.Distance,e.Id);
                 var direction=Match.Route.Position(e.Distance+.1f,e.LateralOffset)-e.Position;
                 if(direction.sqrMagnitude>.00001f) view.transform.rotation=Quaternion.LookRotation(direction);
                 healthViews[e.Id].rotation=battleCamera.transform.rotation;
@@ -147,7 +148,7 @@ namespace TheLineHolds
             {
                 var t=Match.Towers[i];
                 if(t==null) { if(towerViews.TryGetValue(i,out var old)) { Destroy(old); towerViews.Remove(i); } continue; }
-                if(!towerViews.TryGetValue(i,out var view)) { view=Instantiate(t.Definition.prefab,Match.Pads[i]+Vector3.up*.12f,Quaternion.identity,dynamicRoot); towerViews[i]=view; }
+                if(!towerViews.TryGetValue(i,out var view)) { view=Instantiate(t.Definition.prefab,Match.Pads[i]+Vector3.up*.025f,Quaternion.identity,dynamicRoot); towerViews[i]=view; }
                 var target=Match.Target(t);var visual=view.GetComponent<TowerVisual>();
                 if(visual)visual.Aim(target!=null?target.Position-view.transform.position:Vector3.zero,Match.Paused || Match.Ended?0:Time.deltaTime);
                 else if(target!=null) { var d=target.Position-view.transform.position; d.y=0; view.transform.rotation=Quaternion.LookRotation(d); }
@@ -189,7 +190,7 @@ namespace TheLineHolds
                 if(preview) Destroy(preview); preview=Instantiate(defenses[Placement].prefab,dynamicRoot); previewType=Placement;
                 foreach(var renderer in preview.GetComponentsInChildren<Renderer>()) renderer.sharedMaterial=rangeMaterial;
             }
-            if(preview) { preview.SetActive(show); if(show) preview.transform.position=Match.Pads[hover]+Vector3.up*.16f; }
+            if(preview) { preview.SetActive(show); if(show) preview.transform.position=Match.Pads[hover]+Vector3.up*.065f; }
         }
         void OnCue(string cue,Vector3 position)
         {
