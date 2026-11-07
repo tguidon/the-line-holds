@@ -59,16 +59,40 @@ def bags():
 
 def gun(kind):
  bags()
+ before=set(bpy.context.scene.objects)
  if kind=='MachineGun':
-  part('Mount',(0,0,.29),(.04,.04,.26),'Steel','cylinder');part('Receiver',(0,.13,.55),(.1,.24,.09),'Steel');barrel((0,.56,.56),.48,.035)
-  part('Ammo',(-.22,.05,.33),(.11,.15,.12),'Olive')
+  part('Mount',(0,0,.29),(.045,.045,.26),'Steel','cylinder')
+  part('Receiver',(0,.13,.55),(.095,.24,.08),'Steel');barrel((0,.56,.56),.48,.035)
+  part('Heat sleeve',(0,.49,.56),(.052,.052,.16),'Dark','cylinder',(math.pi/2,0,0))
+  for y in [.39,.45,.51,.57,.63]:part('Cooling ring',(0,y,.56),(.057,.057,.012),'Steel','cylinder',(math.pi/2,0,0))
+  part('Stock',(0,-.21,.53),(.065,.16,.055),'Wood')
+  part('Ammo',(-.23,.05,.29),(.11,.15,.12),'Olive');part('Ammo lid',(-.23,.05,.42),(.12,.16,.02),'Edge')
+  for i in range(5):part('Belt round',(-.15-i*.035,.13,.54),(.014,.04,.014),'Sand','cylinder',(math.pi/2,0,0))
+  part('Rear sight',(0,.03,.66),(.015,.025,.03),'Dark')
  elif kind=='AntiTank':
-  for x in [-.42,.42]:part('Wheel',(x,-.05,.3),(.26,.26,.08),'Dark','cylinder',(0,math.pi/2,0))
-  part('Shield',(0,.05,.55),(.4,.055,.29));barrel((0,.65,.6),1.3,.065)
+  for x in [-.42,.42]:
+   part('Rubber tire',(x,-.05,.3),(.26,.26,.08),'Dark','cylinder',(0,math.pi/2,0))
+   part('Wheel rim',(x*1.2,-.05,.3),(.19,.19,.018),'Edge','cylinder',(0,math.pi/2,0))
+   part('Axle hub',(x*1.25,-.05,.3),(.065,.065,.035),'Steel','cylinder',(0,math.pi/2,0))
+  part('Shield',(0,.05,.55),(.4,.045,.27),'Olive',rot=(.13,0,0));barrel((0,.65,.6),1.3,.065)
+  part('Breech',(0,-.15,.6),(.13,.24,.11),'Steel')
+  part('Recoil sleeve',(0,.32,.6),(.085,.085,.32),'Edge','cylinder',(math.pi/2,0,0))
+  part('Muzzle brake',(0,1.26,.6),(.085,.09,.075),'Dark')
+  for x in [-.32,.32]:
+   for z in [.4,.68]:part('Shield rivet',(x,.108,z),(.018,.014,.018),'Edge','sphere')
   for x in [-.26,.26]:part('Trail',(x,-.55,.18),(.045,.5,.045),'Steel',rot=(0,0,x))
+  part('Elevation handwheel',(.19,-.2,.52),(.09,.09,.02),'Steel','cylinder',(0,math.pi/2,0))
  else:
-  part('Base',(0,0,.08),(.3,.3,.05),'Steel','cylinder');barrel((0,.1,.4),.7,.09,-.65)
+  part('Base plate',(0,0,.07),(.3,.3,.045),'Steel','cylinder');barrel((0,.1,.4),.7,.09,-.65)
+  part('Tube collar',(0,.22,.57),(.105,.105,.04),'Edge','cylinder',(math.pi/2-.65,0,0))
   for x in [-.2,.2]:part('Bipod',(x,.3,.25),(.025,.025,.28),'Steel','cylinder',(0,x,0))
+  part('Sight',(-.13,.14,.5),(.028,.065,.035),'Dark')
+  part('Ammo case',(-.47,-.22,.13),(.14,.23,.12),'Wood')
+  for y in [-.3,-.15]:part('Mortar round',(-.47,y,.28),(.04,.04,.12),'Sand','sphere')
+ # Traverse only the mechanism; the sandbags remain fixed on their emplacement.
+ pivot=bpy.data.objects.new('Traverse',None);bpy.context.collection.objects.link(pivot)
+ for obj in set(bpy.context.scene.objects)-before:
+  if obj!=pivot:obj.parent=pivot
 
 def tree():
  rng=random.Random(74)

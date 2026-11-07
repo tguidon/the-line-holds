@@ -5,6 +5,33 @@ using UnityEngine;
 using TheLineHolds;
 public static class CheckDiorama
 {
+    public static string Towers()
+    {
+        foreach(string name in new[]{"MachineGun","AntiTank","Mortar"})
+        {
+            var prefab=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/TheLineHolds/Prefabs/"+name+".prefab");
+            var view=UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                var visual=view.GetComponent<TowerVisual>();
+                if(!visual)throw new Exception("Tower visual missing: "+name);
+                // Awake runs in Play Mode; validate the actual traverse direction and static sandbags.
+                var pivot=view.GetComponentsInChildren<Transform>().First(t=>t.name.StartsWith("Traverse"));
+                var barrel=pivot.GetComponentsInChildren<Transform>().First(t=>t.name.StartsWith("Barrel"));
+                var bag=view.GetComponentsInChildren<Transform>().First(t=>t.name.StartsWith("Sandbag"));
+                var fixedPosition=bag.position;var fixedRotation=bag.rotation;
+                foreach(var direction in new[]{Vector3.forward,Vector3.left,Vector3.back})
+                {
+                    visual.Aim(direction,.1f);
+                    var forward=Vector3.ProjectOnPlane(barrel.position-pivot.position,Vector3.up);
+                    if(Vector3.Angle(forward,direction)>1)throw new Exception("Wrong traverse axis: "+name);
+                    if(bag.position!=fixedPosition || bag.rotation!=fixedRotation)throw new Exception("Sandbags rotated: "+name);
+                }
+            }
+            finally{UnityEngine.Object.DestroyImmediate(view);}
+        }
+        Debug.Log("[Diorama check] PASS three tower traverse axes and stationary sandbags");return "PASS three tower traverse axes and stationary sandbags";
+    }
     public static string Map()
     {
         var root=GameObject.Find("Diorama landscape");if(!root)throw new Exception("Diorama missing");

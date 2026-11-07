@@ -148,7 +148,9 @@ namespace TheLineHolds
                 var t=Match.Towers[i];
                 if(t==null) { if(towerViews.TryGetValue(i,out var old)) { Destroy(old); towerViews.Remove(i); } continue; }
                 if(!towerViews.TryGetValue(i,out var view)) { view=Instantiate(t.Definition.prefab,Match.Pads[i]+Vector3.up*.12f,Quaternion.identity,dynamicRoot); towerViews[i]=view; }
-                var target=Match.Target(t); if(target!=null) { var d=target.Position-view.transform.position; d.y=0; view.transform.rotation=Quaternion.LookRotation(d); }
+                var target=Match.Target(t);var visual=view.GetComponent<TowerVisual>();
+                if(visual)visual.Aim(target!=null?target.Position-view.transform.position:Vector3.zero,Match.Paused || Match.Ended?0:Time.deltaTime);
+                else if(target!=null) { var d=target.Position-view.transform.position; d.y=0; view.transform.rotation=Quaternion.LookRotation(d); }
             }
             active.Clear();
             foreach(var s in Match.Shots)
@@ -192,6 +194,8 @@ namespace TheLineHolds
         void OnCue(string cue,Vector3 position)
         {
             audioPlayer.Play(cue);
+            if(cue=="fire")foreach(var tower in towerViews.Values)
+                if((tower.transform.position-position).sqrMagnitude<1.5f)tower.GetComponent<TowerVisual>()?.Fire();
             if(cue!="fire" && cue!="impact" && cue!="escape") return;
             var v=GameObject.CreatePrimitive(PrimitiveType.Sphere); Destroy(v.GetComponent<Collider>()); v.transform.SetParent(dynamicRoot); v.transform.position=position;
             v.GetComponent<Renderer>().sharedMaterial=cue=="escape"?damageMaterial:tracerMaterial;
