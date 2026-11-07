@@ -1,64 +1,54 @@
 # Prototype validation
 
-Checked on Apple silicon macOS, November 5, 2026, using Unity 6000.6.7f1, URP 17.6.0, Unity CLI 1.0.0-beta.17, and Unity Pipeline 0.10.0-exp.1. All editor operations, input checks, captures, and builds used the Unity CLI.
+Checked on Apple silicon macOS, November 7, 2026, with Unity 6000.6.7f1, URP 17.6.0, Unity CLI 1.0.0-beta.17, and Pipeline 0.10.0-exp.1. All authoring, play checks, captures, and builds used Blender scripts and Unity CLI. No computer-use automation was used.
 
-## Round 1 feedback and fixes
+## Step 2 visual pass
 
-- Road geometry: the regression sampled triangle interiors and found road sections 0.0484 m below the terrain. Road triangles now split at each terrain slope boundary. Minimum sampled clearance is 0.0450 m throughout the mesh. Native resize, close zoom, and 135-degree orbit captures show a continuous road without the exposed terrain patches.
-- HUD overlap: the original fixed widths made counters overlap Pause and wave text overlap Start Wave at narrower widths. Header and footer content now occupy separate responsive regions. Checks pass at logical canvas widths 1100, 1200, 1386, 1600, and 2000, with readable counters and briefings.
-- Camera: middle-drag remains available. Command+left-drag rotates on macOS; Ctrl+left-drag is the Windows binding. Queued macOS Input System events confirm rotation, preservation of build selection, and no purchase when dragging over an empty pad. Windows runtime input remains unverified.
-- Tank spacing: model bounds are 1.29 m wide and 2.00 m long. The old minimum centre separation was 0.73 m. Vehicle intervals now use 5.5 seconds, with a 4.8 m route-spacing guard across section boundaries. The guard delays the column rather than releasing a catch-up burst. Minimum measured centre separation is 2.77 m through the full route, including a compressed-spawn stress case. A conservative bounding-circle test also covers rotation at bends.
-- Funds: completed waves award 70, 80, 90, 100, and 110 funds. The first bonus adds 20 funds to the previous baseline and makes a cannon affordable after a clean first wave. The HUD reports the completed round bonus.
-- Difficulty: stronger armor, faster infantry, more later squads, and longer vehicle columns form the single baseline. Easier and harder modes remain future work.
+Steps 2a, 2b, and 2c are implemented. See `ART_DIRECTION.md`, `VISUAL_REVIEW.md`, and `TheLineHolds/Screenshots/diorama-*.png` for the direction, scoped scorecard, and captured evidence.
 
-## Combat and balance
+The terrain is now one smooth, textured meadow with 12,325 vertices. The road is painted into that surface, with worn edges and wheel ruts, so no visible road ribbon can intersect the hills. Road corners use gradual quadratic transitions; the maximum sampled turn is 20.1 degrees. Sampled mesh interiors deviate at most 0.0118 m from the movement surface. Ten level emplacement footprints blend into the hills. Pad labels lie above the stone surface.
 
-Waves contain 18, 30, 40, 56, and 72 units (216 total), including 0, 0, 4, 8, and 12 tanks. Six-soldier squads retain individual health, targeting, rewards, and escape accounting. Infantry have 80 health and move at 1.5 m/s. Tanks have 650 health and move at 1.05 m/s. Per-type health stays constant across waves.
+Rounded, irregular tree crowns replace cones; clustered blades, shrubs, and stones replace cube grass. Small vegetation combines into three meshes. The exposed earth has a continuous cut edge and pigment layers. Warm sunlight and cool sky fill use four persisted Volume overrides. Native grade-on/off captures differ by about 15.94, 13.19, and 15.93 RGB levels on average.
 
-Focused checks pass for squad totals and formation, armor damage and target priority, mortar cluster selection, actual single-target versus six-target splash hits, economy and round bonuses, invalid/occupied purchases, sale rounding, pause, wave gates, terminal freeze, rating boundaries, final-escape defeat priority, stable ties, and exactly-once rewards.
+The default window is 1920×1080, with a fitting size on smaller displays. Existing installations migrate their old saved window size once. Native startup was verified at 1920×1080 in Windowed mode.
 
-`CheckBalance.All` uses actual purchases and earned funds. Strong strategies can reinvest during combat. Mixed layouts fill all ten pads before wave 5. Each must send enemies beyond 75% of the route and fire the rear defenses at least five times.
+Tower models have smooth sandbags, bevelled edges, ammunition and mechanical details, independent traverse, and restrained recoil. Play Mode checks verify all three imported traverse axes and stationary sandbags. Infantry have rounded clothing, helmets, packs, straps, and distance-driven strides; the stride freezes at a fixed distance and never changes the unit root. Tank detail includes armor, tracks, wheel hubs, hatches, lights, grilles, and stowage. Prefab wrappers correct the imported units' backward forward axis without changing movement roots.
 
-| Strategy | Outcome | Lives | Kills / escapes | Combat time | Final-wave route depth | Rear shots in wave 5 |
+A native-only terrain shading defect was caught before handoff. Texture and shadow probes ruled out those causes; adding tangents alone removed the corruption with lighting and ambient occlusion restored. Both textured meshes now retain tangent data. The regression failed before the fix and passes in the saved mesh and native player. Diagnostic overrides were discarded by quitting that QA session and testing a fresh build.
+
+## Gameplay and regressions
+
+Enemy and tower stats, prices, rewards, wave counts, and spacing rules are unchanged. Rounding the route and softening its heights slightly alter travel/coverage; the six-strategy check still accepts mixed defenses and rejects neglect. Tower upgrades and further balance remain deferred to roadmap step 6.
+
+Focused core checks pass for economy, bonuses, invalid orders, sale rounding, pause, wave gates, terminal freeze, defeat priority, ratings, stable targeting, exactly-once rewards, squad formation, armor priority, cluster selection, and actual single-target/splash damage.
+
+| Strategy | Outcome | Lives | Kills / escapes | Combat time | Final-wave route depth | Rear shots |
 | --- | --- | --- | --- | --- | --- | --- |
-| Mixed bends | Victory | 20 | 216 / 0 | 315 s | 92% | 87 |
-| Mixed entrance and middle | Victory | 19 | 215 / 1 | 296 s | 100% | 106 |
-| Five MG, three cannons, two mortars | Victory | 3 | 199 / 17 | 314 s | 86% | 28 |
-| Machine guns only | Defeat, wave 5 | 0 | 188 / 20 | 310 s | 100% | 177 |
-| Lone opening machine gun | Defeat, wave 2 | 0 | 8 / 20 | 84 s | Not reached | 0 |
-| Initial defenses, never reinvest | Defeat, wave 3 | 0 | 65 / 20 | 138 s | Not reached | 0 |
+| Mixed bends | Victory | 19 | 215 / 1 | 314 s | 100% | 107 |
+| Mixed entrance/middle | Victory | 17 | 213 / 3 | 293 s | 100% | 131 |
+| Five MG, three cannons, two mortars | Victory | 12 | 208 / 8 | 309 s | 85% | 26 |
+| Machine guns only | Defeat, wave 5 | 0 | 192 / 20 | 313 s | 100% | 220 |
+| Lone opening gun | Defeat, wave 2 | 0 | 8 / 20 | 82 s | Not reached | 0 |
+| Never reinvest | Defeat, wave 3 | 0 | 64 / 20 | 136 s | Not reached | 0 |
 
-Times exclude player-controlled preparation. Defeat stops immediately, so losing runs can leave unresolved units. Human playtest round 2 remains pending; these automated checks do not judge whether the revised pacing feels fun.
+The revised tank measures 1.34×0.97×2.03 m. Minimum measured centre separation is 2.99 m through the entire rounded route, including compressed-spawn stress. The conservative bounding-circle check passes.
 
-## Input, resizing, and live checks
+Frame-driven input checks pass for placement, inspection, selling, rejected purchases, cancellation, Escape priority, middle/Command drag, pan, zoom limits, reset, camera buttons, rotated placement, UI scroll isolation, wave start, pause, resume, restart, and menu. Temporary devices and focus-routing overrides were restored. Five logical HUD widths (1100, 1200, 1386, 1600, 2000) pass overlap/truncation checks. Standalone UI and lifecycle checks pass.
 
-`CheckInput.All` injects temporary mouse/keyboard events across real Play Mode frames. It passes placement/inspection/selling, rejected purchases, same-frame shop-to-pad placement, cancellation, Escape priority, wheel limits, middle-drag, Command-drag, pan, reset, camera buttons, and placement after rotation/zoom. Temporary devices, background behavior, and editor-only input routing are restored in `finally`.
+## Native match and builds
 
-The editor's default focus routing initially discarded virtual mouse events. The harness now temporarily routes device input to the Game view. Product input configuration remains unchanged.
+A complete normal-speed standalone match passed in **312 seconds**, with **18,439 rendered frames**, **3 stars / 19 lives / 215 kills / 1 escape**, and **zero runtime errors or warnings**. Final-wave enemies reached the exit and triggered **106 rear-defense shots**. Purchases used earned funds, with no health, income, damage, or wave cheats. The later prefab-only forward-axis correction was checked separately in Play Mode and a fresh native build; it does not change the simulation.
 
-Standalone `CheckResize.cs` passes actual native window sizes 1600×900, 1200×1000, 1024×768, and 1920×1080. Each size also checks a 5.5 close zoom and 135-degree orbit. The narrow HUD and close road captures were visually inspected.
+macOS release, Windows cross-build, and macOS QA builds succeed with zero build warnings/errors. Release builds exclude Pipeline's server/compiler assemblies. Packages exclude build backups/symbols and pass ZIP CRC checks. Outputs stay ignored under `TheLineHolds/Builds/`.
 
-Standalone UI raycasts/callbacks and lifecycle checks pass for menus, shops, camera controls, wave start, pause/resume, restart, cancellation priority, freeze, and Main Menu cleanup. Physical OS mouse/window focus is outside the injected-device check. No computer-use automation was used.
+Windows runtime verification remains deferred by the user. Use a future Windows VM and `Tools/Validation/windows-checklist.md` before release on that platform.
 
-## Standalone match
+The editor and QA session opened for validation are closed at handoff; generated font atlas changes are discarded. One updated macOS release copy is left at its main menu for visual review. No live method-reload overrides or temporary input settings remain.
 
-The complete standalone Mac match passed at normal speed in **315 seconds**, with **18,837 rendered frames**, **3 stars / 20 lives / 216 kills / 0 escapes**, and **zero runtime error entries**. Final-wave enemies reached **92.1% of the route** and triggered **85 rear-defense shots**. The real-time controller used only actual purchases and earned funds, including reinforcements during combat. No health, damage, income, or wave cheats were used. Current combat and victory captures are retained.
+## Checkpoints
 
-## Builds and platform scope
+- `8287e76`: terrain, road, foliage, lighting, and larger window.
+- `849adf9`: refined tower models, independent traverse, recoil, and checks.
+- `beccf63`: refined enemy models/stride and native terrain tangent fix.
 
-The updated Mac release is open for round 2 and logs no startup exceptions or script compilation errors. The QA player and the editor opened for this task are closed. Automation overrides are restored, and generated font atlas changes are discarded.
-
-The macOS ARM64 release, Windows x86-64 Mono cross-build, and Mac QA build succeed with zero warnings and errors. Development-only Pipeline instrumentation remains excluded from release builds. Outputs and ZIPs remain ignored under `TheLineHolds/Builds/`.
-
-Windows runtime verification is deferred by the user. Use a Windows VM when ready, following `Tools/Validation/windows-checklist.md`. No Windows runtime test or VM setup was performed in this revision.
-
-See `README.md` and `Tools/Validation/README.md` for reproduction commands. Compact results are in `Tools/Validation/last-run.json`. Representative captures are under `TheLineHolds/Screenshots/`.
-
-The installed Pipeline documentation consulted includes `commands/scripts.md`, `commands/build-and-compilation.md`, `commands/editor-lifecycle-and-observability.md`, `commands/capture.md`, `commands/runtime.md`, and `runtime-setup.md`.
-
-## Checkpoints and roadmap
-
-- `a12aa99`: camera shortcut and purchase protection, responsive HUD regions, road surface repair, and regression checks.
-- `92b5610`: round funds, harder baseline, tank spacing, full-map pressure checks, and playthrough updates.
-
-Roadmap step 1 remains in progress until the user's next hands-on round. Steps 2–5 remain pending. Earlier baselines and their validation remain in Git history.
+Roadmap steps 1 and 2a–2c are complete. User visual review comes next, then step 3's authored map composition/detail. Later tower/enemy presentation passes and gameplay upgrades remain pending. Compact results are in `Tools/Validation/last-run.json`; commands are in `Tools/Validation/README.md`.

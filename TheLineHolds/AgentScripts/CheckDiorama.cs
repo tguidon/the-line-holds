@@ -34,6 +34,8 @@ public static class CheckDiorama
     }
     public static string Units()
     {
+        var tank=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/TheLineHolds/Prefabs/LightTank.prefab");
+        if(tank.GetComponentsInChildren<Transform>().First(t=>t.name.StartsWith("Muzzle")).position.z<.9f)throw new Exception("Tank faces backward relative to the +Z movement root");
         var prefab=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/TheLineHolds/Prefabs/Infantry.prefab");
         var view=UnityEngine.Object.Instantiate(prefab);
         try

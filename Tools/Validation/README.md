@@ -30,3 +30,5 @@ unity command script run --project-path "$PWD/TheLineHolds" --file AgentScripts/
 The balance check also requires all mixed layouts to fill ten pads before wave 5. Final-wave enemies must reach at least 75% of the route and trigger rear defenses. This prevents a win-only check from accepting a dull front-half clear.
 
 `CheckDiorama.Map` checks terrain density, normals, materials, grounded pad centres, smooth route turns, and default window settings in Edit Mode. `CheckDiorama.Towers` and `CheckDiorama.Units` run in Play Mode and verify imported traverse axes, fixed sandbags, distance-driven stride, and unchanged unit-root position. `ShowTowers.cs` and `ShowUnits.cs` stage temporary visual reviews in Play Mode; stop Play Mode to remove them. They are visual showcases, not gameplay evidence.
+
+`CheckNativeVisuals.cs` verifies final prefab forward axes, persisted terrain tangents, and all four saved Volume overrides in a standalone QA player, then captures grade-on/off, overview combat, and close combat. `compare_captures.py` checks a visible grade difference without external Python dependencies. Native resized views are covered by `CheckResize.cs`.

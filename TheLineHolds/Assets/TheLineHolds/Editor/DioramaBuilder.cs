@@ -92,10 +92,17 @@ namespace TheLineHolds.Editor
         }
         public static string RefreshModels(string[] names)
         {
+            if(EditorApplication.isPlaying)throw new InvalidOperationException("Stop Play Mode before authoring prefabs.");
             foreach(var name in names)
             {
                 var model=AssetDatabase.LoadAssetAtPath<GameObject>(Root+"/Art/Models/"+name+".fbx");if(!model)throw new Exception("Missing model "+name);
                 var go=UnityEngine.Object.Instantiate(model);go.name=name;
+                if(name=="Infantry" || name=="LightTank")
+                {
+                    // Blender +Y exports as Unity -Z. Keep gameplay roots +Z-forward.
+                    var miniature=go;go=new GameObject(name);miniature.name="Miniature";
+                    miniature.transform.SetParent(go.transform,false);miniature.transform.localRotation=Quaternion.Euler(0,180,0)*miniature.transform.localRotation;
+                }
                 foreach(var r in go.GetComponentsInChildren<Renderer>())r.sharedMaterials=r.sharedMaterials.Select(m=>
                 {
                     var authored=AssetDatabase.LoadAssetAtPath<Material>(Root+"/Art/Materials/"+m.name.Replace(" (Instance)","")+".mat");

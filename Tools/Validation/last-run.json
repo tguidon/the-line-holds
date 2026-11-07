@@ -1,19 +1,46 @@
 {
-  "date": "2026-11-05",
+  "date": "2026-11-07",
   "unity": "6000.6.7f1",
   "urp": "17.6.0",
   "unity_cli": "1.0.0-beta.17",
-  "runtime_source_sha256": "1abada8df9d15747ed23e7282048d7c34ad2ae2e428c7afa21c549e5884796f5",
+  "runtime_source_sha256": "6c27cf1b0f9fa5649526bbae11c22d7cd7cef5dcb55d8c096024c37f188e117b",
   "source_hash_method": "Sorted UTF-8 paths relative to Assets/TheLineHolds/Scripts, each followed by file bytes",
   "checkpoints": {
-    "usability": "a12aa99",
-    "baseline_and_spacing": "92b5610"
+    "terrain": "8287e76",
+    "towers": "849adf9",
+    "units_and_native_shading": "beccf63"
   },
-  "road_regression": {
-    "before_minimum_clearance_m": -0.0484,
-    "after_minimum_clearance_m": 0.045,
-    "triangle_interiors_sampled": true,
-    "split_at_terrain_slope_boundaries": true
+  "terrain": {
+    "vertices": 12325,
+    "maximum_route_turn_degrees": 20.1,
+    "maximum_sampled_movement_surface_error_m": 0.0118,
+    "road_is_part_of_meadow_surface": true,
+    "tangents_persisted": true
+  },
+  "window": {
+    "default": [
+      1920,
+      1080
+    ],
+    "mode": "Windowed",
+    "old_size_migrated_once": true,
+    "smaller_displays_fit": true,
+    "native_startup_verified": [
+      1920,
+      1080
+    ]
+  },
+  "native_visuals": {
+    "volume_overrides": 4,
+    "grade_rgb_mean_absolute_delta": [
+      15.94,
+      13.19,
+      15.93
+    ],
+    "terrain_tangent_regression": "Failed before fix, passed in fresh native build",
+    "tower_traverse_and_fixed_sandbags": "Passed",
+    "infantry_stride_and_fixed_root": "Passed",
+    "unit_forward_axis": "Corrected in prefab wrapper; Play Mode and native assertion"
   },
   "camera_modifier": {
     "macOS": "Command + left drag",
@@ -36,14 +63,12 @@
   },
   "tank_spacing": {
     "model_bounds_m": [
-      1.29,
-      0.96,
-      2.0
+      1.34,
+      0.97,
+      2.03
     ],
-    "old_minimum_centre_distance_m": 0.73,
-    "new_minimum_centre_distance_m": 2.77,
+    "minimum_centre_distance_m": 2.99,
     "minimum_route_gap_m": 4.8,
-    "section_interval_seconds": 5.5,
     "compressed_spawn_stress": "Passed"
   },
   "round_bonuses": [
@@ -76,41 +101,41 @@
     {
       "strategy": "Mixed bends",
       "outcome": "Victory",
-      "lives": 20,
-      "kills": 216,
-      "escapes": 0,
-      "combatSeconds": 315,
-      "final_wave_route_percent": 92,
-      "rear_shots": 87
+      "lives": 19,
+      "kills": 215,
+      "escapes": 1,
+      "combatSeconds": 314,
+      "final_wave_route_percent": 100,
+      "rear_shots": 107
     },
     {
       "strategy": "Mixed entrance/middle",
       "outcome": "Victory",
-      "lives": 19,
-      "kills": 215,
-      "escapes": 1,
-      "combatSeconds": 296,
+      "lives": 17,
+      "kills": 213,
+      "escapes": 3,
+      "combatSeconds": 293,
       "final_wave_route_percent": 100,
-      "rear_shots": 106
+      "rear_shots": 131
     },
     {
       "strategy": "Five MG, three cannons, two mortars",
       "outcome": "Victory",
-      "lives": 3,
-      "kills": 199,
-      "escapes": 17,
-      "combatSeconds": 314,
-      "final_wave_route_percent": 86,
-      "rear_shots": 28
+      "lives": 12,
+      "kills": 208,
+      "escapes": 8,
+      "combatSeconds": 309,
+      "final_wave_route_percent": 85,
+      "rear_shots": 26
     },
     {
       "strategy": "Machine guns only",
       "outcome": "Defeat",
       "wave": 5,
       "lives": 0,
-      "kills": 188,
+      "kills": 192,
       "escapes": 20,
-      "combatSeconds": 310
+      "combatSeconds": 313
     },
     {
       "strategy": "Lone opening gun",
@@ -119,16 +144,16 @@
       "lives": 0,
       "kills": 8,
       "escapes": 20,
-      "combatSeconds": 84
+      "combatSeconds": 82
     },
     {
       "strategy": "Never reinvest",
       "outcome": "Defeat",
       "wave": 3,
       "lives": 0,
-      "kills": 65,
+      "kills": 64,
       "escapes": 20,
-      "combatSeconds": 138
+      "combatSeconds": 136
     }
   ],
   "mixed_layout_acceptance": "Ten pads filled before wave 5, at least 75% final-wave route depth and five rear-defense shots",
@@ -188,15 +213,17 @@
   "standalone_mac_normal_speed": {
     "status": "Passed",
     "timeScale": 1,
-    "combatSeconds": 315,
-    "renderedFrames": 18837,
+    "combatSeconds": 312,
+    "renderedFrames": 18439,
     "stars": 3,
-    "lives": 20,
-    "kills": 216,
-    "escapes": 0,
+    "lives": 19,
+    "kills": 215,
+    "escapes": 1,
     "errorEntries": 0,
-    "final_wave_route_depth": 0.921,
-    "rear_shots": 85
+    "warningEntries": 0,
+    "final_wave_route_depth": 1,
+    "rear_shots": 106,
+    "note": "Final prefab-only forward-axis correction validated separately in Play Mode and fresh native visual check; simulation source unchanged"
   },
   "standalone_ui_and_lifecycle": "Passed menu/shop/camera/start/pause/resume raycasts and callbacks, cancellation, freeze, restart and cleanup",
   "builds": {
@@ -204,41 +231,45 @@
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 80913476,
-      "buildTimeMs": 5283
+      "totalSizeBytes": 93276865,
+      "buildTimeMs": 8832
     },
     "Windows": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 107524629,
-      "buildTimeMs": 6699
+      "totalSizeBytes": 119885218,
+      "buildTimeMs": 4760
     },
     "macOS-QA": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 187853114,
-      "buildTimeMs": 12239
+      "totalSizeBytes": 200217851,
+      "buildTimeMs": 10812
     }
   },
   "packages": {
-    "macOS": "CRC OK, 28.6 MiB",
-    "Windows": "CRC OK, 38.3 MiB",
-    "debug_and_backup_files_excluded": true
+    "macOS": "CRC OK, 34.9 MiB",
+    "Windows": "CRC OK, 44.5 MiB"
   },
-  "release_pipeline_server_and_compiler_assemblies_absent": true,
   "windows_runtime": "Deferred by user; cross-build succeeded; future Windows VM",
   "roadmap": {
-    "step_1": "In progress",
-    "round_1": "Feedback implemented",
-    "round_2": "Pending user playtest",
-    "steps_2_through_5": "Pending"
+    "step_1": "Complete",
+    "round_1": "Complete",
+    "round_2": "Complete",
+    "step_2a": "Complete",
+    "step_2b": "Complete",
+    "step_2c": "Complete",
+    "steps_3_through_6": "Pending"
   },
-  "mac_release_startup_smoke": {
+  "release_pipeline_server_and_compiler_assemblies_absent": true,
+  "final_orientation_native_check": "Passed in rebuilt QA player; infantry and tank forward-axis assertions",
+  "final_resize_native_check": "Passed 1600x900, 1200x1000, 1024x768, 1920x1080; zoom 5.5; orbit 135 degrees",
+  "release_startup_smoke": {
     "passed": true,
-    "player_process_alive": true,
-    "startup_exception_or_compile_error_lines": 0,
-    "left_open_for_round_2": true
+    "one_release_process": true,
+    "startup_errors": 0,
+    "left_at_main_menu": true
   }
 }
