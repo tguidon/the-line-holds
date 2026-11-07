@@ -26,19 +26,53 @@ namespace TheLineHolds
             var position = Position(distance);
             var direction = Position(Mathf.Min(Length, distance + .1f)) - Position(Mathf.Max(0, distance - .1f));
             position += Vector3.Cross(Vector3.up, direction).normalized * lateralOffset;
-            position.y = Ground(position.x) + .035f;
+            position.y = Ground(position.x, position.z) + .035f;
             return position;
         }
-        public static float Ground(float x) => .25f + .7f * Mathf.InverseLerp(-4, -2, x) + .7f * Mathf.InverseLerp(4, 6, x);
-        public static Vector3 OnGround(float x, float z) => new Vector3(x, Ground(x) + .035f, z);
-        public static Vector3[] DefaultPoints => new[] {
+        public static float Ground(float x) => Ground(x, 0);
+        // Continuous derivatives remove the old diagonal terrace seams. Shared by art and movement.
+        static float NaturalGround(float x, float z) => .25f
+            + .7f * Mathf.SmoothStep(0, 1, Mathf.InverseLerp(-5, -1, x))
+            + .7f * Mathf.SmoothStep(0, 1, Mathf.InverseLerp(3, 7, x))
+            + .09f * Mathf.Sin(x * .47f + z * .38f) * Mathf.Sin(z * .55f);
+        public static Vector3 OnGround(float x, float z) => new Vector3(x, Ground(x,z) + .035f, z);
+        public static Vector3[] DefaultPoints => Rounded(new[] {
             OnGround(-11,-5), OnGround(-7,-5), OnGround(-5,-3), OnGround(-6,1),
             OnGround(-8,4), OnGround(-4,5), OnGround(0,4), OnGround(1,1),
             OnGround(-1,-2), OnGround(3,-4), OnGround(7,-3), OnGround(8,0), OnGround(6,3), OnGround(8,5), OnGround(11,5)
+        });
+        static Vector3[] Rounded(Vector3[] corners)
+        {
+            var points = new System.Collections.Generic.List<Vector3> { corners[0] };
+            for (int i=1; i<corners.Length-1; i++)
+            {
+                var a=corners[i]+(corners[i-1]-corners[i]).normalized*.7f;
+                var b=corners[i]+(corners[i+1]-corners[i]).normalized*.7f;
+                for(int j=0;j<=8;j++)
+                {
+                    float t=j/8f;
+                    var p=(1-t)*(1-t)*a+2*(1-t)*t*corners[i]+t*t*b;
+                    points.Add(OnGround(p.x,p.z));
+                }
+            }
+            points.Add(corners[corners.Length-1]); return points.ToArray();
+        }
+        static readonly Vector2[] PadSites = {
+            new Vector2(-8,-3),new Vector2(-3,-4),new Vector2(-8,1),new Vector2(-5,3),new Vector2(-2,2),
+            new Vector2(2,3),new Vector2(2,-1),new Vector2(5,-1.5f),new Vector2(5,4.5f),new Vector2(10,2.5f)
         };
-        public static Vector3[] DefaultPads => new[] {
-            OnGround(-8,-3), OnGround(-3,-4), OnGround(-8,1), OnGround(-5,3), OnGround(-2,2),
-            OnGround(2,3), OnGround(2,-1), OnGround(5,-1.5f), OnGround(5,4.5f), OnGround(10,2.5f)
-        };
+        public static float Ground(float x,float z)
+        {
+            float h=NaturalGround(x,z);
+            foreach(var pad in PadSites)
+            {
+                float d=Vector2.Distance(pad,new Vector2(x,z));
+                if(d>=1.65f)continue;
+                float blend=1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.76f,1.65f,d));
+                h=Mathf.Lerp(h,NaturalGround(pad.x,pad.y),blend);
+            }
+            return h;
+        }
+        public static Vector3[] DefaultPads => System.Array.ConvertAll(PadSites,p=>OnGround(p.x,p.y));
     }
 }

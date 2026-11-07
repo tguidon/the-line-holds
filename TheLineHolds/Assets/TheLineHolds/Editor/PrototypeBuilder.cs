@@ -51,7 +51,7 @@ namespace TheLineHolds.Editor
             controller.audioPlayer=controller.gameObject.AddComponent<BattleAudio>(); BuildAudio(controller.audioPlayer);
             var font=BuildFont(); var hud=new GameObject("Command UI").AddComponent<GameHud>(); hud.font=font; controller.hud=hud;
             PlayerSettings.companyName="The Line Holds"; PlayerSettings.productName="The Line Holds"; PlayerSettings.bundleVersion="0.1.0";
-            PlayerSettings.defaultScreenWidth=1600; PlayerSettings.defaultScreenHeight=900; PlayerSettings.fullScreenMode=FullScreenMode.Windowed; PlayerSettings.resizableWindow=true;
+            PlayerSettings.defaultScreenWidth=1920; PlayerSettings.defaultScreenHeight=1080; PlayerSettings.fullScreenMode=FullScreenMode.Windowed; PlayerSettings.resizableWindow=true;
             PlayerSettings.runInBackground=true; PlayerSettings.macOS.buildNumber="1";
             EditorUtility.SetDirty(profile); EditorUtility.SetDirty(urp);
             EditorSceneManager.SaveScene(scene,Root+"/Scenes/Countryside.unity");

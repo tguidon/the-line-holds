@@ -1,23 +1,36 @@
 """Run: Blender --background --python Tools/Blender/generate_assets.py -- <repo>.
 Original procedural models, metres, +Z forward in Unity. No external assets.
 """
-import bpy, math, os, sys
+import bpy, math, os, sys, random
 from mathutils import Vector
 root = sys.argv[sys.argv.index('--')+1]
 out = os.path.join(root, 'TheLineHolds/Assets/TheLineHolds/Art/Models')
 os.makedirs(out, exist_ok=True)
 materials={}
-for name,c in {'Olive':(.25,.29,.16,1),'Dark':(.075,.085,.065,1),'Steel':(.19,.22,.19,1),'Cloth':(.36,.39,.25,1),'Skin':(.59,.43,.3,1),'Sand':(.51,.44,.29,1),'Wood':(.25,.17,.10,1),'Leaf':(.25,.32,.15,1),'Plaster':(.62,.57,.43,1),'Roof':(.27,.24,.20,1)}.items():
+for name,c in {'Olive':(.25,.29,.16,1),'Dark':(.075,.085,.065,1),'Steel':(.19,.22,.19,1),'Cloth':(.36,.39,.25,1),'Skin':(.59,.43,.3,1),'Sand':(.51,.44,.29,1),'Wood':(.25,.17,.10,1),'Leaf':(.25,.32,.15,1),'Plaster':(.62,.57,.43,1),'Roof':(.27,.24,.20,1),'LeafLight':(.48,.56,.32,1),'LeafDark':(.18,.29,.17,1),'Bark':(.36,.28,.18,1),'Leather':(.28,.21,.13,1),'Edge':(.39,.44,.28,1),'Badge':(.72,.67,.49,1)}.items():
  m=bpy.data.materials.new(name); m.diffuse_color=c; materials[name]=m
 
 def part(name,loc,scale,mat='Olive',shape='cube',rot=None):
- if shape=='sphere': bpy.ops.mesh.primitive_uv_sphere_add(segments=12,ring_count=6,location=loc)
- elif shape=='cylinder': bpy.ops.mesh.primitive_cylinder_add(vertices=12,radius=1,depth=2,location=loc)
+ if shape=='sphere': bpy.ops.mesh.primitive_uv_sphere_add(segments=20,ring_count=12,location=loc)
+ elif shape=='cylinder': bpy.ops.mesh.primitive_cylinder_add(vertices=24,radius=1,depth=2,location=loc)
  elif shape=='cone': bpy.ops.mesh.primitive_cone_add(vertices=9,radius1=1,radius2=.06,depth=2,location=loc)
  else: bpy.ops.mesh.primitive_cube_add(size=2,location=loc)
  o=bpy.context.object; o.name=name; o.scale=scale
  if rot: o.rotation_euler=rot
- o.data.materials.append(materials[mat]); return o
+ o.data.materials.append(materials[mat])
+ if name.startswith('Leaf crown') or name=='Crown top':
+  for v in o.data.vertices:
+   v.co *= 1 + .09*math.sin(v.co.x*11+v.co.y*8)*math.sin(v.co.z*9+v.co.x*4)
+ # Apply scale before bevel so metre-sized edges stay consistent across long thin parts.
+ bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+ if shape=='cube':
+  bevel=o.modifiers.new('Soft manufactured edges','BEVEL');bevel.width=min(scale)*.23;bevel.segments=3
+  bpy.context.view_layer.objects.active=o;bpy.ops.object.modifier_apply(modifier=bevel.name)
+  weighted=o.modifiers.new('Weighted corner normals','WEIGHTED_NORMAL');weighted.keep_sharp=True
+  bpy.ops.object.modifier_apply(modifier=weighted.name)
+ else:
+  for polygon in o.data.polygons: polygon.use_smooth=True
+ return o
 
 def barrel(loc,length=.8,r=.045,angle=0):
  return part('Barrel',loc,(r,r,length/2),'Steel','cylinder',(math.pi/2+angle,0,0))
@@ -58,8 +71,17 @@ def gun(kind):
   for x in [-.2,.2]:part('Bipod',(x,.3,.25),(.025,.025,.28),'Steel','cylinder',(0,x,0))
 
 def tree():
- part('Trunk',(0,0,.85),(.11,.11,.85),'Wood','cylinder')
- for z,s in [(1.3,.85),(1.85,.64),(2.35,.43)]:part('Pine',(0,0,z),(s,s,.65),'Leaf','cone')
+ rng=random.Random(74)
+ part('Root flare',(0,0,.2),(.2,.17,.2),'Bark','sphere')
+ part('Trunk',(0,0,.85),(.095,.095,.8),'Bark','cylinder',(.035,.05,0))
+ for i in range(5):
+  angle=i*math.tau/5
+  part('Branch',(math.cos(angle)*.23,math.sin(angle)*.23,1.3),(.055,.055,.48),'Bark','cylinder',(math.sin(angle)*.6,math.cos(angle)*.6,0))
+ # Broadleaf bocage crowns: irregular overlapping masses rather than stacked cones.
+ for i in range(19):
+  angle=i*2.39996;r=.65*math.sqrt(rng.random());z=1.7+rng.random()*.7
+  part('Leaf crown',(math.cos(angle)*r,math.sin(angle)*r,z),(.42+rng.random()*.21,.4+rng.random()*.2,.38+rng.random()*.22),['Leaf','LeafLight','LeafDark'][i%3],'sphere')
+ part('Crown top',(.07,0,2.45),(.5,.47,.43),'LeafLight','sphere')
 
 def hut():
  part('Walls',(0,0,.65),(1,.7,.65),'Plaster');part('Door',(.35,.707,.38),(.2,.02,.38),'Wood')
@@ -71,9 +93,11 @@ def crate():
  part('Crate',(0,0,.24),(.32,.25,.24),'Wood')
  for x in [-.25,.25]:part('Strap',(x,0,.24),(.025,.26,.25),'Sand')
 
+only=set(sys.argv[sys.argv.index('--only')+1].split(',')) if '--only' in sys.argv else None
 for name,fn in [('Infantry',infantry),('LightTank',tank),('MachineGun',lambda:gun('MachineGun')),('AntiTank',lambda:gun('AntiTank')),('Mortar',lambda:gun('Mortar')),('Pine',tree),('Farmhouse',hut),('Crate',crate),('Sandbags',bags)]:
  scene=bpy.data.scenes.new(name); bpy.context.window.scene=scene; fn()
  bpy.ops.object.select_all(action='SELECT');bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+ if only and name not in only: continue
  bpy.ops.export_scene.fbx(filepath=os.path.join(out,name+'.fbx'),use_selection=True,axis_forward='-Z',axis_up='Y',apply_unit_scale=True,bake_anim=False,add_leaf_bones=False)
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(root,'Tools/Blender/miniatures.blend'))
-print('Generated 9 original miniature models')
+print('Generated original diorama models', only or 'all')

@@ -8,16 +8,17 @@ public static class CheckFeedback
 {
     public static string Geometry()
     {
-        var mesh=AssetDatabase.LoadAssetAtPath<Mesh>("Assets/TheLineHolds/Art/Materials/RoadMesh.asset");
-        var vertices=mesh.vertices;var triangles=mesh.triangles;float clearance=float.MaxValue;Vector3 worst=default;
+        var mesh=AssetDatabase.LoadAssetAtPath<Mesh>("Assets/TheLineHolds/Art/Diorama/Meadow.asset");
+        var vertices=mesh.vertices;var triangles=mesh.triangles;float deviation=0;Vector3 worst=default;
         for(int i=0;i<triangles.Length;i+=3)
             for(int a=0;a<=10;a++)for(int b=0;b<=10-a;b++)
             {
                 var p=(vertices[triangles[i]]*a+vertices[triangles[i+1]]*b+vertices[triangles[i+2]]*(10-a-b))/10;
-                float gap=p.y-BattleRoute.Ground(p.x);if(gap<clearance){clearance=gap;worst=p;}
+                float gap=p.y-BattleRoute.Ground(p.x,p.z);if(Mathf.Abs(gap)>deviation){deviation=Mathf.Abs(gap);worst=p;}
             }
-        string result=$"Road minimum clearance={clearance:0.0000}m at {worst}";Debug.Log("[Road regression] "+result);
-        if(clearance<.015f)throw new Exception("Road intersects terrain: "+result);
+        string result=$"Unified road/meadow maximum surface error={deviation:0.0000}m at {worst}";Debug.Log("[Road regression] "+result);
+        if(deviation>.025f)throw new Exception("Terrain and movement surface diverge: "+result);
+        if(GameObject.Find("Authored winding road"))throw new Exception("Legacy road overlay still exists");
         return result;
     }
     public static string Hud()

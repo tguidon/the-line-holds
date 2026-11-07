@@ -179,7 +179,7 @@ namespace TheLineHolds
             {
                 bool valid=Placement<0 || (Match.Towers[pad]==null && Match.Funds>=definition.cost);
                 ring.startColor=ring.endColor=valid?new Color(.86f,.76f,.39f):new Color(.95f,.28f,.2f);
-                for(int j=0;j<97;j++) { float a=j/96f*Mathf.PI*2; var p=Match.Pads[pad]+new Vector3(Mathf.Cos(a)*definition.range,0,Mathf.Sin(a)*definition.range); p.y=BattleRoute.Ground(p.x)+.18f; ring.SetPosition(j,p); }
+                for(int j=0;j<97;j++) { float a=j/96f*Mathf.PI*2; var p=Match.Pads[pad]+new Vector3(Mathf.Cos(a)*definition.range,0,Mathf.Sin(a)*definition.range); p.y=BattleRoute.Ground(p.x,p.z)+.18f; ring.SetPosition(j,p); }
             }
             bool show=allowed && Placement>=0 && hover>=0 && Match.Towers[hover]==null;
             if(show && previewType!=Placement)
