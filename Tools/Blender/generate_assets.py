@@ -7,7 +7,7 @@ root = sys.argv[sys.argv.index('--')+1]
 out = os.path.join(root, 'TheLineHolds/Assets/TheLineHolds/Art/Models')
 os.makedirs(out, exist_ok=True)
 materials={}
-for name,c in {'Olive':(.25,.29,.16,1),'Dark':(.075,.085,.065,1),'Steel':(.19,.22,.19,1),'Cloth':(.36,.39,.25,1),'Skin':(.59,.43,.3,1),'Sand':(.51,.44,.29,1),'Wood':(.25,.17,.10,1),'Leaf':(.25,.32,.15,1),'Plaster':(.62,.57,.43,1),'Roof':(.27,.24,.20,1),'LeafLight':(.48,.56,.32,1),'LeafDark':(.18,.29,.17,1),'Bark':(.36,.28,.18,1),'Leather':(.28,.21,.13,1),'Edge':(.39,.44,.28,1),'Badge':(.72,.67,.49,1)}.items():
+for name,c in {'Olive':(.25,.29,.16,1),'Dark':(.075,.085,.065,1),'Steel':(.19,.22,.19,1),'Cloth':(.36,.39,.25,1),'Skin':(.59,.43,.3,1),'Sand':(.51,.44,.29,1),'Wood':(.25,.17,.10,1),'Leaf':(.25,.32,.15,1),'Plaster':(.62,.57,.43,1),'Roof':(.27,.24,.20,1),'LeafLight':(.48,.56,.32,1),'LeafDark':(.18,.29,.17,1),'Bark':(.36,.28,.18,1),'Leather':(.28,.21,.13,1),'Edge':(.39,.44,.28,1),'Badge':(.72,.67,.49,1),'BagCloth':(.51,.44,.29,1)}.items():
  m=bpy.data.materials.new(name); m.diffuse_color=c; materials[name]=m
 
 def part(name,loc,scale,mat='Olive',shape='cube',rot=None):
@@ -83,14 +83,17 @@ def infantry():
  for x in [-.12,.12]:part('Belt pouch',(x,.15,.46),(.05,.033,.05),'Sand')
  part('Rifle stock',(.18,.16,.49),(.03,.16,.035),'Wood');barrel((.18,.32,.57),.48,.023)
 
-def bags():
+def bags(radius=.68,count=14):
+ # Complete, staggered courses; long axes follow the circle instead of radiating like petals.
+ rng=random.Random(618)
  for row in range(2):
-  for i in range(5): part('Sandbag',((i-2)*.31+(row%2)*.08,.34,row*.16+.12),(.17,.13,.1),'Sand','sphere')
- for x in [-.68,.68]:
-  for j in range(2):part('SideBag',(x,.03-j*.25,.13),(.13,.17,.11),'Sand','sphere')
+  for i in range(count):
+   angle=(i+row*.5)*math.tau/count
+   r=radius+rng.uniform(-.008,.008)
+   part('Sandbag',(math.cos(angle)*r,math.sin(angle)*r,.10+row*.155),(.163,.115,.09),'BagCloth','sphere',(.025*math.sin(i),.02*math.cos(i),angle+math.pi/2))
 
 def gun(kind):
- bags()
+ bags(.79,16) if kind=='AntiTank' else bags()
  before=set(bpy.context.scene.objects)
  if kind=='MachineGun':
   part('Mount',(0,0,.29),(.045,.045,.26),'Steel','cylinder')
@@ -112,32 +115,72 @@ def gun(kind):
   part('Muzzle brake',(0,1.26,.6),(.085,.09,.075),'Dark')
   for x in [-.32,.32]:
    for z in [.4,.68]:part('Shield rivet',(x,.108,z),(.018,.014,.018),'Edge','sphere')
-  for x in [-.26,.26]:part('Trail',(x,-.55,.18),(.045,.5,.045),'Steel',rot=(0,0,x))
+  for x in [-.2,.2]:part('Trail',(x,-.32,.18),(.045,.24,.045),'Steel',rot=(0,0,x))
   part('Elevation handwheel',(.19,-.2,.52),(.09,.09,.02),'Steel','cylinder',(0,math.pi/2,0))
  else:
   part('Base plate',(0,0,.07),(.3,.3,.045),'Steel','cylinder');barrel((0,.1,.4),.7,.09,-.65)
   part('Tube collar',(0,.22,.57),(.105,.105,.04),'Edge','cylinder',(math.pi/2-.65,0,0))
   for x in [-.2,.2]:part('Bipod',(x,.3,.25),(.025,.025,.28),'Steel','cylinder',(0,x,0))
   part('Sight',(-.13,.14,.5),(.028,.065,.035),'Dark')
-  part('Ammo case',(-.47,-.22,.13),(.14,.23,.12),'Wood')
-  for y in [-.3,-.15]:part('Mortar round',(-.47,y,.28),(.04,.04,.12),'Sand','sphere')
+  part('Ammo case',(-.34,-.16,.13),(.11,.17,.12),'Wood')
+  for y in [-.24,-.1]:part('Mortar round',(-.34,y,.28),(.04,.04,.12),'Sand','sphere')
  # Traverse only the mechanism; the sandbags remain fixed on their emplacement.
  pivot=bpy.data.objects.new('Traverse',None);bpy.context.collection.objects.link(pivot)
  for obj in set(bpy.context.scene.objects)-before:
   if obj!=pivot:obj.parent=pivot
 
+def branch(a,b,radius=.04):
+ delta=Vector(b)-Vector(a)
+ rotation=delta.to_track_quat('Z','Y').to_euler()
+ return part('Branch',(Vector(a)+Vector(b))/2,(radius,radius,delta.length/2),'Bark','cylinder',rotation)
+
+def foliage(name,clusters,count,seed):
+ rng=random.Random(seed);vertices=[];faces=[];uvs=[];shades=[]
+ # Ridged, pointed leaf geometry. Each leaf gets the same UV motif so veins retain real scale.
+ outline=[(.5,0),(.16,.16),(0,.4),(.13,.73),(.5,1),(.87,.73),(1,.4),(.84,.16)]
+ for centre,radii in clusters:
+  for i in range(count):
+   direction=Vector((rng.uniform(-1,1),rng.uniform(-1,1),rng.uniform(-1,1))).normalized()
+   radius=rng.random()**(1/3)
+   position=Vector(centre)+Vector((direction.x*radii[0],direction.y*radii[1],direction.z*radii[2]))*radius
+   normal=(direction+Vector((0,0,.35))).normalized()
+   rotation=normal.to_track_quat('Z','Y')
+   twist=rng.random()*math.tau
+   length=rng.uniform(.14,.24);width=length*rng.uniform(.5,.68)
+   start=len(vertices)
+   for u,v in outline+[(.5,.46)]:
+    x=(u-.5)*width;y=(v-.46)*length
+    z=.012 if (u,v)==(.5,.46) else -.006*abs(v-.46)
+    local=Vector((x*math.cos(twist)-y*math.sin(twist),x*math.sin(twist)+y*math.cos(twist),z))
+    vertices.append(position+rotation@local);uvs.append((u,v))
+   shade=rng.choices([0,1,2],[.5,.3,.2])[0]
+   for j in range(8):faces.append((start+8,start+(j+1)%8,start+j));shades.append(shade)
+ mesh=bpy.data.meshes.new(name);mesh.from_pydata(vertices,[],faces);mesh.update()
+ layer=mesh.uv_layers.new(name='LeafUV')
+ for polygon in mesh.polygons:
+  polygon.material_index=shades[polygon.index]
+  for index in polygon.loop_indices:layer.data[index].uv=uvs[mesh.loops[index].vertex_index]
+ obj=bpy.data.objects.new(name,mesh);bpy.context.collection.objects.link(obj)
+ for material in ['Leaf','LeafLight','LeafDark']:mesh.materials.append(materials[material])
+ return obj
+
 def tree():
- rng=random.Random(74)
- part('Root flare',(0,0,.2),(.2,.17,.2),'Bark','sphere')
- part('Trunk',(0,0,.85),(.095,.095,.8),'Bark','cylinder',(.035,.05,0))
+ part('Trunk',(0,0,.67),(.095,.105,.67),'Bark','cylinder',(.025,.04,0))
+ clusters=[]
  for i in range(5):
-  angle=i*math.tau/5
-  part('Branch',(math.cos(angle)*.23,math.sin(angle)*.23,1.3),(.055,.055,.48),'Bark','cylinder',(math.sin(angle)*.6,math.cos(angle)*.6,0))
- # Broadleaf bocage crowns: irregular overlapping masses rather than stacked cones.
- for i in range(19):
-  angle=i*2.39996;r=.65*math.sqrt(rng.random());z=1.7+rng.random()*.7
-  part('Leaf crown',(math.cos(angle)*r,math.sin(angle)*r,z),(.42+rng.random()*.21,.4+rng.random()*.2,.38+rng.random()*.22),['Leaf','LeafLight','LeafDark'][i%3],'sphere')
- part('Crown top',(.07,0,2.45),(.5,.47,.43),'LeafLight','sphere')
+  angle=i*2.39996
+  endpoint=(math.cos(angle)*.5,math.sin(angle)*.5,1.55+(i%3)*.22)
+  branch((0,0,.7),endpoint,.045)
+  branch(endpoint,(endpoint[0]*1.45,endpoint[1]*1.45,endpoint[2]+.25),.018)
+  clusters.append(((endpoint[0],endpoint[1],endpoint[2]+.25),(.55,.51,.53)))
+ clusters.append(((0,0,2.22),(.48,.45,.45)))
+ foliage('Broadleaf canopy',clusters,125,74)
+
+def bush():
+ for i in range(5):
+  angle=i*2.39996
+  branch((0,0,.02),(math.cos(angle)*.26,math.sin(angle)*.23,.35+(i%2)*.12),.012)
+ foliage('Shrub leaves',[((-.16,0,.27),(.35,.29,.27)),((.17,.06,.36),(.33,.28,.3)),((.02,-.12,.2),(.28,.3,.21))],85,93)
 
 def hut():
  part('Walls',(0,0,.65),(1,.7,.65),'Plaster');part('Door',(.35,.707,.38),(.2,.02,.38),'Wood')
@@ -150,7 +193,7 @@ def crate():
  for x in [-.25,.25]:part('Strap',(x,0,.24),(.025,.26,.25),'Sand')
 
 only=set(sys.argv[sys.argv.index('--only')+1].split(',')) if '--only' in sys.argv else None
-for name,fn in [('Infantry',infantry),('LightTank',tank),('MachineGun',lambda:gun('MachineGun')),('AntiTank',lambda:gun('AntiTank')),('Mortar',lambda:gun('Mortar')),('Pine',tree),('Farmhouse',hut),('Crate',crate),('Sandbags',bags)]:
+for name,fn in [('Infantry',infantry),('LightTank',tank),('MachineGun',lambda:gun('MachineGun')),('AntiTank',lambda:gun('AntiTank')),('Mortar',lambda:gun('Mortar')),('Pine',tree),('Bush',bush),('Farmhouse',hut),('Crate',crate),('Sandbags',bags)]:
  scene=bpy.data.scenes.new(name); bpy.context.window.scene=scene; fn()
  bpy.ops.object.select_all(action='SELECT');bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
  if only and name not in only: continue

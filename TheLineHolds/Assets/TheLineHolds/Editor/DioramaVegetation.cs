@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -11,7 +12,8 @@ namespace TheLineHolds.Editor
         {
             var route=new BattleRoute(BattleRoute.DefaultPoints);var random=new System.Random(1944);
             var grassV=new List<Vector3>();var grassT=new List<int>();var grassColors=new List<Color>();
-            var shrubs=new List<CombineInstance>();var stones=new List<CombineInstance>();
+            var shrubs=new Dictionary<Material,List<CombineInstance>>();var stones=new List<CombineInstance>();
+            var bush=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/TheLineHolds/Prefabs/Bush.prefab");
             var sphere=GameObject.CreatePrimitive(PrimitiveType.Sphere);var shape=sphere.GetComponent<MeshFilter>().sharedMesh;
             UnityEngine.Object.DestroyImmediate(sphere);
             float R()=> (float)random.NextDouble();
@@ -40,10 +42,20 @@ namespace TheLineHolds.Editor
                     grassT.AddRange(new[]{index,index+2,index+1});
                     var color=Color.Lerp(DioramaSurface.Hex("61754A"),DioramaSurface.Hex("B4B47C"),R());grassColors.Add(color);grassColors.Add(color);grassColors.Add(color);
                 }
-                if(i%15==0 && RoadDistance(p)>1.35f)
+                if(i%15==0 && RoadDistance(p)>1.45f && !BattleRoute.DefaultPads.Any(pad=>new Vector2(pad.x-x,pad.z-z).magnitude<1.55f))
                 {
                     float s=.22f+R()*.3f;
-                    for(int k=0;k<3;k++)shrubs.Add(new CombineInstance{mesh=shape,transform=Matrix4x4.TRS(p+new Vector3((R()-.5f)*.5f,s*.25f,(R()-.5f)*.5f),Quaternion.Euler(R()*25,R()*360,0),new Vector3(s*1.8f,s,s*1.4f))});
+                    var placement=Matrix4x4.TRS(p,Quaternion.Euler(0,R()*360,0),Vector3.one*(.75f+s));
+                    foreach(var filter in bush.GetComponentsInChildren<MeshFilter>())
+                    {
+                        var renderer=filter.GetComponent<MeshRenderer>();
+                        for(int sub=0;sub<filter.sharedMesh.subMeshCount;sub++)
+                        {
+                            var material=renderer.sharedMaterials[sub];
+                            if(!shrubs.TryGetValue(material,out var list)){list=new List<CombineInstance>();shrubs[material]=list;}
+                            list.Add(new CombineInstance{mesh=filter.sharedMesh,subMeshIndex=sub,transform=placement*bush.transform.worldToLocalMatrix*filter.transform.localToWorldMatrix});
+                        }
+                    }
                 }
                 if(i%23==0)stones.Add(new CombineInstance{mesh=shape,transform=Matrix4x4.TRS(p,Quaternion.Euler(R()*40,R()*360,R()*25),new Vector3(.14f+R()*.17f,.09f+R()*.08f,.13f+R()*.2f))});
             }
@@ -56,8 +68,11 @@ namespace TheLineHolds.Editor
             var grass=new Mesh{name="Meadow grass clusters"};grass.SetVertices(grassV);grass.SetTriangles(grassT,0);grass.SetColors(grassColors);grass.RecalculateNormals();
             var blades=DioramaBuilder.Material("Grass blades","829564");blades.SetFloat("_Cull",0);UnityEditor.EditorUtility.SetDirty(blades);
             Display("Meadow grass clusters",grass,blades);
-            var bushes=new Mesh{name="Hedgerow undergrowth",indexFormat=IndexFormat.UInt32};bushes.CombineMeshes(shrubs.ToArray());
-            Display("Hedgerow undergrowth",bushes,DioramaBuilder.Material("Hedge foliage","61754A"));
+            foreach(var group in shrubs)
+            {
+                var leaves=new Mesh{name="Leafy shrubs "+group.Key.name,indexFormat=IndexFormat.UInt32};leaves.CombineMeshes(group.Value.ToArray());
+                Display(leaves.name,leaves,group.Key);
+            }
             var rocks=new Mesh{name="Weathered field stones"};rocks.CombineMeshes(stones.ToArray());
             Display("Weathered field stones",rocks,DioramaBuilder.Material("Warm limestone","9B9C87"));
         }

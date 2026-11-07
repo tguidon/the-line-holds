@@ -40,3 +40,9 @@ Skill references: `craft-game-floors/references/art-direction.md`, `scene-lighti
 Engine documentation: [Unity 6.6 Volumes](https://docs.unity.com/en-us/engine/6000.6/manual/post-processing-and-full-screen-effects/urp/volumes-landing-page), [Bloom](https://docs.unity.com/en-us/engine/6000.6/manual/post-processing-and-full-screen-effects/urp/effect-list/bloom), and [defaultScreenWidth](https://docs.unity.com/en-us/engine/6000.6/script-reference/unityeditor/playersettings/defaultscreenwidth). The attempted ambient-lighting documentation link was unavailable; the installed engine API and live probes supplied that check.
 
 No packages, services, external art, or computer-use tools were added. Original Blender source and deterministic editor generators remain in version control. Windows runtime review remains deferred to a future VM.
+
+## Follow-up: leaves and circular sandbags
+
+The user requested readable leaf detail instead of cloud-like bushes/trees and complete circular sandbag walls. `sandbag-rings.png` records all three gun roles; `leaf-detail.png` is a temporary 2.8-orthographic-size material review, closer than the unchanged 5.5 gameplay zoom limit. The temporary camera controller override ends when Play Mode stops. `foliage-overview.png` records the native gameplay view.
+
+Canopies now use individually shaped leaves, visible branches, vein/color texture, and three related greens. The first leaf draft had inverted surface normals; the fix corrected face winding before handoff. The established palette, lighting, UI, and gameplay are retained. Scoped style/silhouette scores remain at least 3/5, now supported by leaf shapes at overview and veins at close review. No smooth canopy spheres remain.

@@ -78,11 +78,12 @@ namespace TheLineHolds.Editor
             Surface("Exposed earth layers",SaveMesh(DioramaSurface.Earth(),"Earth"),earth);
             var plinth=GameObject.CreatePrimitive(PrimitiveType.Cube);plinth.name="Miniature display plinth";plinth.transform.SetParent(environment);plinth.transform.position=new Vector3(0,-1.47f,0);plinth.transform.localScale=new Vector3(24.3f,.3f,14.3f);plinth.GetComponent<Renderer>().sharedMaterial=Material("Display charcoal","303B38");UnityEngine.Object.DestroyImmediate(plinth.GetComponent<Collider>());
             AssetDatabase.DeleteAsset(DioramaSurface.Root+"/RoadDiagnostic.asset");
-            RefreshModels(new[]{"Pine","Farmhouse","Crate","Sandbags"});
+            RefreshModels(new[]{"Pine","Bush","Farmhouse","Crate","Sandbags"});
             var trees=new[]{new Vector2(-10.8f,5.6f),new Vector2(-11,2.5f),new Vector2(-10.9f,-.5f),new Vector2(-8.6f,6),new Vector2(-1.2f,6.2f),new Vector2(2.8f,6.1f),new Vector2(10.5f,-5.7f),new Vector2(11,-3),new Vector2(11,6.1f)};
             for(int i=0;i<trees.Length;i++)Model("Pine",BattleRoute.OnGround(trees[i].x,trees[i].y),.8f+(i%3)*.13f,i*57);
             Model("Farmhouse",BattleRoute.OnGround(-10.4f,.1f),.65f,15);Model("Farmhouse",BattleRoute.OnGround(10.4f,-.4f),.65f,-20);
             Model("Crate",BattleRoute.OnGround(-3,6),.7f,20);Model("Crate",BattleRoute.OnGround(9.8f,4),.7f,-15);
+            FoliageMaterials.Configure();
             DioramaVegetation.Build(environment);
             Lighting(game.battleCamera);
             PlayerSettings.defaultScreenWidth=1920;PlayerSettings.defaultScreenHeight=1080;PlayerSettings.fullScreenMode=FullScreenMode.Windowed;PlayerSettings.resizableWindow=true;
@@ -95,6 +96,7 @@ namespace TheLineHolds.Editor
             if(EditorApplication.isPlaying)throw new InvalidOperationException("Stop Play Mode before authoring prefabs.");
             foreach(var name in names)
             {
+                AssetDatabase.ImportAsset(Root+"/Art/Models/"+name+".fbx",ImportAssetOptions.ForceUpdate|ImportAssetOptions.ForceSynchronousImport);
                 var model=AssetDatabase.LoadAssetAtPath<GameObject>(Root+"/Art/Models/"+name+".fbx");if(!model)throw new Exception("Missing model "+name);
                 var go=UnityEngine.Object.Instantiate(model);go.name=name;
                 if(name=="Infantry" || name=="LightTank")
@@ -114,7 +116,7 @@ namespace TheLineHolds.Editor
             }
             AssetDatabase.SaveAssets();return "Updated "+string.Join(", ",names);
         }
-        static string ExtraColor(string name)=>name.Contains("LeafLight")?"738451":name.Contains("LeafDark")?"4C633E":name.Contains("Bark")?"71604A":name.Contains("Leather")?"604B36":name.Contains("Edge")?"6F7859":name.Contains("Badge")?"D0C4A0":"747C60";
+        static string ExtraColor(string name)=>name.Contains("BagCloth")?"A18C60":name.Contains("LeafLight")?"738451":name.Contains("LeafDark")?"4C633E":name.Contains("Bark")?"71604A":name.Contains("Leather")?"604B36":name.Contains("Edge")?"6F7859":name.Contains("Badge")?"D0C4A0":"747C60";
         static void Lighting(Camera camera)
         {
             var light=UnityEngine.Object.FindObjectsByType<Light>().First(l=>l.type==LightType.Directional);

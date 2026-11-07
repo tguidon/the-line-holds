@@ -15,3 +15,7 @@ With Countryside open and Play Mode stopped, run `TheLineHolds.Editor.DioramaBui
 `BattleRoute.Ground(x,z)` is shared by terrain, pad placement, range previews, and unit movement. Road corners use short quadratic transitions. The road pigment and wheel ruts are baked into the meadow texture, so there is no visible coplanar road overlay to clip at hills.
 
 The map-wide surface is the base for step 2a. Steps 2b and 2c establish matching tower and enemy targets. Step 3 can add authored local stories and richer variations; steps 4 and 5 can expand motion and combat feedback after visual review.
+
+## Leaf and fortification refinement
+
+Tree crowns and shrubs use individually shaped, ridged leaves over branches, with a shared leaf-vein texture and three related green materials. Avoid smooth cloud-shaped canopy balls. Bush meshes combine by material for efficient drawing. Sandbag walls form full circles with two staggered courses; bags follow the tangent of the wall, and the gun mechanism rotates within the fixed wall. Cannon wheels/trails and mortar supplies fit inside their respective rings.
