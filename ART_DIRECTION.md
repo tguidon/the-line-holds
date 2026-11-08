@@ -21,3 +21,7 @@ The map-wide surface is the base for step 2a. Steps 2b and 2c establish matching
 Tree crowns and shrubs use individually shaped, ridged leaves over branches, with a shared leaf-vein texture and three related green materials. Avoid smooth cloud-shaped canopy balls. Bush meshes combine by material for efficient drawing. Sandbag walls form full circles with two staggered courses; bags follow the tangent of the wall, and the gun mechanism rotates within the fixed wall. Cannon wheels/trails and mortar supplies fit inside their respective rings.
 
 Architecture uses crisp plaster/stone corners with very small edge breaks. Farmhouse roofs descend from one ridge to matching eaves, with closed gables, coursed slate and seated chimney details. Keep building corners and roof planes more angular than foliage and fabric. Static detail is combined by material.
+
+## Battlefield composition
+
+Gun sites are bare-earth clearings with faint access tracks and low timber markers, with no numbering or raised display pedestals. The original ten placement anchors are preserved. Enemy and defended endpoints use physical farm-gate/checkpoint details and two-sided painted wood signs; their lettering is baked into board textures so it stays attached during camera orbit. Road pigment reaches both map edges. Exposed earth uses three wavy horizons, world-sized grain/stone detail, a muted root mat, and embedded stones. Small crop plots, farm fences and a timber-lined field position give the unused margins a purpose. Keep the whole vehicle corridor free of scenery.

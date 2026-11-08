@@ -30,7 +30,7 @@ namespace TheLineHolds.Editor
             for(int i=0;i<2100;i++)
             {
                 float x=R()*23.4f-11.7f,z=R()*13.4f-6.7f;var p=BattleRoute.OnGround(x,z);
-                if(RoadDistance(p)<.83f || BattleRoute.DefaultPads.Any(pad=>new Vector2(pad.x-x,pad.z-z).magnitude<1.0f))continue;
+                if(BattlefieldDetails.Reserved(p) || RoadDistance(p)<.83f || BattleRoute.DefaultPads.Any(pad=>new Vector2(pad.x-x,pad.z-z).magnitude<1.0f))continue;
                 float patch=Mathf.PerlinNoise(x*.65f+37,z*.65f+52);
                 if(patch<.44f)continue;
                 for(int blade=0;blade<5;blade++)

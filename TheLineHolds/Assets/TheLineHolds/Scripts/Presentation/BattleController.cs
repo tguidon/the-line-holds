@@ -17,7 +17,7 @@ namespace TheLineHolds
         public MatchState Match { get; private set; }
         public int Placement { get; private set; } = -1;
         public int SelectedPad { get; private set; } = -1;
-        public string Notice { get; private set; } = "Choose a defense, then click a numbered emplacement.";
+        public string Notice { get; private set; } = "Choose a defense, then click a cleared gun site.";
         public bool InMenu { get; private set; } = true;
         readonly Dictionary<int, GameObject> enemyViews = new Dictionary<int, GameObject>();
         readonly Dictionary<int, Transform> healthViews = new Dictionary<int, Transform>();
@@ -118,7 +118,7 @@ namespace TheLineHolds
         public void ClickPad(int pad)
         {
             if(Match==null || Match.Paused || Match.Ended || pad<0 || pad>=Match.Pads.Length) return;
-            if(Match.Towers[pad]!=null) { SelectedPad=pad; Placement=-1; Notice="Emplacement "+(pad+1)+" selected."; return; }
+            if(Match.Towers[pad]!=null) { SelectedPad=pad; Placement=-1; Notice="Emplacement selected."; return; }
             if(Placement<0) { SelectedPad=-1; Notice="Select a defense from the supply bar first."; return; }
             if(!Match.Build(pad,defenses[Placement])) { Notice="Insufficient funds for this defense."; return; }
             Notice=defenses[Placement].displayName+" deployed. Right-click to finish building.";
@@ -148,7 +148,7 @@ namespace TheLineHolds
             {
                 var t=Match.Towers[i];
                 if(t==null) { if(towerViews.TryGetValue(i,out var old)) { Destroy(old); towerViews.Remove(i); } continue; }
-                if(!towerViews.TryGetValue(i,out var view)) { view=Instantiate(t.Definition.prefab,Match.Pads[i]+Vector3.up*.025f,Quaternion.identity,dynamicRoot); towerViews[i]=view; }
+                if(!towerViews.TryGetValue(i,out var view)) { view=Instantiate(t.Definition.prefab,Match.Pads[i]-Vector3.up*.015f,Quaternion.identity,dynamicRoot); towerViews[i]=view; }
                 var target=Match.Target(t);var visual=view.GetComponent<TowerVisual>();
                 if(visual)visual.Aim(target!=null?target.Position-view.transform.position:Vector3.zero,Match.Paused || Match.Ended?0:Time.deltaTime);
                 else if(target!=null) { var d=target.Position-view.transform.position; d.y=0; view.transform.rotation=Quaternion.LookRotation(d); }
@@ -190,7 +190,7 @@ namespace TheLineHolds
                 if(preview) Destroy(preview); preview=Instantiate(defenses[Placement].prefab,dynamicRoot); previewType=Placement;
                 foreach(var renderer in preview.GetComponentsInChildren<Renderer>()) renderer.sharedMaterial=rangeMaterial;
             }
-            if(preview) { preview.SetActive(show); if(show) preview.transform.position=Match.Pads[hover]+Vector3.up*.065f; }
+            if(preview) { preview.SetActive(show); if(show) preview.transform.position=Match.Pads[hover]+Vector3.up*.025f; }
         }
         void OnCue(string cue,Vector3 position)
         {

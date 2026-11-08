@@ -69,7 +69,7 @@ public static class CheckInput
             Check(game.Placement == -1 && !game.Match.Paused, "Escape cancels placement before pausing");
             pointer = new Vector2(Screen.width*.5f,Screen.height*.5f); MouseEvent(); await Frame();
             var homePosition=game.battleCamera.transform.position;var homeRotation=game.battleCamera.transform.rotation;
-            var label=UnityEngine.Object.FindObjectsByType<TMPro.TextMeshPro>().First();var labelRotation=label.transform.rotation;
+            var landmark=GameObject.Find("Enemy entry gateway").transform;var landmarkRotation=landmark.rotation;
             float zoom = game.battleCamera.orthographicSize;
             MouseEvent(0, 120); await Frame(); Check(game.battleCamera.orthographicSize < zoom, "wheel zooms");
             MouseEvent(0, 4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, MapCameraControls.MinimumZoom), "close zoom minimum clamps");
@@ -81,7 +81,7 @@ public static class CheckInput
             var rotation=game.battleCamera.transform.rotation;
             MouseEvent(4); await Frame(); MouseEvent(4,delta:new Vector2(120,0)); await Frame(); MouseEvent(); await Frame();
             Check(Quaternion.Angle(rotation,game.battleCamera.transform.rotation)>20,"middle drag rotates map");
-            Check(Quaternion.Angle(labelRotation,label.transform.rotation)>20,"world labels follow camera orbit");
+            Check(Quaternion.Angle(landmarkRotation,landmark.rotation)<.01f,"physical landmarks remain fixed during camera orbit");
             await Button("RESET VIEW");await Button("Shop Machine");
             pointer=Pad(4);MouseEvent();await Frame();
             int fundsBeforeDrag=game.Match.Funds;

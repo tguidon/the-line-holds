@@ -45,7 +45,7 @@ namespace TheLineHolds
             resetView.GetComponentInChildren<TextMeshProUGUI>().fontSize=14;
             help=Panel("Field guide",transform,new Vector2(0,1),new Vector2(0,1),new Vector2(24,-222),new Vector2(399,-110),new Color(.08f,.1f,.09f,.86f));
             Label(help.transform,"HOLD THE ROAD",new Vector2(16,-12),new Vector2(340,25),18,accent);
-            Label(help.transform,"Build overlapping defenses on numbered pads.\nRight-click: cancel  /  Esc: pause",new Vector2(16,-44),new Vector2(345,59),14,paper);
+            Label(help.transform,"Build overlapping defenses on cleared gun sites.\nRight-click: cancel  /  Esc: pause",new Vector2(16,-44),new Vector2(345,59),14,paper);
             sell=Panel("Inspection",transform,new Vector2(1,1),new Vector2(1,1),new Vector2(-360,-280),new Vector2(-24,-120),ink);
             selection=Label(sell.transform,"",new Vector2(18,-12),new Vector2(300,66),18,paper);
             Button(sell.transform,"SELL",new Vector2(18,-91),new Vector2(298,48),()=>game.SellSelected());

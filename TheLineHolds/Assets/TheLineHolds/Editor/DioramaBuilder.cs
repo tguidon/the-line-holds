@@ -58,33 +58,36 @@ namespace TheLineHolds.Editor
             // Keep the authored pad and marker objects, including their controller references.
             foreach(Transform t in old.transform.Cast<Transform>().ToArray())
             {
-                bool keep=t.name.StartsWith("Emplacement ") || t.name=="Pad number" || t.name.Contains("ENTRY") || t.name.Contains("EXIT");
+                bool keep=t.name.StartsWith("Emplacement ");
                 if(!keep)UnityEngine.Object.DestroyImmediate(t.gameObject);
             }
             var game=UnityEngine.Object.FindAnyObjectByType<BattleController>();
             for(int i=0;i<game.padViews.Length;i++)
             {
-                var pad=game.padViews[i];pad.position=BattleRoute.DefaultPads[i];pad.localScale=new Vector3(1.42f,.035f,1.42f);
-                pad.GetComponent<Renderer>().sharedMaterial=Material("Emplacement limestone","B5AB83");
+                var pad=game.padViews[i];pad.position=BattleRoute.DefaultPads[i];pad.localScale=Vector3.one;
+                // Preserve placement references; the visible site is now pigment and timber in the terrain.
+                if(pad.TryGetComponent<MeshRenderer>(out var renderer))UnityEngine.Object.DestroyImmediate(renderer);
+                if(pad.TryGetComponent<MeshFilter>(out var filter))UnityEngine.Object.DestroyImmediate(filter);
             }
-            var numbers=old.GetComponentsInChildren<TMPro.TextMeshPro>().Where(t=>t.name=="Pad number").ToArray();
-            for(int i=0;i<numbers.Length;i++){numbers[i].transform.position=BattleRoute.DefaultPads[i]+new Vector3(0,.075f,-.45f);numbers[i].transform.rotation=Quaternion.Euler(90,0,0);}
-            foreach(var t in old.GetComponentsInChildren<TMPro.TextMeshPro>().Where(t=>t.name!="Pad number"))
-            {var p=t.transform.position;p.y=BattleRoute.Ground(p.x,p.z)+1.7f;t.transform.position=p;}
             environment=new GameObject("Diorama landscape").transform;
             var turf=Material("Meadow and worn road","FFFFFF");turf.mainTexture=DioramaSurface.Paint();EditorUtility.SetDirty(turf);
             Surface("Continuous rolling meadow and road",SaveMesh(DioramaSurface.Terrain(),"Meadow"),turf);
-            var earth=Material("Earth strata","FFFFFF");earth.mainTexture=DioramaSurface.EarthPaint();EditorUtility.SetDirty(earth);
-            Surface("Exposed earth layers",SaveMesh(DioramaSurface.Earth(),"Earth"),earth);
+            var earthTexture=DioramaSurface.EarthPaint();
+            var strata=new[]{Material("Earth compact clay","514735"),Material("Earth sandy subsoil","816C4D"),Material("Earth rooted topsoil","464A31")};
+            foreach(var material in strata){material.mainTexture=earthTexture;material.SetFloat("_Smoothness",.05f);EditorUtility.SetDirty(material);}
+            strata[2].color=Color.white;strata[2].mainTexture=DioramaSurface.RootPaint();EditorUtility.SetDirty(strata[2]);
+            var earth=Surface("Exposed earth layers",SaveMesh(DioramaSurface.Earth(),"Earth"),strata[0]);earth.GetComponent<MeshRenderer>().sharedMaterials=strata;
             var plinth=GameObject.CreatePrimitive(PrimitiveType.Cube);plinth.name="Miniature display plinth";plinth.transform.SetParent(environment);plinth.transform.position=new Vector3(0,-1.47f,0);plinth.transform.localScale=new Vector3(24.3f,.3f,14.3f);plinth.GetComponent<Renderer>().sharedMaterial=Material("Display charcoal","303B38");UnityEngine.Object.DestroyImmediate(plinth.GetComponent<Collider>());
             AssetDatabase.DeleteAsset(DioramaSurface.Root+"/RoadDiagnostic.asset");
-            RefreshModels(new[]{"Pine","Bush","Farmhouse","Crate","Sandbags"});
-            var trees=new[]{new Vector2(-10.8f,5.6f),new Vector2(-11,2.5f),new Vector2(-10.9f,-.5f),new Vector2(-8.6f,6),new Vector2(-1.2f,6.2f),new Vector2(2.8f,6.1f),new Vector2(10.5f,-5.7f),new Vector2(11,-3),new Vector2(11,6.1f)};
+            AssetDatabase.DeleteAsset(DioramaSurface.Root+"/Earth strata.mat");
+            RefreshModels(new[]{"Pine","Bush","Farmhouse","Crate","Sandbags","FieldGate","Checkpoint","RoadSign","FieldFence","BuildStake","Revetment","Duckboard","FieldStone"});
+            var trees=new[]{new Vector2(-10.8f,5.6f),new Vector2(-11,2.5f),new Vector2(-10.9f,-.5f),new Vector2(-8.6f,6),new Vector2(-1.2f,6.2f),new Vector2(2.8f,6.1f),new Vector2(10.5f,-5.7f),new Vector2(11,-3),new Vector2(9.3f,6.4f)};
             for(int i=0;i<trees.Length;i++)Model("Pine",BattleRoute.OnGround(trees[i].x,trees[i].y),.8f+(i%3)*.13f,i*57);
             Model("Farmhouse",BattleRoute.OnGround(-10.4f,.1f),.65f,15);Model("Farmhouse",BattleRoute.OnGround(10.4f,-.4f),.65f,-20);
             Model("Crate",BattleRoute.OnGround(-3,6),.7f,20);Model("Crate",BattleRoute.OnGround(9.8f,4),.7f,-15);
             FoliageMaterials.Configure();
             DioramaVegetation.Build(environment);
+            BattlefieldDetails.Build(environment);
             AssetDatabase.DeleteAsset(DioramaSurface.Root+"/Hedgerow undergrowth.asset");
             AssetDatabase.DeleteAsset(DioramaSurface.Root+"/Hedge foliage.mat");
             Lighting(game.battleCamera);

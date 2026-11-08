@@ -16,7 +16,7 @@ Build one complete, replayable WWII tower defense level to test placement, tower
 
 - One compact countryside battlefield with a winding road, one enemy entrance, and one defended exit.
 - One fixed route, following authored waypoints. Towers never block or change the route.
-- Two or three terrain tiers connected by gentle road ramps, with roughly 10 fixed build pads distributed along the route.
+- Rolling terrain with roughly 10 fixed gun sites distributed along the route. Sites are cleared earth with timber markers, blended into the meadow.
 - Tiering creates the miniature landscape and placement choices. Height grants no damage or range bonuses in the prototype; terrain and props do not block shots.
 - Elevated three-quarter overview with full 360-degree orbit, orthographic zoom from 5.5 to 18 (default 13.5), and bounded ground-plane panning. Keep the whole battlefield visible at the default view; provide a reset action. Labels and health bars remain readable while rotating.
 - Keep enemies and build pads readable: avoid trees, cliffs, or buildings obscuring the road from this camera angle.

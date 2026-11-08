@@ -12,3 +12,5 @@ No historical faction insignia or third-party reference art is included.
 - Broadleaf tree and shrub meshes: original leaf/branch geometry generated in `Tools/Blender/generate_assets.py`, including individual leaf UVs. Leaf veins and sandbag weave: original procedural textures generated in `FoliageMaterials.cs`. No external foliage art or texture source.
 
 - Revised farmhouse architecture and coursed slate roof: original procedural Blender geometry in `generate_assets.py`, with editable source retained in `miniatures.blend`. No external building assets.
+
+- Field gates, raised checkpoint boom, road signs, fences, stakes, timber revetments, duckboards and field stones: original Blender field kit in `generate_assets.py`. Soil/root and stencil-sign textures: original deterministic editor generation in `DioramaSurface` and `BattlefieldDetails`.

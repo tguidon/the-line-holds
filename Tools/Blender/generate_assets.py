@@ -7,7 +7,7 @@ root = sys.argv[sys.argv.index('--')+1]
 out = os.path.join(root, 'TheLineHolds/Assets/TheLineHolds/Art/Models')
 os.makedirs(out, exist_ok=True)
 materials={}
-for name,c in {'Olive':(.25,.29,.16,1),'Dark':(.075,.085,.065,1),'Steel':(.19,.22,.19,1),'Cloth':(.36,.39,.25,1),'Skin':(.59,.43,.3,1),'Sand':(.51,.44,.29,1),'Wood':(.25,.17,.10,1),'Leaf':(.25,.32,.15,1),'Plaster':(.62,.57,.43,1),'Roof':(.27,.24,.20,1),'LeafLight':(.48,.56,.32,1),'LeafDark':(.18,.29,.17,1),'Bark':(.36,.28,.18,1),'Leather':(.28,.21,.13,1),'Edge':(.39,.44,.28,1),'Badge':(.72,.67,.49,1),'BagCloth':(.51,.44,.29,1),'Masonry':(.57,.55,.47,1),'RoofSlate':(.28,.33,.32,1),'RoofSlateLight':(.34,.39,.36,1),'RoofTrim':(.19,.23,.22,1),'WindowGlass':(.13,.2,.22,1),'Shutter':(.27,.35,.26,1)}.items():
+for name,c in {'Olive':(.25,.29,.16,1),'Dark':(.075,.085,.065,1),'Steel':(.19,.22,.19,1),'Cloth':(.36,.39,.25,1),'Skin':(.59,.43,.3,1),'Sand':(.51,.44,.29,1),'Wood':(.25,.17,.10,1),'Leaf':(.25,.32,.15,1),'Plaster':(.62,.57,.43,1),'Roof':(.27,.24,.20,1),'LeafLight':(.48,.56,.32,1),'LeafDark':(.18,.29,.17,1),'Bark':(.36,.28,.18,1),'Leather':(.28,.21,.13,1),'Edge':(.39,.44,.28,1),'Badge':(.72,.67,.49,1),'BagCloth':(.51,.44,.29,1),'Masonry':(.57,.55,.47,1),'RoofSlate':(.28,.33,.32,1),'RoofSlateLight':(.34,.39,.36,1),'RoofTrim':(.19,.23,.22,1),'WindowGlass':(.13,.2,.22,1),'Shutter':(.27,.35,.26,1),'SignPaint':(.65,.6,.43,1)}.items():
  m=bpy.data.materials.new(name); m.diffuse_color=c; materials[name]=m
 
 def part(name,loc,scale,mat='Olive',shape='cube',rot=None,edge=None):
@@ -249,8 +249,78 @@ def crate():
  part('Crate',(0,0,.24),(.32,.25,.24),'Wood')
  for x in [-.25,.25]:part('Strap',(x,0,.24),(.025,.26,.25),'Sand')
 
+def combine_static(prefix):
+ groups={}
+ for obj in list(bpy.context.scene.objects):
+  if obj.type=='MESH':groups.setdefault(obj.data.materials[0].name,[]).append(obj)
+ for material,objects in groups.items():
+  bpy.ops.object.select_all(action='DESELECT')
+  for obj in objects:obj.select_set(True)
+  bpy.context.view_layer.objects.active=objects[0];bpy.ops.object.join();bpy.context.object.name=prefix+' '+material
+
+def gate():
+ # Open farm entrance. The 1.8 m corridor accommodates armor without decorative intersections.
+ for x in [-1,1]:
+  for row in range(3):part('Gate pier',(x*.99,0,.09+row*.17),(.14,.15,.08),'Masonry',edge=.009)
+  part('Pier coping',(x*.99,0,.55),(.18,.18,.04),'Masonry',edge=.009)
+  part('Gate hinge',(x*.99,0,.77),(.055,.055,.2),'Wood',edge=.006)
+  # Gate leaves lie open along the verge, rather than crossing the lane.
+  for y in [-.26,-.75]:part('Open gate upright',(x*1.10,y,.39),(.04,.04,.36),'Wood',edge=.005)
+  for z in [.22,.62]:part('Open gate rail',(x*1.10,-.5,z),(.035,.38,.035),'Wood',edge=.004)
+ combine_static('Farm gate')
+
+def checkpoint():
+ for x in [-1,1]:
+  part('Checkpoint timber',(x*1.04,0,.47),(.065,.07,.47),'Wood',edge=.006)
+  part('Timber pale tip',(x*1.04,0,.94),(.08,.085,.025),'Sand',edge=.003)
+  for i in range(4):part('Verge sandbag',(x*(1.04+(i%2)*.19),-.16-i//2*.22,.10),(.12,.17,.09),'BagCloth','sphere')
+ # Raised boom stays above the road, with its support on the verge.
+ part('Raised boom',(-1.04,0,1.10),(.035,.035,.55),'Sand',rot=(0,-.6,0),edge=.004)
+ part('Boom hinge',(-1.04,0,.7),(.1,.09,.08),'Steel',edge=.008)
+ combine_static('Road checkpoint')
+
+def signpost():
+ part('Sign post',(0,0,.6),(.045,.045,.6),'Wood',edge=.004)
+ part('Sign board',(0,0,1.13),(.5,.045,.17),'Wood',edge=.006)
+ # Two printed faces; fixed geometry cannot detach as the player orbits the camera.
+ for side in [-1,1]:
+  verts=[(-.47,side*.047,.985),(.47,side*.047,.985),(.47,side*.047,1.275),(-.47,side*.047,1.275)]
+  m=bpy.data.meshes.new('Sign face');m.from_pydata(verts,[],[(0,1,2,3)] if side<0 else [(3,2,1,0)])
+  uv=m.uv_layers.new(name='SignUV');coords=[(0,0),(1,0),(1,1),(0,1)]
+  if side>0:coords=[(1,0),(0,0),(0,1),(1,1)]
+  for loop in m.loops:uv.data[loop.index].uv=coords[loop.vertex_index]
+  obj=bpy.data.objects.new('Sign face',m);bpy.context.collection.objects.link(obj);m.materials.append(materials['SignPaint'])
+ for x in [-.43,.43]:part('Board nail',(x,-.052,1.13),(.012,.008,.012),'Steel','sphere')
+ combine_static('Road sign')
+
+def fence():
+ for x in [-.65,.65]:part('Fence post',(x,0,.35),(.045,.055,.35),'Wood',edge=.005)
+ for z in [.24,.53]:part('Fence rail',(0,0,z),(.69,.03,.035),'Wood',edge=.004)
+ part('Fence brace',(0,0,.37),(.65,.022,.025),'Wood',rot=(0,-.22,0),edge=.003)
+ combine_static('Farm fence')
+
+def stake():
+ part('Survey stake',(0,0,.065),(.035,.035,.095),'Wood',edge=.003)
+ part('Pale stake cap',(0,0,.146),(.036,.036,.015),'Sand',edge=.002)
+
+def revetment():
+ for i in range(12):
+  part('Trench plank',((i-5.5)*.13,0,.14),(.062,.035,.14),'Wood',rot=(0,(i%3-1)*.025,0),edge=.003)
+ for x in [-.6,.6]:part('Trench support',(x,-.04,.12),(.035,.055,.16),'Bark',edge=.004)
+ combine_static('Field revetment')
+
+def duckboard():
+ for i in range(12):part('Duckboard',((i-5.5)*.13,0,.018),(.055,.22,.016),'Wood',edge=.003)
+ combine_static('Duckboards')
+
+def fieldstone():
+ bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1,radius=1)
+ o=bpy.context.object;o.name='Cut stone';o.data.materials.append(materials['Masonry'])
+ for v in o.data.vertices:v.co*=1+.12*math.sin(v.co.x*5+v.co.z*7)
+ for p in o.data.polygons:p.use_smooth=True
+
 only=set(sys.argv[sys.argv.index('--only')+1].split(',')) if '--only' in sys.argv else None
-for name,fn in [('Infantry',infantry),('LightTank',tank),('MachineGun',lambda:gun('MachineGun')),('AntiTank',lambda:gun('AntiTank')),('Mortar',lambda:gun('Mortar')),('Pine',tree),('Bush',bush),('Farmhouse',hut),('Crate',crate),('Sandbags',bags)]:
+for name,fn in [('Infantry',infantry),('LightTank',tank),('MachineGun',lambda:gun('MachineGun')),('AntiTank',lambda:gun('AntiTank')),('Mortar',lambda:gun('Mortar')),('Pine',tree),('Bush',bush),('Farmhouse',hut),('Crate',crate),('Sandbags',bags),('FieldGate',gate),('Checkpoint',checkpoint),('RoadSign',signpost),('FieldFence',fence),('BuildStake',stake),('Revetment',revetment),('Duckboard',duckboard),('FieldStone',fieldstone)]:
  scene=bpy.data.scenes.new(name); bpy.context.window.scene=scene; fn()
  bpy.ops.object.select_all(action='SELECT');bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
  if only and name not in only: continue
