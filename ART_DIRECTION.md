@@ -19,3 +19,5 @@ The map-wide surface is the base for step 2a. Steps 2b and 2c establish matching
 ## Leaf and fortification refinement
 
 Tree crowns and shrubs use individually shaped, ridged leaves over branches, with a shared leaf-vein texture and three related green materials. Avoid smooth cloud-shaped canopy balls. Bush meshes combine by material for efficient drawing. Sandbag walls form full circles with two staggered courses; bags follow the tangent of the wall, and the gun mechanism rotates within the fixed wall. Cannon wheels/trails and mortar supplies fit inside their respective rings.
+
+Architecture uses crisp plaster/stone corners with very small edge breaks. Farmhouse roofs descend from one ridge to matching eaves, with closed gables, coursed slate and seated chimney details. Keep building corners and roof planes more angular than foliage and fabric. Static detail is combined by material.

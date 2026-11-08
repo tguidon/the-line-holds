@@ -1,0 +1,18 @@
+using UnityEngine;
+using TheLineHolds;
+using System.Linq;
+var game=Object.FindAnyObjectByType<BattleController>();game.NewMatch();
+var houses=Object.FindObjectsByType<MeshRenderer>().Where(r=>r.name.StartsWith("House ")).ToArray();
+if(houses.Length!=20)throw new System.Exception("Expected two material-batched farmhouses; renderer count="+houses.Length);
+if(houses.Any(r=>r.sharedMaterials.Any(m=>!m || !m.shader.isSupported)))throw new System.Exception("House material missing/unsupported");
+int frame=Time.frameCount;await System.Threading.Tasks.Task.Delay(500);
+if(Time.frameCount-frame<5)throw new System.Exception("Native game frames not advancing");
+ScreenCapture.CaptureScreenshot(System.IO.Path.Combine(System.IO.Path.GetTempPath(),"houses-native-overview.png"));await System.Threading.Tasks.Task.Delay(250);
+game.CameraControls.enabled=false;game.battleCamera.orthographicSize=2.5f;
+var focus=BattleRoute.OnGround(10.4f,-.4f)+Vector3.up*.8f;
+game.battleCamera.transform.position=focus-game.battleCamera.transform.forward*40;
+await System.Threading.Tasks.Task.Delay(350);
+ScreenCapture.CaptureScreenshot(System.IO.Path.Combine(System.IO.Path.GetTempPath(),"houses-native-close.png"));await System.Threading.Tasks.Task.Delay(250);
+game.CameraControls.enabled=true;game.CameraControls.ResetView();game.MainMenu();
+string result="PASS two native farmhouses, 20 batched renderers, supported materials, live frames, overview and close captures";
+Debug.Log("[House review] "+result);return result;

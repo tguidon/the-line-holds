@@ -231,27 +231,27 @@
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 99006065,
-      "buildTimeMs": 7330
+      "totalSizeBytes": 102211249,
+      "buildTimeMs": 5575
     },
     "Windows": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 125614418,
-      "buildTimeMs": 6146
+      "totalSizeBytes": 128819602,
+      "buildTimeMs": 4911
     },
     "macOS-QA": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 205947050,
-      "buildTimeMs": 6145
+      "totalSizeBytes": 209152235,
+      "buildTimeMs": 13458
     }
   },
   "packages": {
-    "macOS": "CRC OK, 35.9 MiB",
-    "Windows": "CRC OK, 45.5 MiB"
+    "macOS": "CRC OK, 36.7 MiB",
+    "Windows": "CRC OK, 46.3 MiB"
   },
   "windows_runtime": "Deferred by user; cross-build succeeded; future Windows VM",
   "roadmap": {
@@ -289,5 +289,24 @@
     "previous_landscape_renderers": 269,
     "runtime_gameplay_source_unchanged": true,
     "old_cloud_shrub_assets_removed": true
+  },
+  "house_refinement": {
+    "checkpoint": "eb22840",
+    "crisp_architectural_edges": true,
+    "ridge_height_m": 2.11,
+    "mid_slope_heights_m": [
+      1.83,
+      1.83
+    ],
+    "eave_heights_m": [
+      1.4,
+      1.4
+    ],
+    "roof_geometry_check": "Passed actual imported mesh raycasts",
+    "renderers_per_house": 10,
+    "native_check": "PASS two native farmhouses, 20 batched renderers, supported materials, live frames, overview and close captures",
+    "native_errors": 0,
+    "native_warnings": 0,
+    "runtime_gameplay_source_unchanged": true
   }
 }
