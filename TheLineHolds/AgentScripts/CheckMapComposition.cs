@@ -16,6 +16,11 @@ public static class CheckMapComposition
         if(earth.subMeshCount!=3 || earth.tangents.Length!=earth.vertexCount || texture.width<512)throw new Exception("Detailed stratified cut missing");
         var route=new BattleRoute(BattleRoute.DefaultPoints);
         if(Vector3.Distance(GameObject.Find("Enemy entry gateway").transform.position,route.Points[0])>.001f || Vector3.Distance(GameObject.Find("Defended exit checkpoint").transform.position,route.Points.Last())>.001f)throw new Exception("Landmarks do not match the gameplay endpoints");
+        foreach(var name in new[]{"FieldFence","Duckboard","FieldStone"})
+        {
+            var prefab=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/TheLineHolds/Prefabs/"+name+".prefab");
+            if(prefab.transform.localPosition!=Vector3.zero || Quaternion.Angle(prefab.transform.localRotation,Quaternion.identity)>.01f || prefab.transform.localScale!=Vector3.one)throw new Exception(name+" placement root must preserve FBX conversion under a child");
+        }
         var details=GameObject.Find("Authored battlefield details");var colliders=new System.Collections.Generic.List<MeshCollider>();
         try
         {

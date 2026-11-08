@@ -104,6 +104,12 @@ namespace TheLineHolds.Editor
                 AssetDatabase.ImportAsset(Root+"/Art/Models/"+name+".fbx",ImportAssetOptions.ForceUpdate|ImportAssetOptions.ForceSynchronousImport);
                 var model=AssetDatabase.LoadAssetAtPath<GameObject>(Root+"/Art/Models/"+name+".fbx");if(!model)throw new Exception("Missing model "+name);
                 var go=UnityEngine.Object.Instantiate(model);go.name=name;
+                if(new[]{"FieldGate","Checkpoint","RoadSign","FieldFence","BuildStake","Revetment","Duckboard","FieldStone"}.Contains(name))
+                {
+                    // Single-mesh FBX files may put their axis conversion on the root itself.
+                    // Preserve that imported transform below a clean placement root.
+                    var imported=go;go=new GameObject(name);imported.name="Model";imported.transform.SetParent(go.transform,false);
+                }
                 if(name=="Infantry" || name=="LightTank")
                 {
                     // Blender +Y exports as Unity -Z. Keep gameplay roots +Z-forward.

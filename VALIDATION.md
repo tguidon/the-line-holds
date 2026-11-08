@@ -6,7 +6,7 @@ Checked on Apple silicon macOS, November 7, 2026, with Unity 6000.6.7f1, URP 17.
 
 Steps 2a, 2b, and 2c are implemented. See `ART_DIRECTION.md`, `VISUAL_REVIEW.md`, and `TheLineHolds/Screenshots/diorama-*.png` for the direction, scoped scorecard, and captured evidence.
 
-The terrain is now one smooth, textured meadow with 12,325 vertices. The road is painted into that surface, with worn edges and wheel ruts, so no visible road ribbon can intersect the hills. Road corners use gradual quadratic transitions; the maximum sampled turn is 20.1 degrees. Sampled mesh interiors deviate at most 0.0118 m from the movement surface. Ten level emplacement footprints blend into the hills. Pad labels lie above the stone surface.
+The terrain is now one smooth, textured meadow with 12,325 vertices. The road is painted into that surface, with worn edges and wheel ruts, so no visible road ribbon can intersect the hills. Road corners use gradual quadratic transitions; the maximum sampled turn is 20.1 degrees. Sampled mesh interiors deviate at most 0.0118 m from the movement surface. Ten level emplacement footprints blend into the hills. Step 3 replaces the initial labelled stone pads with painted earth clearings.
 
 Rounded, irregular tree crowns replace cones; clustered blades, shrubs, and stones replace cube grass. Small vegetation combines by material instead of hundreds of separate objects. The exposed earth has a continuous cut edge and pigment layers. Warm sunlight and cool sky fill use four persisted Volume overrides. Native grade-on/off captures differ by about 15.94, 13.19, and 15.93 RGB levels on average.
 
@@ -51,7 +51,7 @@ The editor and QA session opened for validation are closed at handoff; generated
 - `849adf9`: refined tower models, independent traverse, recoil, and checks.
 - `beccf63`: refined enemy models/stride and native terrain tangent fix.
 
-Roadmap steps 1 and 2a–2c are complete. User visual review comes next, then step 3's authored map composition/detail. Later tower/enemy presentation passes and gameplay upgrades remain pending. Compact results are in `Tools/Validation/last-run.json`; commands are in `Tools/Validation/README.md`.
+Roadmap steps 1, 2a–2c and 3 are complete. User visual review comes next; step 4 extends tower presentation. Later enemy presentation and gameplay upgrades remain pending. Compact results are in `Tools/Validation/last-run.json`; commands are in `Tools/Validation/README.md`.
 
 ## November 7 visual-review refinement
 
@@ -66,3 +66,13 @@ New review captures: `leaf-detail.png`, `sandbag-rings.png`, `foliage-overview.p
 Checkpoint `eb22840` replaces the broad rounded building bevel with millimetre-scale architectural edge breaks and rebuilds the roof around one shared ridge. Both wings now descend toward the eaves; solid gables fill their ends. Slate courses, fascia, ridge cap, chimney flashing/cap, stone footing/sills, window frames/shutters and a timber door add definition. The final fix pass adds side windows for rotated views.
 
 Imported-geometry raycasts pass: ridge 2.11 m, mid slopes 1.83/1.83 m, and eaves 1.40/1.40 m, with no missing roof sample. Static parts combine into ten material groups per house. Native checks verify both existing map houses, live frames, and supported materials. `houses-detail.png` is a temporary two-orientation art review; `houses-native-close.png` and `houses-native-overview.png` show actual map instances. Gameplay source, placement and balance are unchanged. All three builds and package integrity are checked again.
+
+## Step 3 composition validation
+
+The ten placement anchors, route, enemy/tower data and wave/economy rules are preserved. Pedestal renderers and numbered/floating map labels are removed; physical signs, ground pigment and low timber markers replace them. Help text refers to cleared gun sites. Tower view height is adjusted to sit on earth; simulation shot origins and rules are unchanged.
+
+`CheckMapComposition.All` verifies anchor positions, removal of pedestals/legacy labels, three textured/tangent-bearing soil horizons, matching endpoint landmarks and a full corridor sweep. It temporarily adds mesh colliders to the actual combined details and probes three lateral lanes/heights along the route; no decoration intersects the vehicle corridor. Temporary colliders are removed in `finally`. Clean placement roots preserve FBX axis/scale conversion for the new single-mesh field kit.
+
+Frame-driven input checks pass placement, selling, invalid orders, camera shortcuts, rotation, zoom, rotated placement, pause/restart/menu and fixed physical landmarks during orbit. Core checks and all six balance strategies pass with unchanged outcomes. Native checks cover ground sites, soil materials/tangents, physical signs and overview/orbit/endpoint/soil close views. An accelerated four-times-speed native match resolves all five waves using earned funds and normal rules; this is a verification run, not a new human pacing test.
+
+That match completed in 79 real seconds and 4,711 rendered frames: three stars, 18 lives, 214 kills, two escapes, 100% final-wave route depth and 108 rear-defense shots. The final field-prop-only transform fix was subsequently checked in a fresh native player and by the corridor sweep; combat source is unchanged. The earlier 312-second normal-speed run is historical step 2 evidence. Four native window sizes pass again; the resize script now restores the user's original size. Final QA console counts are zero errors and zero warnings. QA/macOS/Windows builds pass without build warnings/errors, release server/compiler assemblies are absent, and both packages pass CRC (macOS 42.6 MiB; Windows 52.2 MiB). Windows execution remains deferred.

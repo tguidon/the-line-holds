@@ -1,4 +1,4 @@
-# Step 2 visual review
+# Visual review: steps 2 and 3
 
 November 7, 2026. Scope: terrain/map (2a), tower target (2b), and enemy target (2c). This establishes the next visual baseline for user review. It does not replace the later composition, effects, or gameplay passes.
 
@@ -22,7 +22,7 @@ Scores are an internal assessment of these captures, not user approval. Before r
 | Style uniformity | 2/5 | 3/5 | Continuous rolling land, worn road, rounded canopy clusters, soft sandbags, and bevelled military miniatures. |
 | Lighting depth | 2/5 | 3/5 | Warm sun, cool sky fill, ACES, restrained bloom/vignette, and persisted color grading. |
 | Silhouette | 2/5 | 3/5 | Distinct MG, cannon, mortar, infantry, and armor shapes remain readable at overview and close zoom. |
-| UI intentionality | 3/5 | 3/5 | Existing UI preserved. Five logical widths pass overlap checks; pad labels stay readable on level footprints. |
+| UI intentionality | 3/5 | 3/5 | Existing UI preserved. Five logical widths pass overlap checks. Step 3 replaces pad labels with ground clearings and low markers. |
 | Feedback visibility | 3/5 | 3/5 | Gun traverse/recoil and infantry strides add motion; existing projectiles, health bars, and impact cues remain visible. |
 
 Fix passes addressed washed-out lighting, partly buried pads/labels, incorrect imported traverse axes, non-persistent grade overrides, missing native terrain tangents, and backward-facing imported units. Ground vegetation is combined into three meshes rather than hundreds of scene objects. Terrain uses 12,325 vertices and smooth normals.
@@ -50,3 +50,15 @@ Canopies now use individually shaped leaves, visible branches, vein/color textur
 ## Follow-up: farmhouse architecture
 
 `houses-detail.png` shows two temporary review orientations of the same revised farmhouse. Broad rounded corners are replaced with small architectural edge breaks. Both roof wings descend from one ridge, with closed gables, slate courses, consistent eaves and a seated chimney. The final fix pass added side windows for the rotated camera. The existing palette and lighting remain in use; the scoped silhouette/style score remains at least 3/5. `CheckHouses.All` raycasts the actual imported roof to verify the ridge is higher than the mid slopes and eaves, symmetric slopes, and a closed surface at each probe. Static parts combine by material. No packages, gameplay changes, or computer-use tools were added.
+
+## Step 3: battlefield composition
+
+The entry uses open farm gates; the defended exit uses a raised checkpoint boom and supplies. Both have physical, two-sided painted signs. Road pigment reaches both slab edges. The same ten build anchors now sit in irregular bare-earth clearings, with narrow access tracks and low timber markers instead of numbered cylinders. Towers sit lower to meet the earth. Farm plots, boundary fencing, supply details and a shallow timber-lined field position refine unused margins.
+
+The cut edge has three irregular soil horizons, world-sized grain/stone texture, a muted root mat and embedded stones. Fix passes reduced overly regular sediment lines and bright tangled roots, cleared shrubs away from the timber position, and preserved single-mesh FBX axis/scale transforms under clean placement roots. This last check restores the proper size and orientation of fences, duckboards and stones.
+
+Scoped scores after the pass: palette discipline 3/5; style uniformity 3/5; lighting depth 3/5; silhouette/readability 3/5; UI intentionality 3/5; feedback visibility 3/5. Established light, palette, UI layout and combat effects are retained. Site/readability and surface-detail fixes address the requested weak areas; this is an internal review, not user approval.
+
+`map-composition.png` is the gameplay overview. Native `map-entry.png`, `map-exit.png`, `map-earth-detail.png`, and `map-rotated.png` record close/orbit views. Close review cameras may be nearer than the unchanged gameplay zoom minimum. The field position is a shallow decorative scrape/revetment, not a navigable trench system. No packages, external art or computer-use tools were added.
+
+References reused for this pass: game-craft art direction, scene lighting and visual scorecard; Unity CLI/Pipeline script, capture and build documentation; uGUI skill for the help-copy update.

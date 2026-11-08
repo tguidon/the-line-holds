@@ -3,12 +3,13 @@
   "unity": "6000.6.7f1",
   "urp": "17.6.0",
   "unity_cli": "1.0.0-beta.17",
-  "runtime_source_sha256": "6c27cf1b0f9fa5649526bbae11c22d7cd7cef5dcb55d8c096024c37f188e117b",
+  "runtime_source_sha256": "4e3741b4014c22c6ce845920f37c3857bd01444d13977c16cb7d5b70c7812cc9",
   "source_hash_method": "Sorted UTF-8 paths relative to Assets/TheLineHolds/Scripts, each followed by file bytes",
   "checkpoints": {
     "terrain": "8287e76",
     "towers": "849adf9",
-    "units_and_native_shading": "beccf63"
+    "units_and_native_shading": "beccf63",
+    "map_composition": "1bfdca5"
   },
   "terrain": {
     "vertices": 12325,
@@ -223,7 +224,8 @@
     "warningEntries": 0,
     "final_wave_route_depth": 1,
     "rear_shots": 106,
-    "note": "Final prefab-only forward-axis correction validated separately in Play Mode and fresh native visual check; simulation source unchanged"
+    "note": "Historical step 2 normal-speed run. Current step 3 changes presentation/help copy only; core rules and balance results unchanged. Step 3 native full-match verification is recorded separately.",
+    "source_sha256": "6c27cf1b0f9fa5649526bbae11c22d7cd7cef5dcb55d8c096024c37f188e117b"
   },
   "standalone_ui_and_lifecycle": "Passed menu/shop/camera/start/pause/resume raycasts and callbacks, cancellation, freeze, restart and cleanup",
   "builds": {
@@ -231,27 +233,27 @@
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 102211249,
-      "buildTimeMs": 5575
+      "totalSizeBytes": 119884161,
+      "buildTimeMs": 5951
     },
     "Windows": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 128819602,
-      "buildTimeMs": 4911
+      "totalSizeBytes": 146492514,
+      "buildTimeMs": 5053
     },
     "macOS-QA": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 209152235,
-      "buildTimeMs": 13458
+      "totalSizeBytes": 226825146,
+      "buildTimeMs": 8848
     }
   },
   "packages": {
-    "macOS": "CRC OK, 36.7 MiB",
-    "Windows": "CRC OK, 46.3 MiB"
+    "macOS": "CRC OK, 42.6 MiB",
+    "Windows": "CRC OK, 52.2 MiB"
   },
   "windows_runtime": "Deferred by user; cross-build succeeded; future Windows VM",
   "roadmap": {
@@ -261,11 +263,12 @@
     "step_2a": "Complete",
     "step_2b": "Complete",
     "step_2c": "Complete",
-    "steps_3_through_6": "Pending"
+    "step_3": "Complete",
+    "steps_4_through_6": "Pending"
   },
   "release_pipeline_server_and_compiler_assemblies_absent": true,
   "final_orientation_native_check": "Passed in rebuilt QA player; infantry and tank forward-axis assertions",
-  "final_resize_native_check": "Passed 1600x900, 1200x1000, 1024x768, 1920x1080; zoom 5.5; orbit 135 degrees",
+  "final_resize_native_check": "Passed all four sizes; zoom 5.5, orbit 135; original window size restored",
   "release_startup_smoke": {
     "passed": true,
     "one_release_process": true,
@@ -308,5 +311,45 @@
     "native_errors": 0,
     "native_warnings": 0,
     "runtime_gameplay_source_unchanged": true
-  }
+  },
+  "standalone_mac_accelerated_step3": {
+    "status": "Passed",
+    "timeScale": 4,
+    "realSeconds": 79,
+    "renderedFrames": 4711,
+    "stars": 3,
+    "lives": 18,
+    "kills": 214,
+    "escapes": 2,
+    "final_wave_route_depth": 1,
+    "rear_shots": 108,
+    "note": "Earned funds and normal rules. Final field-prop import transform fix checked separately in fresh native player and corridor sweep. This is not human pacing evidence."
+  },
+  "map_composition": {
+    "status": "Complete",
+    "unchanged_anchors": 10,
+    "visible_pedestals": 0,
+    "number_labels": 0,
+    "entry": "Open farm gates and physical sign",
+    "exit": "Raised checkpoint boom, supplies and physical sign",
+    "soil_horizons": 3,
+    "world_sized_soil_texture": true,
+    "embedded_stones": true,
+    "farm_plots_and_boundaries": true,
+    "decorative_timber_field_position": true,
+    "clean_field_prop_roots": "Passed",
+    "vehicle_corridor": "Actual combined-mesh sweep passed; three lanes, three heights, 0.16m route steps",
+    "native_views": [
+      "overview",
+      "orbit",
+      "entry",
+      "exit",
+      "soil"
+    ],
+    "native_errors": 0,
+    "native_warnings": 0,
+    "core_rules_route_economy_unchanged": true,
+    "tower_and_preview_height": "Adjusted to meet bare earth"
+  },
+  "final_composition_native_check": "Passed in final QA build after field-prop transform correction"
 }

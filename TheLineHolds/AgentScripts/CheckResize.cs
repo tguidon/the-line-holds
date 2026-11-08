@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.Linq;
 using System.Threading.Tasks;
 var game=Object.FindAnyObjectByType<BattleController>();
+var originalSize=new Vector2Int(Screen.width,Screen.height);
 void Check(bool condition,string message){if(!condition)throw new System.Exception(message);}
 Rect Bounds(RectTransform t){var p=new Vector3[4];t.GetWorldCorners(p);return Rect.MinMaxRect(p[0].x,p[0].y,p[2].x,p[2].y);}
 var report=new System.Text.StringBuilder();
@@ -27,5 +28,5 @@ foreach(var size in new[]{new Vector2Int(1600,900),new Vector2Int(1200,1000),new
     ScreenCapture.CaptureScreenshot(System.IO.Path.Combine(root,$"the-line-holds-road-close-{size.x}x{size.y}.png"));await Task.Delay(150);
     report.AppendLine($"PASS native resize {Screen.width}x{Screen.height}, separate UI regions, close zoom {game.battleCamera.orthographicSize}, orbit 135 degrees");
 }
-Screen.SetResolution(1600,900,FullScreenMode.Windowed);await Task.Delay(400);game.MainMenu();
+Screen.SetResolution(originalSize.x,originalSize.y,FullScreenMode.Windowed);await Task.Delay(400);game.CameraControls.ResetView();game.MainMenu();
 Debug.Log("[Resize verification]\n"+report);return report.ToString();

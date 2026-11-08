@@ -1,6 +1,6 @@
 # Prototype Improvement Roadmap
 
-Created November 4, 2026. Step 1 is complete. Steps 2a, 2b, and 2c are complete. Step 3 is in progress. Steps 4–6 are pending.
+Created November 4, 2026. Steps 1, 2a, 2b, 2c, and 3 are complete. Steps 4–6 are pending.
 
 Follow the steps in order. Update each status to In progress or Complete as work advances. Record findings, validation results, and commit references in the progress log.
 
@@ -10,7 +10,7 @@ Follow the steps in order. Update each status to In progress or Complete as work
 | 2a | Complete | Terrain and map | Replace hard slopes and angular road edges with natural landforms, worn roads, rounded trees, clustered foliage, and deliberate diorama lighting. Increase the default window size. Assess overview, close-up, and rotated views. |
 | 2b | Complete | Tower visual target | Improve the three tower models with rounded sandbags, richer materials, mechanical detail, and distinct silhouettes. Keep prices and combat rules unchanged. |
 | 2c | Complete | Enemy visual target | Improve infantry and armor geometry, surface detail, and movement presentation. Keep individual units readable and preserve vehicle spacing. |
-| 3 | In progress | Extend the approved map detail | Build on the map-wide terrain base with authored hedgerows, farm boundaries, trenches, and local prop details. Keep the route and build pads readable from different camera angles and zoom levels. |
+| 3 | Complete | Extend the approved map detail | Build on the map-wide terrain base with authored hedgerows, farm boundaries, field positions, and local prop details. Keep the route and tower sites readable from different camera angles and zoom levels. |
 | 4 | Pending | Extend tower presentation | Refine the step 2b target with richer firing motion, operation details, and combat effects. Keep each tower role easy to identify during combat. |
 | 5 | Pending | Extend enemy presentation | Build on the step 2c miniatures with richer movement, damage feedback, and death effects. Keep squads, armor, and individual targets readable during busy waves. |
 | 6 | Pending | Revisit gameplay after the visual passes | Add and playtest tower upgrades so spending decisions continue after all build pads are filled. Revisit upgrade costs, economy, wave pressure, and difficulty. Record fresh playtest findings and resulting changes. |
@@ -51,3 +51,5 @@ November 7, 2026 — House refinement: Replaced broad rounded wall bevels with c
 November 7, 2026 — House validation: `eb22840` records the architecture checkpoint. Imported roof raycasts and native views pass; both houses render correctly with ten material groups each. Fresh native console has zero errors/warnings. QA, macOS release and Windows cross-build pass without build warnings/errors; ZIPs pass CRC. Runtime gameplay source is unchanged. One updated release copy is open for review.
 
 November 7, 2026 — Step 3 editor checkpoint: Replaced raised numbered pads with painted earth clearings, faint access tracks, and low timber markers at the same ten anchors. Added an open farm entrance, raised rear checkpoint, physical two-sided stencil signs, crop plots/fences, supply details and a timber-lined field position. Road pigment now reaches both board edges. The earth cut uses three irregular horizons, world-sized grain/stone detail, a muted root mat and embedded stones. A geometry sweep verifies the whole vehicle corridor remains clear. Frame-driven placement/orbit checks and all six balance scenarios pass.
+
+November 7, 2026 — Step 3 complete: `1bfdca5` records the composition checkpoint. Corrected single-mesh field-prop import transforms after native close-up review, then rechecked the actual combined-mesh vehicle corridor. Final native overview/orbit/entry/exit/soil views and four window sizes pass with zero console errors/warnings. A complete four-times-speed native match passed with three stars, 18 lives, 214 kills and two escapes; this verifies operation, not human pacing. Fresh QA/macOS/Windows cross-builds have zero build warnings/errors and packages pass CRC. One updated macOS release is open for user review. Step 4, tower presentation and combat effects, is next; gameplay tuning remains step 6.
