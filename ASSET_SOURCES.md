@@ -10,3 +10,5 @@ No historical faction insignia or third-party reference art is included.
 - Meadow/road pigment, wheel ruts, earth strata, grass clusters, and stones: original deterministic procedural assets. Their generator code is retained in the Unity editor tools. No external textures were used.
 
 - Broadleaf tree and shrub meshes: original leaf/branch geometry generated in `Tools/Blender/generate_assets.py`, including individual leaf UVs. Leaf veins and sandbag weave: original procedural textures generated in `FoliageMaterials.cs`. No external foliage art or texture source.
+
+- Revised farmhouse architecture and coursed slate roof: original procedural Blender geometry in `generate_assets.py`, with editable source retained in `miniatures.blend`. No external building assets.

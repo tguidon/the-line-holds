@@ -1,16 +1,16 @@
 """Run: Blender --background --python Tools/Blender/generate_assets.py -- <repo>.
 Original procedural models, metres, +Z forward in Unity. No external assets.
 """
-import bpy, math, os, sys, random
+import bpy, bmesh, math, os, sys, random
 from mathutils import Vector
 root = sys.argv[sys.argv.index('--')+1]
 out = os.path.join(root, 'TheLineHolds/Assets/TheLineHolds/Art/Models')
 os.makedirs(out, exist_ok=True)
 materials={}
-for name,c in {'Olive':(.25,.29,.16,1),'Dark':(.075,.085,.065,1),'Steel':(.19,.22,.19,1),'Cloth':(.36,.39,.25,1),'Skin':(.59,.43,.3,1),'Sand':(.51,.44,.29,1),'Wood':(.25,.17,.10,1),'Leaf':(.25,.32,.15,1),'Plaster':(.62,.57,.43,1),'Roof':(.27,.24,.20,1),'LeafLight':(.48,.56,.32,1),'LeafDark':(.18,.29,.17,1),'Bark':(.36,.28,.18,1),'Leather':(.28,.21,.13,1),'Edge':(.39,.44,.28,1),'Badge':(.72,.67,.49,1),'BagCloth':(.51,.44,.29,1)}.items():
+for name,c in {'Olive':(.25,.29,.16,1),'Dark':(.075,.085,.065,1),'Steel':(.19,.22,.19,1),'Cloth':(.36,.39,.25,1),'Skin':(.59,.43,.3,1),'Sand':(.51,.44,.29,1),'Wood':(.25,.17,.10,1),'Leaf':(.25,.32,.15,1),'Plaster':(.62,.57,.43,1),'Roof':(.27,.24,.20,1),'LeafLight':(.48,.56,.32,1),'LeafDark':(.18,.29,.17,1),'Bark':(.36,.28,.18,1),'Leather':(.28,.21,.13,1),'Edge':(.39,.44,.28,1),'Badge':(.72,.67,.49,1),'BagCloth':(.51,.44,.29,1),'Masonry':(.57,.55,.47,1),'RoofSlate':(.28,.33,.32,1),'RoofSlateLight':(.34,.39,.36,1),'RoofTrim':(.19,.23,.22,1),'WindowGlass':(.13,.2,.22,1),'Shutter':(.27,.35,.26,1)}.items():
  m=bpy.data.materials.new(name); m.diffuse_color=c; materials[name]=m
 
-def part(name,loc,scale,mat='Olive',shape='cube',rot=None):
+def part(name,loc,scale,mat='Olive',shape='cube',rot=None,edge=None):
  if shape=='sphere': bpy.ops.mesh.primitive_uv_sphere_add(segments=20,ring_count=12,location=loc)
  elif shape=='cylinder': bpy.ops.mesh.primitive_cylinder_add(vertices=24,radius=1,depth=2,location=loc)
  elif shape=='cone': bpy.ops.mesh.primitive_cone_add(vertices=9,radius1=1,radius2=.06,depth=2,location=loc)
@@ -24,7 +24,7 @@ def part(name,loc,scale,mat='Olive',shape='cube',rot=None):
  # Apply scale before bevel so metre-sized edges stay consistent across long thin parts.
  bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
  if shape=='cube':
-  bevel=o.modifiers.new('Soft manufactured edges','BEVEL');bevel.width=min(scale)*.23;bevel.segments=3
+  bevel=o.modifiers.new('Soft manufactured edges','BEVEL');bevel.width=min(scale)*.23 if edge is None else edge;bevel.segments=3
   bpy.context.view_layer.objects.active=o;bpy.ops.object.modifier_apply(modifier=bevel.name)
   weighted=o.modifiers.new('Weighted corner normals','WEIGHTED_NORMAL');weighted.keep_sharp=True
   bpy.ops.object.modifier_apply(modifier=weighted.name)
@@ -183,10 +183,67 @@ def bush():
  foliage('Shrub leaves',[((-.16,0,.27),(.35,.29,.27)),((.17,.06,.36),(.33,.28,.3)),((.02,-.12,.2),(.28,.3,.21))],85,93)
 
 def hut():
- part('Walls',(0,0,.65),(1,.7,.65),'Plaster');part('Door',(.35,.707,.38),(.2,.02,.38),'Wood')
- for x in [-.5,.5]:part('Window',(x,.715,.9),(.16,.025,.16),'Dark')
- for x in [-1,1]:part('Roof',(x*.51,0,1.55),(.62,.83,.07),'Roof',rot=(0,x*-.48,0))
- part('Chimney',(-.5,0,1.85),(.13,.14,.42),'Roof')
+ # Architecture gets millimetre-scale edge breaks, not the broad soft bevel used on miniatures.
+ part('Stone footing',(0,0,.12),(1.025,.725,.12),'Masonry',edge=.006)
+ part('Plaster walls',(0,0,.75),(1,.7,.6),'Plaster',edge=.008)
+ # Solid plaster gables meet the underside of the two roof slopes.
+ vertices=[(-1,-.7,1.34),(1,-.7,1.34),(0,-.7,1.99),(-1,.7,1.34),(1,.7,1.34),(0,.7,1.99)]
+ mesh=bpy.data.meshes.new('Solid gables');mesh.from_pydata(vertices,[],[(0,2,1),(3,4,5),(0,1,4,3),(1,2,5,4),(2,0,3,5)])
+ bm=bmesh.new();bm.from_mesh(mesh);bmesh.ops.recalc_face_normals(bm,faces=bm.faces);bm.to_mesh(mesh);bm.free()
+ gables=bpy.data.objects.new('Solid gables',mesh);bpy.context.collection.objects.link(gables);mesh.materials.append(materials['Plaster'])
+ # Both wings descend from the same ridge to matching eaves; no inverted valley or floating slabs.
+ run,rise,depth=1.14,.75,.86;angle=math.atan2(rise,run);slope=math.hypot(run,rise)
+ for sign in [-1,1]:
+  part('Roof wing',(sign*run/2,0,2.03-rise/2),(slope/2,depth,.035),'RoofTrim',rot=(0,sign*angle,0),edge=.003)
+  for row in range(8):
+   t=(row+.5)/8
+   for column in range(-1,11):
+    lo=max(-depth,-depth+(column+(row%2)*.5)*depth/5)
+    hi=min(depth,-depth+(column+1+(row%2)*.5)*depth/5)
+    if hi-lo<.03:continue
+    normal=Vector((sign*math.sin(angle),0,math.cos(angle)))
+    centre=Vector((sign*run*t,(lo+hi)/2,2.03-rise*t))+normal*.043
+    part('Slate tile',centre,(slope/16+.008,(hi-lo)/2-.004,.009),'RoofSlateLight' if (row*7+column*3)%9==0 else 'RoofSlate',rot=(0,sign*angle,0),edge=.002)
+  part('Eave fascia',(sign*1.14,0,1.27),(.025,.89,.045),'RoofTrim',edge=.003)
+ part('Ridge cap',(0,0,2.085),(.07,.89,.025),'RoofSlateLight',edge=.004)
+ # Front and back have framed glass and crisp timber shutters.
+ for side in [-1,1]:
+  y=side*.716
+  for x in [-.58,.58]:
+   part('Window frame',(x,y,.87),(.205,.018,.225),'Wood',edge=.004)
+   part('Glass pane',(x,y+side*.022,.87),(.175,.009,.19),'WindowGlass',edge=.002)
+   part('Window mullion',(x,y+side*.034,.87),(.012,.012,.19),'Wood',edge=.002)
+   part('Window crossbar',(x,y+side*.036,.87),(.18,.012,.013),'Wood',edge=.002)
+   part('Stone sill',(x,y+side*.025,.637),(.23,.055,.025),'Masonry',edge=.003)
+   for shutter in [-1,1]:
+    sx=x+shutter*.29
+    part('Shutter',(sx,y,.87),(.071,.026,.215),'Shutter',edge=.003)
+    for z in [.75,.97]:part('Shutter strap',(sx,y+side*.029,z),(.065,.008,.012),'RoofTrim',edge=.001)
+ for side in [-1,1]:
+  part('Side window frame',(side*1.016,0,.87),(.018,.205,.225),'Wood',edge=.004)
+  part('Side glass',(side*1.04,0,.87),(.009,.175,.19),'WindowGlass',edge=.002)
+  part('Side mullion',(side*1.052,0,.87),(.012,.012,.19),'Wood',edge=.002)
+  part('Side crossbar',(side*1.054,0,.87),(.012,.18,.013),'Wood',edge=.002)
+  part('Side sill',(side*1.04,0,.637),(.055,.23,.025),'Masonry',edge=.003)
+ part('Door surround',(0,.72,.55),(.225,.025,.43),'Masonry',edge=.004)
+ part('Timber door',(0,.754,.54),(.18,.015,.385),'Wood',edge=.004)
+ for x in [-.09,0,.09]:part('Door plank joint',(x,.771,.54),(.004,.004,.37),'RoofTrim',edge=.001)
+ part('Door lintel',(0,.76,.995),(.25,.05,.035),'Masonry',edge=.003)
+ part('Door latch',(.12,.779,.57),(.012,.012,.022),'Steel','sphere')
+ part('Doorstep',(0,.83,.065),(.28,.2,.065),'Masonry',edge=.005)
+ part('Square chimney',(-.57,-.25,1.94),(.12,.14,.42),'Masonry',edge=.004)
+ part('Chimney flashing',(-.57,-.25,1.71),(.17,.2,.015),'RoofTrim',rot=(0,-angle,0),edge=.002)
+ for z in [1.75,1.91,2.07,2.23]:part('Chimney mortar joint',(-.57,-.25,z),(.122,.142,.006),'RoofTrim',edge=.001)
+ part('Chimney cap',(-.57,-.25,2.385),(.16,.18,.025),'RoofTrim',edge=.003)
+ part('Chimney opening',(-.57,-.25,2.413),(.085,.10,.004),'Dark',edge=.001)
+ # Keep architectural detail inexpensive: combine static parts by material after authoring.
+ groups={}
+ for obj in list(bpy.context.scene.objects):
+  if obj.type=='MESH':groups.setdefault(obj.data.materials[0].name,[]).append(obj)
+ for material,objects in groups.items():
+  bpy.ops.object.select_all(action='DESELECT')
+  for obj in objects:obj.select_set(True)
+  bpy.context.view_layer.objects.active=objects[0];bpy.ops.object.join();bpy.context.object.name='House '+material
 
 def crate():
  part('Crate',(0,0,.24),(.32,.25,.24),'Wood')
