@@ -54,11 +54,11 @@ namespace TheLineHolds.Editor
                 var bags = AssetDatabase.LoadAssetAtPath<Material>(DioramaSurface.Root + "/BagCloth.mat");
                 bags.SetFloat("_Smoothness", .05f); EditorUtility.SetDirty(bags);
                 var fx = game.GetComponent<CombatEffects>(); if (!fx) fx = game.gameObject.AddComponent<CombatEffects>();
-                fx.flashMaterial = ParticleMaterial("Warm flash", Stamp("Flash", true), new Color(1, .85f, .51f));
+                fx.flashMaterial = ParticleMaterial("Warm flash", Stamp("Flash", true), new Color(2.3f, 1.4f, .6f), true);
                 var puff = Stamp("Puff", false);
                 fx.smokeMaterial = ParticleMaterial("Soft smoke", puff, Color.white);
                 fx.dustMaterial = ParticleMaterial("Earth dust", puff, Color.white);
-                fx.sparkMaterial = ParticleMaterial("Hot spark", Stamp("Spark", true), new Color(1, .86f, .52f));
+                fx.sparkMaterial = ParticleMaterial("Hot spark", Stamp("Spark", true), new Color(2, 1.1f, .4f), true);
                 fx.brassMaterial = ParticleMaterial("Brass", Stamp("Brass", true), new Color(.82f, .65f, .33f));
                 fx.shellMaterial = DioramaBuilder.Material("Shell casing", "79774D", .25f);
                 game.combatEffects = fx; EditorUtility.SetDirty(fx); EditorUtility.SetDirty(game);
@@ -137,12 +137,12 @@ namespace TheLineHolds.Editor
             var importer = (TextureImporter)AssetImporter.GetAtPath(path); importer.alphaIsTransparency = true; importer.mipmapEnabled = true; importer.wrapMode = TextureWrapMode.Clamp; importer.SaveAndReimport();
             return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
         }
-        static Material ParticleMaterial(string name, Texture2D texture, Color color)
+        static Material ParticleMaterial(string name, Texture2D texture, Color color, bool additive = false)
         {
             string path = Art + "/" + name + ".mat"; var material = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (!material) { material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit")); AssetDatabase.CreateAsset(material, path); }
             material.SetTexture("_BaseMap", texture); material.SetColor("_BaseColor", color);
-            material.SetFloat("_Surface", 1); material.SetFloat("_Blend", 0); material.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha); material.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
+            material.SetFloat("_Surface", 1); material.SetFloat("_Blend", additive ? 2 : 0); material.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha); material.SetFloat("_DstBlend", (float)(additive ? BlendMode.One : BlendMode.OneMinusSrcAlpha));
             material.SetFloat("_ZWrite", 0); material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT"); material.renderQueue = (int)RenderQueue.Transparent;
             EditorUtility.SetDirty(material); return material;
         }

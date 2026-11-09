@@ -1,15 +1,16 @@
 {
-  "date": "2026-11-07",
+  "date": "2026-11-09",
   "unity": "6000.6.7f1",
   "urp": "17.6.0",
   "unity_cli": "1.0.0-beta.17",
-  "runtime_source_sha256": "4e3741b4014c22c6ce845920f37c3857bd01444d13977c16cb7d5b70c7812cc9",
+  "runtime_source_sha256": "ec3998b7282a724125895fcc55543a9528b8e01575d2e6e477854f64b744b964",
   "source_hash_method": "Sorted UTF-8 paths relative to Assets/TheLineHolds/Scripts, each followed by file bytes",
   "checkpoints": {
     "terrain": "8287e76",
     "towers": "849adf9",
     "units_and_native_shading": "beccf63",
-    "map_composition": "1bfdca5"
+    "map_composition": "1bfdca5",
+    "weapon_presentation": "dddf6cc"
   },
   "terrain": {
     "vertices": 12325,
@@ -185,7 +186,8 @@
       "menu"
     ],
     "temporary_devices_and_settings_restored": true,
-    "editor_only_focus_routing_temporarily_overridden": true
+    "editor_only_focus_routing_temporarily_overridden": true,
+    "latest_run": "Passed November 9 after weapon presentation changes"
   },
   "native_resize": {
     "passed_sizes": [
@@ -214,18 +216,18 @@
   "standalone_mac_normal_speed": {
     "status": "Passed",
     "timeScale": 1,
-    "combatSeconds": 312,
-    "renderedFrames": 18439,
+    "combatSeconds": 314,
+    "renderedFrames": 18701,
     "stars": 3,
-    "lives": 19,
-    "kills": 215,
-    "escapes": 1,
+    "lives": 18,
+    "kills": 214,
+    "escapes": 2,
     "errorEntries": 0,
     "warningEntries": 0,
     "final_wave_route_depth": 1,
-    "rear_shots": 106,
-    "note": "Historical step 2 normal-speed run. Current step 3 changes presentation/help copy only; core rules and balance results unchanged. Step 3 native full-match verification is recorded separately.",
-    "source_sha256": "6c27cf1b0f9fa5649526bbae11c22d7cd7cef5dcb55d8c096024c37f188e117b"
+    "rear_shots": 109,
+    "source_sha256": "370a03f21869075520ac79a6478a07313b4c658c7659eb11fb604f6109cc0937",
+    "note": "Final visibility-only hull ricochet offset, raised mortar smoke and additive flash/spark material checked in fresh native QA separately. No combat/audio logic changed after this full match."
   },
   "standalone_ui_and_lifecycle": "Passed menu/shop/camera/start/pause/resume raycasts and callbacks, cancellation, freeze, restart and cleanup",
   "builds": {
@@ -233,27 +235,27 @@
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 119884161,
-      "buildTimeMs": 5951
+      "totalSizeBytes": 121013475,
+      "buildTimeMs": 5724
     },
     "Windows": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 146492514,
-      "buildTimeMs": 5053
+      "totalSizeBytes": 147626910,
+      "buildTimeMs": 7116
     },
     "macOS-QA": {
       "result": "Succeeded",
       "totalErrors": 0,
       "totalWarnings": 0,
-      "totalSizeBytes": 226825146,
-      "buildTimeMs": 8848
+      "totalSizeBytes": 227957723,
+      "buildTimeMs": 12861
     }
   },
   "packages": {
-    "macOS": "CRC OK, 42.6 MiB",
-    "Windows": "CRC OK, 52.2 MiB"
+    "macOS": "CRC OK, 43.5 MiB, audio credits included",
+    "Windows": "CRC OK, 53.1 MiB, audio credits included"
   },
   "windows_runtime": "Deferred by user; cross-build succeeded; future Windows VM",
   "roadmap": {
@@ -264,7 +266,8 @@
     "step_2b": "Complete",
     "step_2c": "Complete",
     "step_3": "Complete",
-    "steps_4_through_6": "Pending"
+    "step_4": "Complete",
+    "steps_5_through_6": "Pending"
   },
   "release_pipeline_server_and_compiler_assemblies_absent": true,
   "final_orientation_native_check": "Passed in rebuilt QA player; infantry and tank forward-axis assertions",
@@ -351,5 +354,63 @@
     "core_rules_route_economy_unchanged": true,
     "tower_and_preview_height": "Adjusted to meet bare earth"
   },
-  "final_composition_native_check": "Passed in final QA build after field-prop transform correction"
+  "final_composition_native_check": "Passed in final QA build after field-prop transform correction",
+  "standalone_mac_normal_speed_step2": {
+    "status": "Passed",
+    "timeScale": 1,
+    "combatSeconds": 312,
+    "renderedFrames": 18439,
+    "stars": 3,
+    "lives": 19,
+    "kills": 215,
+    "escapes": 1,
+    "errorEntries": 0,
+    "warningEntries": 0,
+    "final_wave_route_depth": 1,
+    "rear_shots": 106,
+    "note": "Historical step 2 normal-speed run. Current step 3 changes presentation/help copy only; core rules and balance results unchanged. Step 3 native full-match verification is recorded separately.",
+    "source_sha256": "6c27cf1b0f9fa5649526bbae11c22d7cd7cef5dcb55d8c096024c37f188e117b"
+  },
+  "weapon_feedback": {
+    "status": "Complete",
+    "muzzle_and_recoil_anchors": "All three imported roles passed",
+    "independent_recoil_recovery_freeze": "Passed; sandbags and carriage/supports stay fixed",
+    "typed_event_check": "57 fire / 57 impacts match legacy cues; original simulation origins",
+    "projectile_pool_warm_count": 32,
+    "emitters": 5,
+    "repeated_shots": 30,
+    "fixed_allocations_editor_and_native": true,
+    "real_fires_by_role": {
+      "MachineGun": 1760,
+      "Cannon": 164,
+      "Mortar": 124
+    },
+    "real_impacts_by_role": {
+      "MachineGun": 1760,
+      "Cannon": 163,
+      "Mortar": 124
+    },
+    "unresolved_cannon_note": "One final shot cleared by normal wave completion",
+    "peak_live_particles": 124,
+    "peak_world_voices": 14,
+    "world_voice_limit": 24,
+    "full_match_audio_sample_peak": 0.3265,
+    "final_native_probe_audio_sample_peak": 0.1952,
+    "clipping_detected": false,
+    "clips": 21,
+    "channels": 1,
+    "sample_rate_hz": 48000,
+    "wave_bank_bytes": 994524,
+    "native_output_probe": "Passed actual mixed output, pause/reset, live frames",
+    "sfx_gain_check": "Passed all sources",
+    "armor_surface_regression": "Passed particles outside target centre",
+    "shipped_attribution_checked": true,
+    "licenses": "Gunshots CC BY 3.0 per archive; Kenney impacts and Spring Spring explosion CC0",
+    "audio_mixer": "Existing headless gain layer retained",
+    "core_changes": "Shot source-pad metadata and read-only presentation notifications; stats/targeting/damage/cooldowns/hit timing/economy unchanged",
+    "final_native_errors": 0,
+    "final_native_warnings": 0,
+    "user_listening_review": "Pending"
+  },
+  "final_weapons_native_check": "PASS native 21-clip bank, supported effect shaders, shipped credits, three roles, 32 stable projectiles / 5 emitters, 30 repeated shots, audio peak=0.1952, pause/reset, 19 live frames"
 }

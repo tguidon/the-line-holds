@@ -1,6 +1,6 @@
 # Prototype Improvement Roadmap
 
-Created November 4, 2026. Steps 1, 2a, 2b, 2c, and 3 are complete. Step 4 is in progress. Steps 5–6 are pending.
+Created November 4, 2026. Steps 1, 2a, 2b, 2c, 3, and 4 are complete. Steps 5–6 are pending.
 
 Follow the steps in order. Update each status to In progress or Complete as work advances. Record findings, validation results, and commit references in the progress log.
 
@@ -11,7 +11,7 @@ Follow the steps in order. Update each status to In progress or Complete as work
 | 2b | Complete | Tower visual target | Improve the three tower models with rounded sandbags, richer materials, mechanical detail, and distinct silhouettes. Keep prices and combat rules unchanged. |
 | 2c | Complete | Enemy visual target | Improve infantry and armor geometry, surface detail, and movement presentation. Keep individual units readable and preserve vehicle spacing. |
 | 3 | Complete | Extend the approved map detail | Build on the map-wide terrain base with authored hedgerows, farm boundaries, field positions, and local prop details. Keep the route and tower sites readable from different camera angles and zoom levels. |
-| 4 | In progress | Extend tower presentation | Refine the step 2b target with richer firing motion, operation details, and combat effects. Give weapons and hits distinct sounds. Keep each tower role easy to identify during combat. |
+| 4 | Complete | Extend tower presentation | Refine the step 2b target with richer firing motion, operation details, and combat effects. Give weapons and hits distinct sounds. Keep each tower role easy to identify during combat. |
 | 5 | Pending | Extend enemy presentation | Build on the step 2c miniatures with richer movement, damage feedback, and death effects. Keep squads, armor, and individual targets readable during busy waves. |
 | 6 | Pending | Revisit gameplay after the visual passes | Add and playtest tower upgrades so spending decisions continue after all build pads are filled. Revisit upgrade costs, economy, wave pressure, and difficulty. Record fresh playtest findings and resulting changes. |
 
@@ -55,3 +55,5 @@ November 7, 2026 — Step 3 editor checkpoint: Replaced raised numbered pads wit
 November 7, 2026 — Step 3 complete: `1bfdca5` records the composition checkpoint. Corrected single-mesh field-prop import transforms after native close-up review, then rechecked the actual combined-mesh vehicle corridor. Final native overview/orbit/entry/exit/soil views and four window sizes pass with zero console errors/warnings. A complete four-times-speed native match passed with three stars, 18 lives, 214 kills and two escapes; this verifies operation, not human pacing. Fresh QA/macOS/Windows cross-builds have zero build warnings/errors and packages pass CRC. One updated macOS release is open for user review. Step 4, tower presentation and combat effects, is next; gameplay tuning remains step 6.
 
 November 9, 2026 — Step 4 implementation checkpoint: Added authored muzzle sockets and independent recoil assemblies, smoothed traverse, MG flashes/tracers/ejected brass, cannon recoil/dust/shells and elevated mortar launch/arc effects. Replaced generic combat spheres with five shared emitters and a warmed 32-object projectile pool. Exact shot-context notifications connect presentation without changing targeting, damage, cooldowns, flight time or economy. Twenty-one edited recorded weapon/hit variations use bounded priority voices, camera-relative stereo and pause/reset/gain handling. Source licenses and shipped attribution are retained. Core rules, all six balance strategies and live three-role mechanical/pooling/audio checks pass; native build review follows.
+
+November 9, 2026 — Step 4 complete: `dddf6cc` records the implementation checkpoint. A full normal-speed native match passed in 314 seconds and 18,701 frames: three stars, 18 lives, 214 kills, two escapes, 100% final-wave route depth and 109 rear shots. All three weapon roles fired and impacted; allocation stayed at 32 projectiles, with peak particles 124 and world voices 14/24. Mixed output peak was 0.3265, without clipping; console errors/warnings were zero. The final visual-only fix brightens muzzle flashes, raises mortar smoke and moves sparks onto exposed armor; the fresh native probe passes, including the surface-position regression. QA/macOS/Windows builds and package checks pass; audio credits ship. Step 5, richer enemy movement/damage/death feedback, is next. Gameplay and tower upgrades remain step 6; Windows execution remains deferred.

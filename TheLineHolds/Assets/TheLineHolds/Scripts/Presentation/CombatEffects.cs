@@ -76,7 +76,7 @@ namespace TheLineHolds
                 var side = Vector3.Cross(Vector3.up, forward).normalized;
                 Puff(brass, origin - forward * .5f + side * .1f, side * V(.7f, 1.2f) + Vector3.up * .8f, .065f, .45f, new Color(.8f, .63f, .29f));
             }
-            if (style == WeaponStyle.Cannon) GroundDust(tower.transform.position, 6, .55f);
+            if (style == WeaponStyle.Cannon) GroundDust(tower ? tower.transform.position : shot.Origin, 6, .55f);
             var flight = pool.Get(); flight.Shot = shot; flight.Style = style; flight.Origin = flight.Previous = origin;
             flight.View.transform.position = origin;
             flight.Body.localScale = mg ? new Vector3(.045f, .045f, .15f) : new Vector3(.11f, .11f, style == WeaponStyle.Mortar ? .25f : .32f);
@@ -90,12 +90,15 @@ namespace TheLineHolds
         {
             var style = WeaponStyles.For(shot.Definition); bool armor = !shot.Target.Resolved && shot.Target.Definition.armored;
             var p = shot.Destination;
+            // Simulation hits the unit centre. Draw ricochets at the exposed hull edge.
+            if (armor && style != WeaponStyle.Mortar)
+                p += Vector3.ProjectOnPlane(shot.Origin - p, Vector3.up).normalized * .75f + Vector3.up * .25f;
             if (style == WeaponStyle.Mortar)
             {
                 p.y = BattleRoute.Ground(p.x, p.z) + .05f;
                 Puff(flash, p + Vector3.up * .12f, Vector3.up * .4f, .65f, .12f, new Color(1.3f, .74f, .26f));
                 GroundDust(p, 18, 1.25f);
-                for (int i = 0; i < 7; i++) Puff(smoke, p + Vector3.up * V(.05f, .2f), new Vector3(V(-.45f, .45f), V(.6f, 1.3f), V(-.45f, .45f)), V(.5f, .8f), V(.45f, .8f), new Color(.35f, .32f, .25f, .75f));
+                for (int i = 0; i < 7; i++) Puff(smoke, p + Vector3.up * V(.2f, .4f), new Vector3(V(-.45f, .45f), V(.6f, 1.3f), V(-.45f, .45f)), V(.5f, .8f), V(.45f, .8f), new Color(.35f, .32f, .25f, .75f));
             }
             else if (armor)
             {

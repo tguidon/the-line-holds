@@ -1,6 +1,6 @@
 # Prototype validation
 
-Checked on Apple silicon macOS, November 7, 2026, with Unity 6000.6.7f1, URP 17.6.0, Unity CLI 1.0.0-beta.17, and Pipeline 0.10.0-exp.1. All authoring, play checks, captures, and builds used Blender scripts and Unity CLI. No computer-use automation was used.
+Checked on Apple silicon macOS, November 7 and 9, 2026, with Unity 6000.6.7f1, URP 17.6.0, Unity CLI 1.0.0-beta.17, and Pipeline 0.10.0-exp.1. All authoring, play checks, captures, and builds used Blender scripts and Unity CLI. No computer-use automation was used.
 
 ## Step 2 visual pass
 
@@ -37,7 +37,7 @@ Frame-driven input checks pass for placement, inspection, selling, rejected purc
 
 ## Native match and builds
 
-A complete normal-speed standalone match passed in **312 seconds**, with **18,439 rendered frames**, **3 stars / 19 lives / 215 kills / 1 escape**, and **zero runtime errors or warnings**. Final-wave enemies reached the exit and triggered **106 rear-defense shots**. Purchases used earned funds, with no health, income, damage, or wave cheats. The later prefab-only forward-axis correction was checked separately in Play Mode and a fresh native build; it does not change the simulation.
+The step 2 normal-speed standalone match passed in **312 seconds**, with **18,439 rendered frames**, **3 stars / 19 lives / 215 kills / 1 escape**, and **zero runtime errors or warnings**. Final-wave enemies reached the exit and triggered **106 rear-defense shots**. Purchases used earned funds, with no health, income, damage, or wave cheats. The later prefab-only forward-axis correction was checked separately in Play Mode and a fresh native build; it does not change the simulation. The current step 4 full-match result is recorded below.
 
 macOS release, Windows cross-build, and macOS QA builds succeed with zero build warnings/errors. Release builds exclude Pipeline's server/compiler assemblies. Packages exclude build backups/symbols and pass ZIP CRC checks. Outputs stay ignored under `TheLineHolds/Builds/`.
 
@@ -51,7 +51,7 @@ The editor and QA session opened for validation are closed at handoff; generated
 - `849adf9`: refined tower models, independent traverse, recoil, and checks.
 - `beccf63`: refined enemy models/stride and native terrain tangent fix.
 
-Roadmap steps 1, 2a–2c and 3 are complete. User visual review comes next; step 4 extends tower presentation. Later enemy presentation and gameplay upgrades remain pending. Compact results are in `Tools/Validation/last-run.json`; commands are in `Tools/Validation/README.md`.
+Roadmap steps 1, 2a–2c, 3 and 4 are complete. User visual/listening review comes next; step 5 extends enemy presentation. Gameplay upgrades remain step 6. Compact results are in `Tools/Validation/last-run.json`; commands are in `Tools/Validation/README.md`.
 
 ## November 7 visual-review refinement
 
@@ -76,3 +76,15 @@ The ten placement anchors, route, enemy/tower data and wave/economy rules are pr
 Frame-driven input checks pass placement, selling, invalid orders, camera shortcuts, rotation, zoom, rotated placement, pause/restart/menu and fixed physical landmarks during orbit. Core checks and all six balance strategies pass with unchanged outcomes. Native checks cover ground sites, soil materials/tangents, physical signs and overview/orbit/endpoint/soil close views. An accelerated four-times-speed native match resolves all five waves using earned funds and normal rules; this is a verification run, not a new human pacing test.
 
 That match completed in 79 real seconds and 4,711 rendered frames: three stars, 18 lives, 214 kills, two escapes, 100% final-wave route depth and 108 rear-defense shots. The final field-prop-only transform fix was subsequently checked in a fresh native player and by the corridor sweep; combat source is unchanged. The earlier 312-second normal-speed run is historical step 2 evidence. Four native window sizes pass again; the resize script now restores the user's original size. Final QA console counts are zero errors and zero warnings. QA/macOS/Windows builds pass without build warnings/errors, release server/compiler assemblies are absent, and both packages pass CRC (macOS 42.6 MiB; Windows 52.2 MiB). Windows execution remains deferred.
+
+## Step 4 weapon and audio validation — November 9
+
+Checkpoint `dddf6cc` adds muzzle sockets and recoil subassemblies to the three Blender weapon models. Live checks verify correct muzzle direction, an elevated mortar tube, recoil recovery/freeze and fixed sandbags/supports. Five shared emitters and 32 warmed projectile objects replace per-shot primitive creation. `CheckWeaponFeedback.Play` repeats 30 fire/impact cycles without growing either pool, checks active audio, pause/unpause, shared SFX gain and reset/menu cleanup. `Events` compares 57 typed fires/impacts with 57 legacy cues and verifies unchanged simulation origins. Core rules and all six balance layouts pass with the same results as step 3. Frame-driven input checks pass again.
+
+The bank contains 21 short mono 48 kHz PCM variations (994,524 WAV bytes including headers), with edge fades and normalized peaks below 0.8. It separates three weapon reports from soft, metal, shell and mortar impacts. The archive's gunshot attribution requirement is retained despite a conflicting web license label; credits ship in StreamingAssets and both ZIPs. Native output probing confirms actual nonzero mixed audio. The headless SFX gain layer is retained; no mixer or new package was installed.
+
+A normal-speed native full match passed in **314 seconds / 18,701 rendered frames**, with **three stars, 18 lives, 214 kills and two escapes**. Final-wave depth reached 100%, with 109 rear-defense shots. Real fire counts were MG 1,760 / cannon 164 / mortar 124; impacts were 1,760 / 163 / 124. The final pending cannon shot was cleared by normal wave completion. Peak live particles were 124, peak world audio voices 14 of 24, mixed output sample peak 0.3265, and projectile allocation stayed at 32. Console errors and warnings were both zero.
+
+The final visibility-only refinement moves ricochets from the simulation's unit centre to the exposed hull edge, raises mortar smoke slightly, and uses additive warm flashes/sparks. Native close-up review checks this separately; it does not alter the earlier match's combat or audio logic. The full-match source hash and final source hash are recorded separately in `last-run.json`. Native screenshots distinguish staged launch/impact probes from real match captures. Signal checks do not replace the user's subjective listening review. Windows runtime testing remains deferred.
+
+Final QA/macOS/Windows builds pass with zero build errors/warnings. Final native probe, including exposed armor sparks, passes with zero console errors/warnings and nonzero unclipped mixed output. ZIP CRC and included audio credits pass (macOS 43.5 MiB; Windows 53.1 MiB). The editor and QA session are closed, generated font cache changes discarded, and one updated macOS release is left at the main menu.

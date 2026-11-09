@@ -22,4 +22,8 @@
 *.wav filter=lfs diff=lfs merge=lfs -text
 *.mp3 filter=lfs diff=lfs merge=lfs -text
 *.ogg filter=lfs diff=lfs merge=lfs -text
+
+# Preserve downloaded license notices as supplied by their authors.
+Tools/Audio/Sources/Kenney/License.txt -whitespace
+Tools/Audio/Sources/Gunshots/creativecommons.txt -whitespace
 *.ttf filter=lfs diff=lfs merge=lfs -text

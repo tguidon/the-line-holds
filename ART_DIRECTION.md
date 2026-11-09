@@ -8,7 +8,7 @@ Mood: Warm afternoon sunlight with cool sky fill, soft shadows, restrained color
 
 ## Repeatable authoring
 
-Run `Tools/Blender/generate_assets.py` in headless Blender. `--only Pine,Farmhouse,Crate,Sandbags` exports just the environment models. All nine editable model scenes remain in `Tools/Blender/miniatures.blend`.
+Run `Tools/Blender/generate_assets.py` in headless Blender. `--only Pine,Farmhouse,Crate,Sandbags` exports just those environment models. All editable model scenes remain in `Tools/Blender/miniatures.blend`.
 
 With Countryside open and Play Mode stopped, run `TheLineHolds.Editor.DioramaBuilder.Map()` through Unity CLI. It replaces its own landscape, preserves controller references and pad objects, generates meadow/road and earth textures, combines small vegetation, and saves the scene. It does not tune combat data. Seed 1944 makes the ground detail repeatable.
 
