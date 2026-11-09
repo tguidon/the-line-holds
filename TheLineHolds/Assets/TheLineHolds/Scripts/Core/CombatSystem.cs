@@ -47,10 +47,12 @@ namespace TheLineHolds
                 if (target == null) continue;
                 tower.Cooldown = tower.Definition.interval;
                 var origin = match.Pads[tower.Pad] + Vector3.up * .65f;
-                match.Shots.Add(new ShotState {
-                    Id = ++shotId, Definition = tower.Definition, Target = target,
+                var shot = new ShotState {
+                    Id = ++shotId, TowerPad = tower.Pad, Definition = tower.Definition, Target = target,
                     Origin = origin, Destination = (tower.Definition.splashRadius > 0 ? PredictedPosition(match, target, tower.Definition.flightTime) : target.Position) + Vector3.up * .4f
-                });
+                };
+                match.Shots.Add(shot);
+                match.NotifyShotFired(shot);
                 match.Emit("fire", origin);
             }
             for (int i = match.Shots.Count - 1; i >= 0; i--)
@@ -61,6 +63,7 @@ namespace TheLineHolds
                     shot.Destination = shot.Target.Position + Vector3.up * .4f;
                 if (shot.Age < shot.Definition.flightTime) continue;
                 match.Shots.RemoveAt(i);
+                match.NotifyShotImpacted(shot);
                 match.Emit("impact", shot.Destination);
                 if (shot.Definition.splashRadius > 0)
                 {

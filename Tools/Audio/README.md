@@ -1,0 +1,11 @@
+# Combat sound sources and editing
+
+Run `TheLineHolds.Editor.CombatPresentationBuilder.Build()` in Edit Mode through Unity CLI. It decodes these sources in a temporary imported folder, exports 21 mono 48 kHz PCM variations under `Assets/TheLineHolds/Audio/Combat`, removes the temporary folder, configures short preloaded clips and saves the scene references. Original source recordings remain here.
+
+- Gunshots: Tabasco / Vincent Sevedge, [Gunshot Sounds](https://opengameart.org/content/gunshot-sounds), downloaded November 9, 2026. `mosin.wav` and `shotty.wav` from `sounds.zip`. The web page lists CC0, but the archive's `creativecommons.txt` specifies **CC BY 3.0**. We follow the archive's attribution license. [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). Changes: isolated shots, trimmed tails, mono conversion, resampling, filtering, pitch edits, gain normalization, fades, and layering. Credits must accompany distributions.
+- Material impacts: Kenney, [Impact Sounds 1.0](https://kenney.nl/assets/impact-sounds), CC0. Six selected originals and the publisher's license are retained. Changes: mono conversion, resampling, filtering, trimming, pitch edits, normalization, fades and layering.
+- Explosion: Spring Spring, [Mechanical Explosion](https://opengameart.org/content/mechanical-explosion), CC0. Original `mechanical_explosion.wav`. Changes: mono conversion, resampling, filtering, trimming, pitch edits, normalization, fades and layering. License declaration verified on the original asset page November 9, 2026.
+
+MG uses isolated rifle transients. Cannon layers a slowed rifle report with explosion body. Mortar launch uses a short filtered shotgun report. Non-armor hits use subdued soft impacts; armor hits use metal/plate impacts. Shell/mortar impacts use filtered explosion layers. These are designed miniature weapon sounds, not claims of recordings of the depicted historical weapons.
+
+Every edit has a short edge fade and a maximum sample peak of 0.78. Runtime gain, family throttles, modest pitch variation and a 24-voice priority budget control overlap. World cues use camera-relative stereo with consistent loudness for the elevated diorama camera; UI uses a separate centered source. No mixer was authored; the existing CLI-only workflow uses a single SFX gain layer.

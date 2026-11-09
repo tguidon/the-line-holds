@@ -15,7 +15,7 @@ namespace TheLineHolds
     }
     public sealed class ShotState
     {
-        public int Id; public DefenseDefinition Definition; public EnemyState Target;
+        public int Id, TowerPad; public DefenseDefinition Definition; public EnemyState Target;
         public Vector3 Origin, Destination; public float Age;
     }
     // Coordinates the small simulation systems and owns match outcomes. Views never award rewards or damage.
@@ -45,6 +45,8 @@ namespace TheLineHolds
         readonly WaveSpawner spawner = new WaveSpawner();
         readonly CombatSystem combat = new CombatSystem();
         public event Action<string, Vector3> Cue;
+        public event Action<ShotState> ShotFired;
+        public event Action<ShotState> ShotImpacted;
         public event Action<string> Journal;
         public MatchState(WaveDefinition[] waves, BattleRoute route, Vector3[] pads)
         {
@@ -110,6 +112,8 @@ namespace TheLineHolds
             if (Lives <= 0) Finish(MatchPhase.Defeat);
         }
         internal void Emit(string cue, Vector3 position) => Cue?.Invoke(cue, position);
+        internal void NotifyShotFired(ShotState shot) => ShotFired?.Invoke(shot);
+        internal void NotifyShotImpacted(ShotState shot) => ShotImpacted?.Invoke(shot);
         void Finish(MatchPhase phase)
         {
             Phase = phase;

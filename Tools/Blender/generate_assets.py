@@ -118,8 +118,8 @@ def gun(kind):
   for x in [-.2,.2]:part('Trail',(x,-.32,.18),(.045,.24,.045),'Steel',rot=(0,0,x))
   part('Elevation handwheel',(.19,-.2,.52),(.09,.09,.02),'Steel','cylinder',(0,math.pi/2,0))
  else:
-  part('Base plate',(0,0,.07),(.3,.3,.045),'Steel','cylinder');barrel((0,.1,.4),.7,.09,-.65)
-  part('Tube collar',(0,.22,.57),(.105,.105,.04),'Edge','cylinder',(math.pi/2-.65,0,0))
+  part('Base plate',(0,0,.07),(.3,.3,.045),'Steel','cylinder');barrel((0,.1,.4),.7,.09,.65)
+  part('Tube collar',(0,.28,.54),(.105,.105,.04),'Edge','cylinder',(math.pi/2+.65,0,0))
   for x in [-.2,.2]:part('Bipod',(x,.3,.25),(.025,.025,.28),'Steel','cylinder',(0,x,0))
   part('Sight',(-.13,.14,.5),(.028,.065,.035),'Dark')
   part('Ammo case',(-.34,-.16,.13),(.11,.17,.12),'Wood')
@@ -128,6 +128,15 @@ def gun(kind):
  pivot=bpy.data.objects.new('Traverse',None);bpy.context.collection.objects.link(pivot)
  for obj in set(bpy.context.scene.objects)-before:
   if obj!=pivot:obj.parent=pivot
+ # Moving internals are separate from wheels, shield, supports and sandbag walls.
+ slide=bpy.data.objects.new('Recoil',None);bpy.context.collection.objects.link(slide);slide.parent=pivot
+ prefixes={'MachineGun':('Receiver','Barrel','Heat sleeve','Cooling ring','Stock','Rear sight'),
+           'AntiTank':('Barrel','Breech','Recoil sleeve','Muzzle brake'),
+           'Mortar':('Barrel','Tube collar')}[kind]
+ for obj in list(pivot.children):
+  if obj.name.startswith(prefixes):obj.parent=slide
+ muzzle=bpy.data.objects.new('Muzzle socket',None);bpy.context.collection.objects.link(muzzle);muzzle.parent=slide
+ muzzle.location={'MachineGun':(0,.82,.56),'AntiTank':(0,1.36,.6),'Mortar':(0,.38,.612)}[kind]
 
 def branch(a,b,radius=.04):
  delta=Vector(b)-Vector(a)

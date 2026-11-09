@@ -22,7 +22,7 @@ public static class CheckDiorama
                 var fixedPosition=bag.position;var fixedRotation=bag.rotation;
                 foreach(var direction in new[]{Vector3.forward,Vector3.left,Vector3.back})
                 {
-                    visual.Aim(direction,.1f);
+                    visual.Aim(direction,1f);
                     var forward=Vector3.ProjectOnPlane(barrel.position-pivot.position,Vector3.up);
                     if(Vector3.Angle(forward,direction)>1)throw new Exception("Wrong traverse axis: "+name);
                     if(bag.position!=fixedPosition || bag.rotation!=fixedRotation)throw new Exception("Sandbags rotated: "+name);

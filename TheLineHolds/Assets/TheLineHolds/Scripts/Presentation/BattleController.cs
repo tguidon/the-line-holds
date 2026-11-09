@@ -21,10 +21,8 @@ namespace TheLineHolds
         public bool InMenu { get; private set; } = true;
         readonly Dictionary<int, GameObject> enemyViews = new Dictionary<int, GameObject>();
         readonly Dictionary<int, Transform> healthViews = new Dictionary<int, Transform>();
-        readonly Dictionary<int, GameObject> shotViews = new Dictionary<int, GameObject>();
         readonly Dictionary<int, GameObject> towerViews = new Dictionary<int, GameObject>();
-        readonly List<Effect> effects = new List<Effect>();
-        sealed class Effect { public GameObject View; public float Life; public float Total; public bool Smoke; }
+        public CombatEffects combatEffects;
         GameObject preview;
         LineRenderer ring;
         int hover = -1, previewType = -1;
@@ -40,22 +38,21 @@ namespace TheLineHolds
         }
         public void NewMatch()
         {
-            ClearViews(); audioPlayer.ResetAudio(); InMenu=false; Placement=SelectedPad=-1;
+            Unsubscribe(); ClearViews(); audioPlayer.ResetAudio(); InMenu=false; Placement=SelectedPad=-1;
             Match=new MatchState(waves,new BattleRoute(BattleRoute.DefaultPoints),BattleRoute.DefaultPads);
-            Match.Cue += OnCue;
+            Match.Cue += OnCue; Match.ShotFired += OnShotFired; Match.ShotImpacted += OnShotImpacted;
             CameraControls.ResetView(); Notice="Deploy your defenses. Wave 1 waits for your order.";
         }
         public void MainMenu()
         {
-            if(Match!=null) { Match.Cue-=OnCue; }
+            Unsubscribe();
             Match=null; InMenu=true; Placement=SelectedPad=-1; ClearViews(); audioPlayer.ResetAudio();
         }
         void ClearViews()
         {
             foreach(var v in enemyViews.Values) Destroy(v); enemyViews.Clear(); healthViews.Clear();
             foreach(var v in towerViews.Values) Destroy(v); towerViews.Clear();
-            foreach(var v in shotViews.Values) Destroy(v); shotViews.Clear();
-            foreach(var e in effects) Destroy(e.View); effects.Clear();
+            if(combatEffects) combatEffects.Clear();
             if(preview) Destroy(preview); previewType=-1; hover=-1;
             if(ring) ring.enabled=false;
             if(audioPlayer) audioPlayer.SetPaused(false);
@@ -99,7 +96,7 @@ namespace TheLineHolds
                 {
                     float remaining=Mathf.Min(Time.deltaTime,.25f);
                     while(remaining>0) { float dt=Mathf.Min(remaining,1f/60); Match.Step(dt); remaining-=dt; }
-                    TickEffects(Time.deltaTime);
+                    combatEffects.Tick(Time.deltaTime,Match.Shots);
                 }
                 SyncViews();
             }
@@ -148,24 +145,11 @@ namespace TheLineHolds
             {
                 var t=Match.Towers[i];
                 if(t==null) { if(towerViews.TryGetValue(i,out var old)) { Destroy(old); towerViews.Remove(i); } continue; }
-                if(!towerViews.TryGetValue(i,out var view)) { view=Instantiate(t.Definition.prefab,Match.Pads[i]-Vector3.up*.015f,Quaternion.identity,dynamicRoot); towerViews[i]=view; }
+                var view=EnsureTower(i);
                 var target=Match.Target(t);var visual=view.GetComponent<TowerVisual>();
                 if(visual)visual.Aim(target!=null?target.Position-view.transform.position:Vector3.zero,Match.Paused || Match.Ended?0:Time.deltaTime);
                 else if(target!=null) { var d=target.Position-view.transform.position; d.y=0; view.transform.rotation=Quaternion.LookRotation(d); }
             }
-            active.Clear();
-            foreach(var s in Match.Shots)
-            {
-                active.Add(s.Id);
-                if(!shotViews.TryGetValue(s.Id,out var v))
-                {
-                    v=GameObject.CreatePrimitive(PrimitiveType.Sphere); Destroy(v.GetComponent<Collider>()); v.name="Tracer"; v.transform.SetParent(dynamicRoot);
-                    v.GetComponent<Renderer>().sharedMaterial=tracerMaterial; v.transform.localScale=Vector3.one*(s.Definition.splashRadius>0?.16f:.07f); shotViews[s.Id]=v;
-                }
-                float t=Mathf.Clamp01(s.Age/s.Definition.flightTime);
-                v.transform.position=Vector3.Lerp(s.Origin,s.Destination,t)+Vector3.up*(s.Definition.splashRadius>0?4*t*(1-t)*3:0);
-            }
-            RemoveMissing(shotViews,active,null);
         }
         void RemoveMissing(Dictionary<int,GameObject> views,HashSet<int> active,Dictionary<int,Transform> extra)
         {
@@ -192,26 +176,37 @@ namespace TheLineHolds
             }
             if(preview) { preview.SetActive(show); if(show) preview.transform.position=Match.Pads[hover]+Vector3.up*.025f; }
         }
+        GameObject EnsureTower(int pad)
+        {
+            if(!towerViews.TryGetValue(pad,out var view))
+            {
+                view=Instantiate(Match.Towers[pad].Definition.prefab,Match.Pads[pad]-Vector3.up*.015f,Quaternion.identity,dynamicRoot);
+                towerViews[pad]=view;
+            }
+            return view;
+        }
+        void OnShotFired(ShotState shot)
+        {
+            var visual=EnsureTower(shot.TowerPad).GetComponent<TowerVisual>();
+            visual.FireAt(shot.Destination);
+            combatEffects.Fire(shot,visual); audioPlayer.Fire(shot.Definition,visual.MuzzlePosition);
+        }
+        void OnShotImpacted(ShotState shot)
+        {
+            combatEffects.Impact(shot); audioPlayer.Impact(shot);
+        }
         void OnCue(string cue,Vector3 position)
         {
+            // Legacy journal cues remain available to core checks; weapon events carry exact shot context.
+            if(cue=="fire" || cue=="impact")return;
             audioPlayer.Play(cue);
-            if(cue=="fire")foreach(var tower in towerViews.Values)
-                if((tower.transform.position-position).sqrMagnitude<1.5f)tower.GetComponent<TowerVisual>()?.Fire();
-            if(cue!="fire" && cue!="impact" && cue!="escape") return;
-            var v=GameObject.CreatePrimitive(PrimitiveType.Sphere); Destroy(v.GetComponent<Collider>()); v.transform.SetParent(dynamicRoot); v.transform.position=position;
-            v.GetComponent<Renderer>().sharedMaterial=cue=="escape"?damageMaterial:tracerMaterial;
-            float life=cue=="fire"?.08f:.28f; v.transform.localScale=Vector3.one*(cue=="fire"?.2f:.35f);
-            effects.Add(new Effect{View=v,Life=life,Total=life});
-            if(cue=="impact")
-            {
-                var smoke=GameObject.CreatePrimitive(PrimitiveType.Sphere); Destroy(smoke.GetComponent<Collider>()); smoke.name="Impact smoke"; smoke.transform.SetParent(dynamicRoot); smoke.transform.position=position; smoke.transform.localScale=Vector3.one*.16f; smoke.GetComponent<Renderer>().sharedMaterial=smokeMaterial;
-                effects.Add(new Effect{View=smoke,Life=.65f,Total=.65f,Smoke=true});
-            }
+            if(cue=="escape")combatEffects.Escape(position);
         }
-        void TickEffects(float dt)
+        void Unsubscribe()
         {
-            for(int i=effects.Count-1;i>=0;i--) { var e=effects[i]; e.Life-=dt; if(e.Life<=0) { Destroy(e.View); effects.RemoveAt(i); } else { e.View.transform.localScale*=1+dt*3; if(e.Smoke)e.View.transform.position+=Vector3.up*dt*.6f; } }
+            if(Match==null)return;
+            Match.Cue-=OnCue; Match.ShotFired-=OnShotFired; Match.ShotImpacted-=OnShotImpacted;
         }
-        void OnDestroy() { if(Match!=null) { Match.Cue-=OnCue; } }
+        void OnDestroy() { Unsubscribe(); }
     }
 }

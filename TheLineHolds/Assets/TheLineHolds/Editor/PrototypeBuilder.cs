@@ -56,7 +56,7 @@ namespace TheLineHolds.Editor
             EditorUtility.SetDirty(profile); EditorUtility.SetDirty(urp);
             EditorSceneManager.SaveScene(scene,Root+"/Scenes/Countryside.unity");
             EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene(Root+"/Scenes/Countryside.unity",true)};
-            AssetDatabase.SaveAssets(); DioramaBuilder.Map(); DioramaBuilder.RefreshModels(new[]{"MachineGun","AntiTank","Mortar","Infantry","LightTank"}); Debug.Log("[Builder] Countryside saved: 10 pads, 5 waves, 3 defenses, 2 enemies; URP HDR and camera postprocessing enabled.");
+            AssetDatabase.SaveAssets(); DioramaBuilder.Map(); DioramaBuilder.RefreshModels(new[]{"Infantry","LightTank"}); CombatPresentationBuilder.Build(); Debug.Log("[Builder] Countryside saved: 10 pads, 5 waves, 3 defenses, 2 enemies; URP HDR and camera postprocessing enabled.");
         }
         // Apply balance without rebuilding the map, materials, prefabs, or audio.
         [MenuItem("The Line Holds/Apply Combat Tuning")]
@@ -206,7 +206,7 @@ namespace TheLineHolds.Editor
         }
         static void BuildAudio(BattleAudio audio)
         {
-            audio.placement=Tone("Placement",660,.14f,0);audio.firing=Tone("Firing",100,.09f,.7f);audio.impact=Tone("Impact",65,.18f,.8f);audio.escape=Tone("Escape",230,.45f,.1f);audio.wave=Tone("Wave",520,.4f,0);audio.victory=Tone("Victory",880,1,0);audio.defeat=Tone("Defeat",145,.9f,.15f);
+            audio.placement=Tone("Placement",660,.14f,0);audio.escape=Tone("Escape",230,.45f,.1f);audio.wave=Tone("Wave",520,.4f,0);audio.victory=Tone("Victory",880,1,0);audio.defeat=Tone("Defeat",145,.9f,.15f);
         }
         static AudioClip Tone(string name,float hz,float duration,float noise)
         {

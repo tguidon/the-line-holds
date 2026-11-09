@@ -1974,6 +1974,7 @@ GameObject:
   - component: {fileID: 1086189336}
   - component: {fileID: 1086189335}
   - component: {fileID: 1086189334}
+  - component: {fileID: 1086189337}
   m_Layer: 0
   m_Name: Battle director
   m_TagString: Untagged
@@ -1994,12 +1995,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.BattleAudio
   placement: {fileID: 8300000, guid: 488089534b47a470f9b71608a3dcd1a3, type: 3}
-  firing: {fileID: 8300000, guid: c9c54a79c9a8a4b6f903592bb0cc4234, type: 3}
-  impact: {fileID: 8300000, guid: f72e2c55e06124295bfb43add2b6eea0, type: 3}
   escape: {fileID: 8300000, guid: 97798a17b79094f4baf6fdfb596dc131, type: 3}
   wave: {fileID: 8300000, guid: 89a65fc8f7f0842ef895c40ecade49fa, type: 3}
   victory: {fileID: 8300000, guid: 731d04a791e794c518588a53fcd2a078, type: 3}
   defeat: {fileID: 8300000, guid: 99eb9e4939e5241aaa7158c764ed556f, type: 3}
+  machineGun:
+  - {fileID: 8300000, guid: faec061d4b44c4fdc928e47a534146f1, type: 3}
+  - {fileID: 8300000, guid: 34635df06a3e34447b6a6a1ea0b769b9, type: 3}
+  - {fileID: 8300000, guid: b16054f6902fc4ec79e26e7a54da9069, type: 3}
+  cannon:
+  - {fileID: 8300000, guid: c4ac9fe7a2d89432ba8533c24f1f105d, type: 3}
+  - {fileID: 8300000, guid: 209f810c99bcd47feb437aba6635b374, type: 3}
+  - {fileID: 8300000, guid: 22ea6dbf4020e4560a5d05558b2be6a0, type: 3}
+  mortarLaunch:
+  - {fileID: 8300000, guid: 12898339de8a944fda268b7dd9cb8da6, type: 3}
+  - {fileID: 8300000, guid: bf356ab165fa14a2fa0e393b29a5e121, type: 3}
+  - {fileID: 8300000, guid: b325a4eaab9264d26ae99c8fa2b3a7bc, type: 3}
+  softHit:
+  - {fileID: 8300000, guid: 6ce0915c105b64040973287a3aca76e2, type: 3}
+  - {fileID: 8300000, guid: eb9a62c780cfd49158ee888c46280ec6, type: 3}
+  - {fileID: 8300000, guid: f1e3ec8b12d98467cb09f7de555f93e2, type: 3}
+  armorHit:
+  - {fileID: 8300000, guid: 4f2521e5aa88b4245ba14a4763295849, type: 3}
+  - {fileID: 8300000, guid: b1834746c70f149348129df76e43df8a, type: 3}
+  - {fileID: 8300000, guid: 7ad07682a4d204eb8b28980f25517579, type: 3}
+  shellImpact:
+  - {fileID: 8300000, guid: e26bae06241724c4fae210b57ee1af4a, type: 3}
+  - {fileID: 8300000, guid: e28af75ec0e79418f9424a51076a64c8, type: 3}
+  - {fileID: 8300000, guid: 70edbd2ea523145a68c83daf04fcecd9, type: 3}
+  mortarImpact:
+  - {fileID: 8300000, guid: ec673abe12f6748289c435fccb82bf87, type: 3}
+  - {fileID: 8300000, guid: f0702d54b3a7e4054889d8db7c494c79, type: 3}
+  - {fileID: 8300000, guid: 2714ffd2dd454443daefdc8c773f6930, type: 3}
+  sfxGain: 0.65
 --- !u!114 &1086189335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2042,6 +2070,7 @@ MonoBehaviour:
   smokeMaterial: {fileID: 2100000, guid: e8b98cedf0e0443deb6c78e27cef8f6f, type: 2}
   hud: {fileID: 612238063}
   audioPlayer: {fileID: 1086189334}
+  combatEffects: {fileID: 1086189337}
 --- !u!4 &1086189336
 Transform:
   m_ObjectHideFlags: 0
@@ -2057,6 +2086,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1086189337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086189333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2739efbfa9246410a8d5c43af814b21c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.CombatEffects
+  flashMaterial: {fileID: 2100000, guid: ae8f4fff2a3d041488bde025025b7f09, type: 2}
+  smokeMaterial: {fileID: 2100000, guid: be5f819364d18470e9bd042b461d59bc, type: 2}
+  dustMaterial: {fileID: 2100000, guid: 3bca225d22bad43179b91c1df01a69f7, type: 2}
+  sparkMaterial: {fileID: 2100000, guid: 528a62797c828433b81d23ee2d07b3b3, type: 2}
+  brassMaterial: {fileID: 2100000, guid: 8fa2d45c827a74d88ac785b1602e3b16, type: 2}
+  shellMaterial: {fileID: 2100000, guid: fa3bf4e72fffd4d8f88913610df3bb2a, type: 2}
 --- !u!1 &1105968724
 GameObject:
   m_ObjectHideFlags: 0

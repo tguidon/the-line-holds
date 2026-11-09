@@ -25,3 +25,9 @@ Architecture uses crisp plaster/stone corners with very small edge breaks. Farmh
 ## Battlefield composition
 
 Gun sites are bare-earth clearings with faint access tracks and low timber markers, with no numbering or raised display pedestals. The original ten placement anchors are preserved. Enemy and defended endpoints use physical farm-gate/checkpoint details and two-sided painted wood signs; their lettering is baked into board textures so it stays attached during camera orbit. Road pigment reaches both map edges. Exposed earth uses three wavy horizons, world-sized grain/stone detail, a muted root mat, and embedded stones. Small crop plots, farm fences and a timber-lined field position give the unused margins a purpose. Keep the whole vehicle corridor free of scenery.
+
+## Weapon operation and effects
+
+Machine guns use quick warm flashes, short tracers, restrained receiver kick and ejected brass. Cannon barrels slide independently of their fixed shield/wheels, recover more slowly, and raise a little dust. Mortar tubes point upward toward the target, with a launch puff and an olive shell travelling along an arc. Weapon effects start at authored muzzle sockets rather than the simulation's generic shot origin. Short earth-colored puffs, warm armor sparks and restrained mortar smoke preserve target/road readability. No camera shake, hit-stop or combat-stat changes are part of this pass.
+
+Five shared world-space particle emitters and warmed projectile objects keep transient effects bounded. Pause freezes effects and mechanical recovery with the match. Edited recorded sounds give each role its own report and hit response; soft impacts and armor strikes stay quieter than heavy weapons. Audio uses the existing CLI-only gain layer, a bounded priority voice pool and camera-relative stereo. Rebuild these assets with `CombatPresentationBuilder.Build()` after model generation. Keep the shipped audio attribution file.

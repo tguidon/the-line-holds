@@ -1,0 +1,29 @@
+THE LINE HOLDS — THIRD-PARTY AUDIO CREDITS
+
+Gunshot Sounds — Tabasco / Vincent Sevedge
+https://opengameart.org/content/gunshot-sounds
+Copyright (c) 2009 Vincent Sevedge
+Creative Commons Attribution 3.0 Unported
+https://creativecommons.org/licenses/by/3.0/
+
+Uses mosin.wav and shotty.wav from the original sounds.zip. The archive's
+CC BY 3.0 notice is followed, although the asset web page lists CC0.
+Modified for this game: isolated shots, shortened tails, mono conversion,
+resampling, filtering, pitch edits, normalization, fades and layering.
+Used in machine-gun reports, cannon reports and mortar launch sounds.
+No endorsement by the original creators is implied.
+
+Impact Sounds (1.0) — Kenney (www.kenney.nl)
+https://kenney.nl/assets/impact-sounds
+Creative Commons Zero (CC0)
+https://creativecommons.org/publicdomain/zero/1.0/
+Selected metal, plate, punch and soft impacts; edited and layered.
+
+Mechanical Explosion — Spring Spring
+https://opengameart.org/content/mechanical-explosion
+Creative Commons Zero (CC0)
+https://creativecommons.org/publicdomain/zero/1.0/
+Filtered, shortened, resampled and layered into cannon and shell/mortar sounds.
+
+Other audio cues are original deterministic synthesis for this repository.
+Editable sources and processing code are retained in the source repository.

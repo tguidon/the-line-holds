@@ -2,36 +2,61 @@ using System.Linq;
 using UnityEngine;
 namespace TheLineHolds
 {
-    // Presentation only: aiming never changes targeting, cooldown, projectile origin, or damage.
+    // Presentation only. The simulation never waits for traverse or recoil.
     public sealed class TowerVisual : MonoBehaviour
     {
-        Transform traverse;
+        Transform traverse, slide, muzzle, barrel;
         Quaternion bindRotation;
-        Vector3 bindPosition,bindForward,aimForward;
-        float recoil;
+        Vector3 bindPosition, bindForward, aimForward;
+        float recoilAge = 10;
+        public WeaponStyle Style { get; private set; }
+        public Vector3 MuzzlePosition => muzzle ? muzzle.position : transform.position + Vector3.up * .65f;
+        public Vector3 MuzzleForward => muzzle && barrel ? (muzzle.position - barrel.position).normalized : aimForward;
+        public float RecoilDistance { get; private set; }
+        public float RecoveryDuration => Style == WeaponStyle.Cannon ? .48f : Style == WeaponStyle.Mortar ? .26f : .12f;
         void Awake()
         {
-            traverse=GetComponentsInChildren<Transform>().FirstOrDefault(t=>t.name.StartsWith("Traverse"));
-            if(traverse)
-            {
-                bindRotation=traverse.rotation;bindPosition=traverse.localPosition;
-                var barrel=traverse.GetComponentsInChildren<Transform>().First(t=>t.name.StartsWith("Barrel"));
-                bindForward=Vector3.ProjectOnPlane(barrel.position-traverse.position,Vector3.up).normalized;
-                aimForward=bindForward;
-            }
+            Style = name.StartsWith("AntiTank") ? WeaponStyle.Cannon : name.StartsWith("Mortar") ? WeaponStyle.Mortar : WeaponStyle.MachineGun;
+            var parts = GetComponentsInChildren<Transform>();
+            traverse = parts.FirstOrDefault(t => t.name.StartsWith("Traverse"));
+            slide = parts.FirstOrDefault(t => t.name.StartsWith("Recoil"));
+            muzzle = parts.FirstOrDefault(t => t.name.StartsWith("Muzzle socket"));
+            barrel = parts.FirstOrDefault(t => t.name.StartsWith("Barrel"));
+            if (!traverse || !barrel) return;
+            bindRotation = traverse.rotation;
+            bindForward = Vector3.ProjectOnPlane(barrel.position - traverse.position, Vector3.up).normalized;
+            aimForward = bindForward;
+            if (slide) bindPosition = slide.localPosition;
         }
-        public void Fire(){recoil=.045f;}
-        public void Aim(Vector3 direction,float dt)
+        public void Fire() { recoilAge = 0; ApplyRecoil(); }
+        public void FireAt(Vector3 destination)
         {
-            if(!traverse)return;
-            direction.y=0;
-            if(direction.sqrMagnitude>.0001f)
-            {
-                aimForward=direction.normalized;
-                traverse.rotation=Quaternion.AngleAxis(Vector3.SignedAngle(bindForward,aimForward,Vector3.up),Vector3.up)*bindRotation;
-            }
-            recoil=Mathf.MoveTowards(recoil,0,dt*.35f);
-            traverse.localPosition=bindPosition+transform.InverseTransformDirection(-aimForward)*recoil;
+            Turn(destination - transform.position, 0, true);
+            Fire();
+        }
+        public void Aim(Vector3 direction, float dt)
+        {
+            Turn(direction, dt, false);
+            recoilAge += dt;
+            ApplyRecoil();
+        }
+        void Turn(Vector3 direction, float dt, bool snap)
+        {
+            if (!traverse) return;
+            direction.y = 0;
+            if (direction.sqrMagnitude < .0001f) return;
+            aimForward = direction.normalized;
+            var rotation = Quaternion.AngleAxis(Vector3.SignedAngle(bindForward, aimForward, Vector3.up), Vector3.up) * bindRotation;
+            traverse.rotation = snap ? rotation : Quaternion.RotateTowards(traverse.rotation, rotation, dt * 540);
+        }
+        void ApplyRecoil()
+        {
+            if (!slide) return;
+            float travel = Style == WeaponStyle.Cannon ? .17f : Style == WeaponStyle.Mortar ? .065f : .028f;
+            float remaining = 1 - Mathf.Clamp01(recoilAge / RecoveryDuration);
+            RecoilDistance = travel * remaining * remaining;
+            // InverseTransformVector includes the imported FBX scale/axis conversion.
+            slide.localPosition = bindPosition + slide.parent.InverseTransformVector(-MuzzleForward * RecoilDistance);
         }
     }
 }
