@@ -1,6 +1,6 @@
 # Prototype Improvement Roadmap
 
-Created November 4, 2026. Steps 1, 2a, 2b, 2c, 3, and 4 are complete. Steps 5 and 6 are in progress. Step 7 is pending.
+Created November 4, 2026. Steps 1, 2a, 2b, 2c, 3, 4, 5, and 6 are complete. Step 7, final player playtesting, is pending.
 
 Follow the steps in order. Update each status to In progress or Complete as work advances. Record findings, validation results, and commit references in the progress log.
 
@@ -12,11 +12,11 @@ Follow the steps in order. Update each status to In progress or Complete as work
 | 2c | Complete | Enemy visual target | Improve infantry and armor geometry, surface detail, and movement presentation. Keep individual units readable and preserve vehicle spacing. |
 | 3 | Complete | Extend the approved map detail | Build on the map-wide terrain base with authored hedgerows, farm boundaries, field positions, and local prop details. Keep the route and tower sites readable from different camera angles and zoom levels. |
 | 4 | Complete | Extend tower presentation | Refine the step 2b target with richer firing motion, operation details, and combat effects. Give weapons and hits distinct sounds. Keep each tower role easy to identify during combat. |
-| 5 | In progress | Extend enemy presentation | Build on the step 2c miniatures with richer movement, damage feedback, and death effects. Keep squads, armor, and individual targets readable during busy waves. |
-| 6 | In progress | Expand the campaign and gameplay | Add tower upgrades/specializations, seven enemy archetypes, a varied ten-wave campaign, fair formation randomness, useful previews, and tuned economy/pressure. Verify that deployments and upgrades matter. |
+| 5 | Complete | Extend enemy presentation | Build on the step 2c miniatures with richer movement, damage feedback, and death effects. Keep squads, armor, and individual targets readable during busy waves. |
+| 6 | Complete | Expand the campaign and gameplay | Add tower upgrades/specializations, seven enemy archetypes, a varied ten-wave campaign, fair formation randomness, useful previews, and tuned economy/pressure. Verify that deployments and upgrades matter. |
 | 7 | Pending | Final player playtesting | Play the expanded campaign, assess fun, readability, progression and difficulty, and record feedback for the next tuning pass. |
 
-Fix readability issues throughout all steps. Step 2 establishes the visual target; later passes extend and refine it. Gameplay upgrades and balance remain deferred to step 6.
+Fix readability issues throughout all steps. Step 2 establishes the visual target; later passes extend and refine it. Step 6 now supplies the expanded campaign and upgrades; step 7 evaluates their fun and pacing.
 
 ## Progress log
 
@@ -62,3 +62,5 @@ November 9, 2026 — Step 4 complete: `dddf6cc` records the implementation check
 November 9, 2026 — Step 5 checkpoint: Added distance-driven body sway, wheel motion, warm hit reactions, visible damage wear/smoke, timed infantry falls and vehicle destruction/retirement. Actor models and bars are reused across waves, with at most 24 retiring actors. Read-only hit/kill notifications preserve combat rules. Editor checks pass root isolation, pause, fall timing, reset and 20 reuse cycles; the prior core regression suite passes. Final native review will include the expanded roster from step 6. Player playtesting is now a separate pending step 7.
 
 November 9, 2026 — Step 6 gameplay checkpoint: Added riflemen, runners, assault troops, trucks, armored cars, light tanks and heavy tanks; ten announced wave compositions contain 459 enemies. Seeded patrol/stream/cluster/convoy/mixed formations vary group sizes, timing, lanes and individual speeds. Infantry can escort queued vehicles, whose spacing remains safe through bends. Each tower has a veteran tier and two mutually exclusive specializations, including suppression and armor/area counters. Purchases retain cooldowns and refund half of actual investment on sale. Added next-wave intel, upgrade inspection, visible tier markings, amber suppression bars and 1x/2x pace. Eighteen seeded strategy runs accept upgraded mixed layouts and reject static, single-role and neglected defenses. Core and upgrade/UI checks pass; native campaign verification follows.
+
+November 9, 2026 — Steps 5 and 6 complete: `cd48407` records enemy presentation; `5ce804a` records the campaign/upgrade checkpoint. Final refinements let infantry pass vehicles along the verge and add vehicle destruction sound. Eighteen seeded strategy runs pass: upgraded mixed layouts win with late enemies reaching rear defenses, while static, MG-only and neglected layouts lose. A complete frame-driven native ten-wave run resolves all 459 enemies, exercises seven archetypes and 19 upgrades, and wins with 16 lives, 455 kills and four escapes. Final-wave depth is 99.7%, with 198 rear shots. This verification uses four-times time acceleration plus a three-second normal-speed busy-scene sample (57.5 fps); human pacing/fun review is still pending. Four native window sizes, input/UI rules, actor lifecycle and unclipped audio checks pass. QA/macOS/Windows cross-builds have zero build errors/warnings; package integrity/credits pass. Windows execution remains deferred. One fresh macOS release is open at the menu for **step 7: final player playtesting**.

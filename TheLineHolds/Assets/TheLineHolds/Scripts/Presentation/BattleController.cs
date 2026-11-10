@@ -42,7 +42,7 @@ namespace TheLineHolds
         {
             Unsubscribe(); ClearViews(); audioPlayer.ResetAudio(); InMenu=false; Placement=SelectedPad=-1;
             Match=new MatchState(waves,new BattleRoute(BattleRoute.DefaultPoints),BattleRoute.DefaultPads,seed==0?System.Environment.TickCount:seed);GameSpeed=1;
-            Match.Cue += OnCue; Match.ShotFired += OnShotFired; Match.ShotImpacted += OnShotImpacted; Match.EnemyDamaged+=EnemyViews.Hit; Match.EnemyKilled+=EnemyViews.Kill;
+            Match.Cue += OnCue; Match.ShotFired += OnShotFired; Match.ShotImpacted += OnShotImpacted; Match.EnemyDamaged+=EnemyViews.Hit; Match.EnemyKilled+=OnEnemyKilled;
             CameraControls.ResetView(); Notice="Deploy your defenses. Wave 1 waits for your order.";
         }
         public void MainMenu()
@@ -170,6 +170,11 @@ namespace TheLineHolds
             view.GetComponent<TowerVisual>().Configure(Match.Towers[pad].Definition,combatEffects.shellMaterial);
             return view;
         }
+        void OnEnemyKilled(EnemyState enemy)
+        {
+            EnemyViews.Kill(enemy);
+            if(enemy.Definition.spawnSeparation>0)audioPlayer.VehicleDestroyed(enemy.Position);
+        }
         void OnShotFired(ShotState shot)
         {
             var visual=EnsureTower(shot.TowerPad).GetComponent<TowerVisual>();
@@ -191,7 +196,7 @@ namespace TheLineHolds
         void Unsubscribe()
         {
             if(Match==null)return;
-            Match.Cue-=OnCue; Match.ShotFired-=OnShotFired; Match.ShotImpacted-=OnShotImpacted; Match.EnemyDamaged-=EnemyViews.Hit; Match.EnemyKilled-=EnemyViews.Kill;
+            Match.Cue-=OnCue; Match.ShotFired-=OnShotFired; Match.ShotImpacted-=OnShotImpacted; Match.EnemyDamaged-=EnemyViews.Hit; Match.EnemyKilled-=OnEnemyKilled;
         }
         void OnDestroy() { Unsubscribe(); }
     }

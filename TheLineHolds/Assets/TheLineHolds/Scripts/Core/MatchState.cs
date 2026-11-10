@@ -7,6 +7,7 @@ namespace TheLineHolds
     public sealed class EnemyState
     {
         public int Id; public EnemyDefinition Definition; public float Health, Distance, LateralOffset;
+        public float AvoidanceOffset;
         public float MaxHealth, SpeedMultiplier=1, SlowMultiplier=1, SlowRemaining;
         public float MaximumHealth => MaxHealth>0?MaxHealth:Definition.health;
         public float Speed => Definition.speed*SpeedMultiplier*(SlowRemaining>0?SlowMultiplier:1); public bool Resolved;

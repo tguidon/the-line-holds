@@ -10,8 +10,8 @@ namespace TheLineHolds
         readonly AudioSource[] voices = new AudioSource[VoiceLimit];
         readonly float[] levels = new float[VoiceLimit];
         readonly int[] priorities = new int[VoiceLimit];
-        readonly float[] nextCue = new float[7];
-        readonly int[] sequence = new int[7];
+        readonly float[] nextCue = new float[8];
+        readonly int[] sequence = new int[8];
         AudioSource ui;
         Camera view;
         bool paused;
@@ -38,6 +38,7 @@ namespace TheLineHolds
             AudioClip clip = cue == "place" ? placement : cue == "escape" ? escape : cue == "wave" ? wave : cue == "victory" ? victory : cue == "defeat" ? defeat : null;
             if (clip) { ui.volume = .35f * sfxGain; ui.PlayOneShot(clip); }
         }
+        public void VehicleDestroyed(Vector3 p) => World(mortarImpact,7,p,.3f,3,.08f);
         public void Fire(DefenseDefinition definition, Vector3 position)
         {
             var style = WeaponStyles.For(definition);

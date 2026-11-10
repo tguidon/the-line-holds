@@ -2,7 +2,21 @@
 
 Checked on Apple silicon macOS, November 7 and 9, 2026, with Unity 6000.6.7f1, URP 17.6.0, Unity CLI 1.0.0-beta.17, and Pipeline 0.10.0-exp.1. All authoring, play checks, captures, and builds used Blender scripts and Unity CLI. No computer-use automation was used.
 
-## Step 2 visual pass
+## Current: steps 5 and 6 — November 9
+
+Steps 5 and 6 are complete. Step 7 is the pending human playtest. The current campaign contains ten waves and 459 enemies across riflemen, runners, assault troops, trucks, armored cars, light tanks and heavy tanks. See `GAMEPLAY.md` for stats, compositions, counters and incremental upgrade prices. Historical five-wave results below describe earlier checkpoints.
+
+- Compilation and focused core rules pass, including upgrade costs/guards/refunds, suppression, exactly-once accounting, seeded formation replay and mixed-speed vehicle spacing. Minimum measured vehicle centre separation is 2.76 m; infantry ease onto the verge when passing vehicles.
+- Eighteen strategy/seed scenarios pass. Upgraded mixed layouts win with 16–20 lives and final-wave rear engagement; fixed base towers lose on waves 9–10, MG-only upgrades lose on wave 6, and neglected defenses lose on wave 2. Exact results are in `Tools/Validation/campaign-balance.json`. These checks establish a useful baseline; they do not measure player enjoyment.
+- Enemy lifecycle checks cover gait/root isolation, pause, hit/death/reset and 20 reuse cycles. Native checks cover all seven models, supported actor shaders, ten-wave data and worst-case intel/upgrade layouts at 1024×768, 1200×1000, 1600×900 and 1920×1080. Original window/data are restored afterward. UI callbacks and frame-driven placement, upgrades, selling, camera, pause/restart/menu input pass separately.
+- The real native campaign passes in **217 real seconds / 12,422 frames**, using earned funds and normal rules: **10 waves, 16 lives, 455 kills, 4 escapes, 19 upgrades and all seven enemy types**. Final-wave route depth is **99.7%**, with **198 rear-defense shots**. Time acceleration is 4x for verification; a three-second 1x busy-scene sample averages **57.5 fps**. This is not a normal-speed human pacing test.
+- Peak live enemies: 38; retiring actors: 7 (cap 24); actors created/reused: 80; world audio voices: 24 (cap 24). Projectile allocation stays at 32 and corpses clear after victory. Sampled mixed audio peaks at 0.5199, below clipping. Signal checks do not replace subjective listening.
+- QA console reports zero errors and one warning. The player log includes URP notices for unused stripped depth-of-field/Panini passes; those effects are not part of the authored grade. No gameplay exception occurs. Retained bloom/color grading and native actor materials were reviewed. Build reports themselves have zero warnings/errors.
+- Final QA, macOS release and Windows cross-builds succeed; ZIP CRC, included audio credits and exclusion of Pipeline server/compiler/debug output pass. Windows runtime testing remains deferred to a future VM. Generated font cache changes are discarded after closing the editor. One fresh release copy is opened for player review.
+
+Native evidence: `campaign-native-roster.png` is a staged roster; `campaign-native-upgrades.png`, `campaign-native-combat.png` and `campaign-native-victory.png` are actual campaign captures under `TheLineHolds/Screenshots/`. Reproduction and measured results are in `Tools/Validation/README.md` and `last-run.json`.
+
+## Historical step 2 visual pass
 
 Steps 2a, 2b, and 2c are implemented. See `ART_DIRECTION.md`, `VISUAL_REVIEW.md`, and `TheLineHolds/Screenshots/diorama-*.png` for the direction, scoped scorecard, and captured evidence.
 

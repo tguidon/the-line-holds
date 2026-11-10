@@ -3,414 +3,161 @@
   "unity": "6000.6.7f1",
   "urp": "17.6.0",
   "unity_cli": "1.0.0-beta.17",
-  "runtime_source_sha256": "ec3998b7282a724125895fcc55543a9528b8e01575d2e6e477854f64b744b964",
+  "pipeline": "0.10.0-exp.1",
+  "runtime_source_sha256": "9eda9235b7770e96d55a5bafb3ccee24ca5a35af0fba945bd2030d54b62998eb",
   "source_hash_method": "Sorted UTF-8 paths relative to Assets/TheLineHolds/Scripts, each followed by file bytes",
   "checkpoints": {
-    "terrain": "8287e76",
-    "towers": "849adf9",
-    "units_and_native_shading": "beccf63",
-    "map_composition": "1bfdca5",
-    "weapon_presentation": "dddf6cc"
+    "enemy_presentation": "cd48407",
+    "campaign_and_upgrades": "5ce804a",
+    "historical_step4_evidence": "c22c049:Tools/Validation/last-run.json"
   },
-  "terrain": {
-    "vertices": 12325,
-    "maximum_route_turn_degrees": 20.1,
-    "maximum_sampled_movement_surface_error_m": 0.0118,
-    "road_is_part_of_meadow_surface": true,
-    "tangents_persisted": true
+  "roadmap": {
+    "5": "Complete",
+    "6": "Complete",
+    "7_final_player_playtesting": "Pending"
   },
-  "window": {
-    "default": [
-      1920,
-      1080
+  "campaign": {
+    "waves": 10,
+    "total_enemies": 459,
+    "archetypes": 7,
+    "specializations": 6,
+    "tower_tiers": 3,
+    "formations": [
+      "Patrol",
+      "Stream",
+      "Clusters",
+      "Convoy",
+      "Mixed"
     ],
-    "mode": "Windowed",
-    "old_size_migrated_once": true,
-    "smaller_displays_fit": true,
-    "native_startup_verified": [
+    "seeded_replay": "Passed",
+    "minimum_measured_vehicle_centre_gap_m": 2.76,
+    "infantry_vehicle_verge_passing": true
+  },
+  "focused_checks": {
+    "compilation": "Passed",
+    "core_rules_and_accounting": "Passed",
+    "upgrades_guards_refunds_and_suppression": "Passed",
+    "enemy_root_pause_hit_fall_reset_and_20_reuses": "Passed",
+    "campaign_rules": "Passed",
+    "campaign_ui_callbacks": "Passed",
+    "frame_driven_input": "Passed",
+    "native_actor_and_lifecycle": "Passed"
+  },
+  "balance": {
+    "scenarios": 18,
+    "seeds": [
+      1944,
+      42,
+      2026
+    ],
+    "results": "campaign-balance.json",
+    "acceptance": "Upgraded mixed layouts win and engage rear defenses; static, MG-only and neglected defenses lose"
+  },
+  "native_window_sizes": [
+    [
+      1024,
+      768
+    ],
+    [
+      1200,
+      1000
+    ],
+    [
+      1600,
+      900
+    ],
+    [
       1920,
       1080
     ]
-  },
-  "native_visuals": {
-    "volume_overrides": 4,
-    "grade_rgb_mean_absolute_delta": [
-      15.94,
-      13.19,
-      15.93
-    ],
-    "terrain_tangent_regression": "Failed before fix, passed in fresh native build",
-    "tower_traverse_and_fixed_sandbags": "Passed",
-    "infantry_stride_and_fixed_root": "Passed",
-    "unit_forward_axis": "Corrected in prefab wrapper; Play Mode and native assertion"
-  },
-  "camera_modifier": {
-    "macOS": "Command + left drag",
-    "Windows": "Ctrl + left drag",
-    "middle_drag_retained": true,
-    "modifier_drag_does_not_purchase": true,
-    "macOS_injected_input": "Passed",
-    "Windows_runtime": "Deferred"
-  },
-  "hud_regression": {
-    "before": "Counters/Pause and briefing/Start overlapped at narrow canvas widths",
-    "logical_widths_passed": [
-      1100,
-      1200,
-      1386,
-      1600,
-      2000
-    ],
-    "counters_and_briefings_not_truncated": true
-  },
-  "tank_spacing": {
-    "model_bounds_m": [
-      1.34,
-      0.97,
-      2.03
-    ],
-    "minimum_centre_distance_m": 2.99,
-    "minimum_route_gap_m": 4.8,
-    "compressed_spawn_stress": "Passed"
-  },
-  "round_bonuses": [
-    70,
-    80,
-    90,
-    100,
-    110
   ],
-  "authored_waves": {
-    "units": [
-      18,
-      30,
-      40,
-      56,
-      72
-    ],
-    "tanks": [
-      0,
-      0,
-      4,
-      8,
-      12
-    ],
-    "total_units": 216,
-    "infantry_per_squad": 6
-  },
-  "focused_checks": "Passed economy and bonuses, invalid orders, sale rounding, pause, wave gates, terminal freeze, defeat priority, ratings, stable targeting, exactly-once rewards, squad formation, armor profiles/priority, cluster selection, actual single-target/splash damage",
-  "balance_layouts": [
-    {
-      "strategy": "Mixed bends",
-      "outcome": "Victory",
-      "lives": 19,
-      "kills": 215,
-      "escapes": 1,
-      "combatSeconds": 314,
-      "final_wave_route_percent": 100,
-      "rear_shots": 107
-    },
-    {
-      "strategy": "Mixed entrance/middle",
-      "outcome": "Victory",
-      "lives": 17,
-      "kills": 213,
-      "escapes": 3,
-      "combatSeconds": 293,
-      "final_wave_route_percent": 100,
-      "rear_shots": 131
-    },
-    {
-      "strategy": "Five MG, three cannons, two mortars",
-      "outcome": "Victory",
-      "lives": 12,
-      "kills": 208,
-      "escapes": 8,
-      "combatSeconds": 309,
-      "final_wave_route_percent": 85,
-      "rear_shots": 26
-    },
-    {
-      "strategy": "Machine guns only",
-      "outcome": "Defeat",
-      "wave": 5,
-      "lives": 0,
-      "kills": 192,
-      "escapes": 20,
-      "combatSeconds": 313
-    },
-    {
-      "strategy": "Lone opening gun",
-      "outcome": "Defeat",
-      "wave": 2,
-      "lives": 0,
-      "kills": 8,
-      "escapes": 20,
-      "combatSeconds": 82
-    },
-    {
-      "strategy": "Never reinvest",
-      "outcome": "Defeat",
-      "wave": 3,
-      "lives": 0,
-      "kills": 64,
-      "escapes": 20,
-      "combatSeconds": 136
-    }
-  ],
-  "mixed_layout_acceptance": "Ten pads filled before wave 5, at least 75% final-wave route depth and five rear-defense shots",
-  "frame_driven_input_check": {
-    "mode": "Editor Play Mode",
-    "passed": [
-      "menu play",
-      "shop",
-      "placement",
-      "same-frame shop-to-pad",
-      "inspection",
-      "selling",
-      "invalid orders",
-      "cancellation",
-      "Escape priority",
-      "zoom limits",
-      "middle drag",
-      "Command drag",
-      "modifier drag over build pad preserves funds/selection",
-      "pan",
-      "reset",
-      "view buttons",
-      "rotated placement",
-      "UI scroll isolation",
-      "wave start",
-      "pause/resume",
-      "restart",
-      "menu"
-    ],
-    "temporary_devices_and_settings_restored": true,
-    "editor_only_focus_routing_temporarily_overridden": true,
-    "latest_run": "Passed November 9 after weapon presentation changes"
-  },
-  "native_resize": {
-    "passed_sizes": [
-      [
-        1600,
-        900
-      ],
-      [
-        1200,
-        1000
-      ],
-      [
-        1024,
-        768
-      ],
-      [
-        1920,
-        1080
-      ]
-    ],
-    "zoom": 5.5,
-    "orbit_degrees": 135,
-    "ui_overlap_or_truncation": false,
-    "narrow_hud_and_close_road_visually_inspected": true
-  },
-  "standalone_mac_normal_speed": {
-    "status": "Passed",
-    "timeScale": 1,
-    "combatSeconds": 314,
-    "renderedFrames": 18701,
-    "stars": 3,
-    "lives": 18,
-    "kills": 214,
-    "escapes": 2,
-    "errorEntries": 0,
-    "warningEntries": 0,
-    "final_wave_route_depth": 1,
-    "rear_shots": 109,
-    "source_sha256": "370a03f21869075520ac79a6478a07313b4c658c7659eb11fb604f6109cc0937",
-    "note": "Final visibility-only hull ricochet offset, raised mortar smoke and additive flash/spark material checked in fresh native QA separately. No combat/audio logic changed after this full match."
-  },
-  "standalone_ui_and_lifecycle": "Passed menu/shop/camera/start/pause/resume raycasts and callbacks, cancellation, freeze, restart and cleanup",
-  "builds": {
-    "macOS": {
-      "result": "Succeeded",
-      "totalErrors": 0,
-      "totalWarnings": 0,
-      "totalSizeBytes": 121013475,
-      "buildTimeMs": 5724
-    },
-    "Windows": {
-      "result": "Succeeded",
-      "totalErrors": 0,
-      "totalWarnings": 0,
-      "totalSizeBytes": 147626910,
-      "buildTimeMs": 7116
-    },
-    "macOS-QA": {
-      "result": "Succeeded",
-      "totalErrors": 0,
-      "totalWarnings": 0,
-      "totalSizeBytes": 227957723,
-      "buildTimeMs": 12861
-    }
-  },
-  "packages": {
-    "macOS": "CRC OK, 43.5 MiB, audio credits included",
-    "Windows": "CRC OK, 53.1 MiB, audio credits included"
-  },
-  "windows_runtime": "Deferred by user; cross-build succeeded; future Windows VM",
-  "roadmap": {
-    "step_1": "Complete",
-    "round_1": "Complete",
-    "round_2": "Complete",
-    "step_2a": "Complete",
-    "step_2b": "Complete",
-    "step_2c": "Complete",
-    "step_3": "Complete",
-    "step_4": "Complete",
-    "steps_5_through_6": "Pending"
-  },
-  "release_pipeline_server_and_compiler_assemblies_absent": true,
-  "final_orientation_native_check": "Passed in rebuilt QA player; infantry and tank forward-axis assertions",
-  "final_resize_native_check": "Passed all four sizes; zoom 5.5, orbit 135; original window size restored",
-  "release_startup_smoke": {
-    "passed": true,
-    "one_release_process": true,
-    "startup_errors": 0,
-    "left_at_main_menu": true
-  },
-  "foliage_and_sandbag_refinement": {
-    "checkpoint": "2a3a3c1",
-    "complete_staggered_rings": {
-      "MachineGun": 28,
-      "AntiTank": 32,
-      "Mortar": 28
-    },
-    "leaf_geometry_and_vein_texture": "Passed editor and native checks",
-    "traverse_with_fixed_walls": "Passed all three towers",
-    "native_check": "PASS native circular walls and leaf textures/UVs/tangents; 12 leaf renderers; 59.7 fps during combat; frames advanced 204",
-    "native_errors": 0,
-    "native_warnings": 0,
-    "sample_duration_seconds": 3,
-    "landscape_renderers": 137,
-    "previous_landscape_renderers": 269,
-    "runtime_gameplay_source_unchanged": true,
-    "old_cloud_shrub_assets_removed": true
-  },
-  "house_refinement": {
-    "checkpoint": "eb22840",
-    "crisp_architectural_edges": true,
-    "ridge_height_m": 2.11,
-    "mid_slope_heights_m": [
-      1.83,
-      1.83
-    ],
-    "eave_heights_m": [
-      1.4,
-      1.4
-    ],
-    "roof_geometry_check": "Passed actual imported mesh raycasts",
-    "renderers_per_house": 10,
-    "native_check": "PASS two native farmhouses, 20 batched renderers, supported materials, live frames, overview and close captures",
-    "native_errors": 0,
-    "native_warnings": 0,
-    "runtime_gameplay_source_unchanged": true
-  },
-  "standalone_mac_accelerated_step3": {
-    "status": "Passed",
-    "timeScale": 4,
-    "realSeconds": 79,
-    "renderedFrames": 4711,
-    "stars": 3,
-    "lives": 18,
-    "kills": 214,
-    "escapes": 2,
-    "final_wave_route_depth": 1,
-    "rear_shots": 108,
-    "note": "Earned funds and normal rules. Final field-prop import transform fix checked separately in fresh native player and corridor sweep. This is not human pacing evidence."
-  },
-  "map_composition": {
-    "status": "Complete",
-    "unchanged_anchors": 10,
-    "visible_pedestals": 0,
-    "number_labels": 0,
-    "entry": "Open farm gates and physical sign",
-    "exit": "Raised checkpoint boom, supplies and physical sign",
-    "soil_horizons": 3,
-    "world_sized_soil_texture": true,
-    "embedded_stones": true,
-    "farm_plots_and_boundaries": true,
-    "decorative_timber_field_position": true,
-    "clean_field_prop_roots": "Passed",
-    "vehicle_corridor": "Actual combined-mesh sweep passed; three lanes, three heights, 0.16m route steps",
-    "native_views": [
-      "overview",
-      "orbit",
-      "entry",
-      "exit",
-      "soil"
-    ],
-    "native_errors": 0,
-    "native_warnings": 0,
-    "core_rules_route_economy_unchanged": true,
-    "tower_and_preview_height": "Adjusted to meet bare earth"
-  },
-  "final_composition_native_check": "Passed in final QA build after field-prop transform correction",
-  "standalone_mac_normal_speed_step2": {
-    "status": "Passed",
-    "timeScale": 1,
-    "combatSeconds": 312,
-    "renderedFrames": 18439,
-    "stars": 3,
-    "lives": 19,
-    "kills": 215,
-    "escapes": 1,
-    "errorEntries": 0,
-    "warningEntries": 0,
-    "final_wave_route_depth": 1,
-    "rear_shots": 106,
-    "note": "Historical step 2 normal-speed run. Current step 3 changes presentation/help copy only; core rules and balance results unchanged. Step 3 native full-match verification is recorded separately.",
-    "source_sha256": "6c27cf1b0f9fa5649526bbae11c22d7cd7cef5dcb55d8c096024c37f188e117b"
-  },
-  "weapon_feedback": {
-    "status": "Complete",
-    "muzzle_and_recoil_anchors": "All three imported roles passed",
-    "independent_recoil_recovery_freeze": "Passed; sandbags and carriage/supports stay fixed",
-    "typed_event_check": "57 fire / 57 impacts match legacy cues; original simulation origins",
-    "projectile_pool_warm_count": 32,
-    "emitters": 5,
-    "repeated_shots": 30,
-    "fixed_allocations_editor_and_native": true,
-    "real_fires_by_role": {
-      "MachineGun": 1760,
-      "Cannon": 164,
-      "Mortar": 124
-    },
-    "real_impacts_by_role": {
-      "MachineGun": 1760,
-      "Cannon": 163,
-      "Mortar": 124
-    },
-    "unresolved_cannon_note": "One final shot cleared by normal wave completion",
-    "peak_live_particles": 124,
-    "peak_world_voices": 14,
+  "native_campaign": {
+    "outcome": "Victory",
+    "waves": 10,
+    "lives": 16,
+    "kills": 455,
+    "escapes": 4,
+    "upgrades": 19,
+    "archetypes_exercised": 7,
+    "final_route_fraction": 0.997,
+    "rear_shots": 198,
+    "real_seconds": 217,
+    "frames": 12422,
+    "verification_time_scale": 4,
+    "normal_speed_busy_sample_seconds": 3,
+    "normal_speed_sample_average_fps": 57.5,
+    "peak_enemies": 38,
+    "peak_retiring_actors": 7,
+    "retiring_actor_limit": 24,
+    "actors_created_and_reused": 80,
+    "projectile_objects": 32,
+    "peak_world_voices": 24,
     "world_voice_limit": 24,
-    "full_match_audio_sample_peak": 0.3265,
-    "final_native_probe_audio_sample_peak": 0.1952,
-    "clipping_detected": false,
-    "clips": 21,
-    "channels": 1,
-    "sample_rate_hz": 48000,
-    "wave_bank_bytes": 994524,
-    "native_output_probe": "Passed actual mixed output, pause/reset, live frames",
-    "sfx_gain_check": "Passed all sources",
-    "armor_surface_regression": "Passed particles outside target centre",
-    "shipped_attribution_checked": true,
-    "licenses": "Gunshots CC BY 3.0 per archive; Kenney impacts and Spring Spring explosion CC0",
-    "audio_mixer": "Existing headless gain layer retained",
-    "core_changes": "Shot source-pad metadata and read-only presentation notifications; stats/targeting/damage/cooldowns/hit timing/economy unchanged",
-    "final_native_errors": 0,
-    "final_native_warnings": 0,
-    "user_listening_review": "Pending"
+    "sampled_audio_peak": 0.5199,
+    "console_errors": 0,
+    "console_warnings": 1,
+    "log_note": "URP emits unused stripped depth-of-field/Panini pass notices; these effects are not authored. No gameplay exception.",
+    "pacing_and_fun": "Pending human playtesting"
   },
-  "final_weapons_native_check": "PASS native 21-clip bank, supported effect shaders, shipped credits, three roles, 32 stable projectiles / 5 emitters, 30 repeated shots, audio peak=0.1952, pause/reset, 19 live frames"
+  "builds": {
+    "qa": {
+      "buildId": "build_4e9329f9e239",
+      "result": "Succeeded",
+      "platform": "StandaloneOSX",
+      "totalSizeBytes": 229787989,
+      "buildTimeMs": 5203,
+      "totalWarnings": 0,
+      "totalErrors": 0
+    },
+    "mac": {
+      "buildId": "build_9e11938300d9",
+      "result": "Succeeded",
+      "platform": "StandaloneOSX",
+      "totalSizeBytes": 122839539,
+      "buildTimeMs": 6665,
+      "totalWarnings": 0,
+      "totalErrors": 0
+    },
+    "windows": {
+      "buildId": "build_c5f56296958b",
+      "result": "Succeeded",
+      "platform": "StandaloneWindows64",
+      "totalSizeBytes": 149452974,
+      "buildTimeMs": 8089,
+      "totalWarnings": 0,
+      "totalErrors": 0
+    }
+  },
+  "packages": [
+    {
+      "file": "The-Line-Holds-Windows.zip",
+      "bytes": 56260780,
+      "crc": "pass",
+      "credits": true,
+      "debugAndPipelineServerExcluded": true
+    },
+    {
+      "file": "The-Line-Holds-macOS.zip",
+      "bytes": 46151213,
+      "crc": "pass",
+      "credits": true,
+      "debugAndPipelineServerExcluded": true
+    }
+  ],
+  "release_startup": {
+    "platform": "macOS",
+    "single_release_process": true,
+    "editor_and_qa_closed": true,
+    "fresh_menu_session": true,
+    "startup_exceptions": 0,
+    "unused_urp_pass_notices": true
+  },
+  "windows_runtime": "Deferred by user to future Windows VM",
+  "computer_use": false,
+  "captures": [
+    "campaign-native-roster.png",
+    "campaign-native-upgrades.png",
+    "campaign-native-combat.png",
+    "campaign-native-victory.png"
+  ]
 }
