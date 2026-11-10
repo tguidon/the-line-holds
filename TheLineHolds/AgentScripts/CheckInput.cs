@@ -80,7 +80,7 @@ public static class CheckInput
             MouseEvent(0, 4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, MapCameraControls.MinimumZoom), "close zoom minimum clamps");
             MouseEvent(0, -4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, MapCameraControls.MaximumZoom), "zoom maximum clamps");
             await Key(UnityEngine.InputSystem.Key.R);
-            Check(Vector3.Distance(homePosition,game.battleCamera.transform.position)<.001f && Mathf.Approximately(game.battleCamera.orthographicSize,MapCameraControls.OverviewZoom), "R resets overview");
+            Check(Vector3.Distance(homePosition,game.battleCamera.transform.position)<.001f && Mathf.Approximately(game.battleCamera.orthographicSize,game.CameraControls.OverviewSize), "R resets overview");
             await Key(UnityEngine.InputSystem.Key.E); Check(Quaternion.Angle(homeRotation,game.battleCamera.transform.rotation)>1,"E rotates map");
             await Key(UnityEngine.InputSystem.Key.Q);
             var rotation=game.battleCamera.transform.rotation;
@@ -108,7 +108,7 @@ public static class CheckInput
             Check(Vector3.Distance(panPosition,game.battleCamera.transform.position)>.1f,"WASD pans");
             await Button("RESET VIEW");Check(Vector3.Distance(homePosition,game.battleCamera.transform.position)<.001f && Quaternion.Angle(homeRotation,game.battleCamera.transform.rotation)<.01f,"reset button restores view");
             await Button(">");Check(Quaternion.Angle(homeRotation,game.battleCamera.transform.rotation)>40,"rotate button works");
-            await Button("+");Check(game.battleCamera.orthographicSize<MapCameraControls.OverviewZoom,"zoom button works");
+            await Button("+");Check(game.battleCamera.orthographicSize<game.CameraControls.OverviewSize,"zoom button works");
             await Button("Shop Machine");await Click(Pad(4));
             Check(game.Match.Towers[4]!=null && game.Match.Funds==37,"world placement works after rotation and zoom");
             await Button("-");zoom=game.battleCamera.orthographicSize;MouseEvent(0,120);await Frame();

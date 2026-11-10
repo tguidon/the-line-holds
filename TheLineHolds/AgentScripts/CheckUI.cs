@@ -20,8 +20,8 @@ await System.Threading.Tasks.Task.Delay(100);Click("Shop Machine");Check(game.Pl
 game.ClickPad(3);game.Cancel();
 var rotation=game.battleCamera.transform.rotation;
 Click(">");Check(Quaternion.Angle(rotation,game.battleCamera.transform.rotation)>40,"rotate view button");
-Click("+");Check(game.battleCamera.orthographicSize<MapCameraControls.OverviewZoom,"zoom view button");
-Click("RESET VIEW");Check(Quaternion.Angle(rotation,game.battleCamera.transform.rotation)<.01f && Mathf.Approximately(game.battleCamera.orthographicSize,MapCameraControls.OverviewZoom),"reset view button");
+Click("+");Check(game.battleCamera.orthographicSize<game.CameraControls.OverviewSize,"zoom view button");
+Click("RESET VIEW");Check(Quaternion.Angle(rotation,game.battleCamera.transform.rotation)<.01f && Mathf.Approximately(game.battleCamera.orthographicSize,game.CameraControls.OverviewSize),"reset view button");
 Click("START WAVE");Check(game.Match.Phase==MatchPhase.Combat,"Start Wave button starts combat");
 Click("II");Check(game.Match.Paused,"Pause button pauses");await System.Threading.Tasks.Task.Delay(100);Click("RESUME");Check(!game.Match.Paused,"Resume button resumes");
 game.MainMenu();return "PASS menu, shop, camera view, Start Wave, Pause, and Resume button raycasts and callbacks";
