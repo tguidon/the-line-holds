@@ -30,7 +30,7 @@ namespace TheLineHolds.Editor
             for(int i=0;i<2100;i++)
             {
                 float x=R()*23.4f-11.7f,z=R()*13.4f-6.7f;var p=BattleRoute.OnGround(x,z);
-                if(BattlefieldDetails.Reserved(p) || RoadDistance(p)<.83f || BattleRoute.DefaultPads.Any(pad=>new Vector2(pad.x-x,pad.z-z).magnitude<1.0f))continue;
+                if(BattlefieldDetails.Reserved(p) || RoadDistance(p)<1.17f || BattleRoute.DefaultPads.Any(pad=>new Vector2(pad.x-x,pad.z-z).magnitude<1.0f))continue;
                 float patch=Mathf.PerlinNoise(x*.65f+37,z*.65f+52);
                 if(patch<.44f)continue;
                 for(int blade=0;blade<5;blade++)
@@ -42,7 +42,7 @@ namespace TheLineHolds.Editor
                     grassT.AddRange(new[]{index,index+2,index+1});
                     var color=Color.Lerp(DioramaSurface.Hex("61754A"),DioramaSurface.Hex("B4B47C"),R());grassColors.Add(color);grassColors.Add(color);grassColors.Add(color);
                 }
-                if(i%15==0 && RoadDistance(p)>1.45f && !BattleRoute.DefaultPads.Any(pad=>new Vector2(pad.x-x,pad.z-z).magnitude<1.55f))
+                if(i%15==0 && RoadDistance(p)>1.55f && !BattleRoute.DefaultPads.Any(pad=>new Vector2(pad.x-x,pad.z-z).magnitude<1.55f))
                 {
                     float s=.22f+R()*.3f;
                     var placement=Matrix4x4.TRS(p,Quaternion.Euler(0,R()*360,0),Vector3.one*(.75f+s));

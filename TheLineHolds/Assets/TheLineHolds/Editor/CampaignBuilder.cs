@@ -15,7 +15,7 @@ namespace TheLineHolds.Editor
   static DefenseDefinition Defense(string key,string name,string hint,DefenseRole role,int tier,int cost,float range,float interval,float damage,float splash,float armor,float slow=1,float duration=0)
   {
    var d=Asset<DefenseDefinition>("Defenses/"+key);d.displayName=name;d.description=hint;d.role=role;d.tier=tier;d.cost=cost;d.range=range;d.interval=interval;d.damage=damage;d.splashRadius=splash;d.flightTime=role==DefenseRole.Mortar?.95f:role==DefenseRole.Cannon?.35f:.12f;d.infantryDamageMultiplier=role==DefenseRole.Cannon && splash==0?.65f:1;d.armorDamageMultiplier=armor;d.priority=role==DefenseRole.Mortar?TargetPriority.Cluster:role==DefenseRole.Cannon?TargetPriority.Armor:TargetPriority.First;d.slowMultiplier=slow;d.slowDuration=duration;d.upgrades=Array.Empty<UpgradeOption>();
-   d.prefab=AssetDatabase.LoadAssetAtPath<GameObject>(Root+"/Prefabs/"+(role==DefenseRole.MachineGun?"MachineGun":role==DefenseRole.Cannon?"AntiTank":"Mortar")+".prefab");EditorUtility.SetDirty(d);return d;
+   d.prefab=AssetDatabase.LoadAssetAtPath<GameObject>(Root+"/Prefabs/"+key+".prefab");if(!d.prefab)d.prefab=AssetDatabase.LoadAssetAtPath<GameObject>(Root+"/Prefabs/"+(role==DefenseRole.MachineGun?"MachineGun":role==DefenseRole.Cannon?"AntiTank":"Mortar")+".prefab");EditorUtility.SetDirty(d);return d;
   }
   static void Upgrades(DefenseDefinition d,params UpgradeOption[] options){d.upgrades=options;EditorUtility.SetDirty(d);}
   static UpgradeOption To(DefenseDefinition d,int price)=>new UpgradeOption{defense=d,price=price};

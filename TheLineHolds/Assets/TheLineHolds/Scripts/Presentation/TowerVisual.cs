@@ -6,6 +6,8 @@ namespace TheLineHolds
     public sealed class TowerVisual : MonoBehaviour
     {
         Transform traverse, slide, muzzle, barrel;
+        Vector3 rootScale;
+        public DefenseDefinition Definition=>configured;
         DefenseDefinition configured; GameObject markings;
         public void Configure(DefenseDefinition definition,Material metal)
         {
@@ -16,7 +18,8 @@ namespace TheLineHolds
         }
         Quaternion bindRotation;
         Vector3 bindPosition, bindForward, aimForward;
-        float recoilAge = 10;
+        float recoilAge = 10, celebration=10;
+        public void Celebrate(){celebration=0;}
         public WeaponStyle Style { get; private set; }
         public Vector3 MuzzlePosition => muzzle ? muzzle.position : transform.position + Vector3.up * .65f;
         public Vector3 MuzzleForward => muzzle && barrel ? (muzzle.position - barrel.position).normalized : aimForward;
@@ -24,6 +27,7 @@ namespace TheLineHolds
         public float RecoveryDuration => Style == WeaponStyle.Cannon ? .48f : Style == WeaponStyle.Mortar ? .26f : .12f;
         void Awake()
         {
+            rootScale=transform.localScale;
             Style = name.StartsWith("AntiTank") ? WeaponStyle.Cannon : name.StartsWith("Mortar") ? WeaponStyle.Mortar : WeaponStyle.MachineGun;
             var parts = GetComponentsInChildren<Transform>();
             traverse = parts.FirstOrDefault(t => t.name.StartsWith("Traverse"));
@@ -45,6 +49,8 @@ namespace TheLineHolds
         public void Aim(Vector3 direction, float dt)
         {
             Turn(direction, dt, false);
+            celebration+=dt;
+            transform.localScale=rootScale*(1+Mathf.Sin(Mathf.Clamp01(celebration/.42f)*Mathf.PI)*.13f);
             recoilAge += dt;
             ApplyRecoil();
         }

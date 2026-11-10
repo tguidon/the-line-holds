@@ -19,7 +19,7 @@ namespace TheLineHolds
                 {
                     var ticket=new Ticket{Enemy=entry.enemy,At=at,Member=member};
                     (entry.enemy.spawnSeparation>0?vehicles:infantry).Add(ticket);
-                    if(member<entry.UnitCount-1)at+=Mathf.Max(.01f,entry.interval);
+                    if(member<entry.UnitCount-1)at+=Mathf.Max(.06f,entry.interval*(wave.varied?.55f+(float)variation.NextDouble()*.9f:1));
                 }
             }
         }
@@ -40,7 +40,7 @@ namespace TheLineHolds
         void Spawn(MatchState match,Ticket ticket)
         {
             var enemy=ticket.Enemy;
-            float lane=enemy.spawnSeparation>0?0:wave.varied?((ticket.Member%3)-1)*.38f+(float)(variation.NextDouble()-.5)*.08f:(ticket.Member%2==0?-.27f:.27f);
+            float lane=enemy.spawnSeparation>0?0:wave.varied?(float)(variation.NextDouble()-.5)*1.56f:(ticket.Member%2==0?-.27f:.27f);
             float hp=enemy.health*wave.healthMultiplier;
             match.Enemies.Add(new EnemyState{Id=++enemyId,Definition=enemy,Health=hp,MaxHealth=hp,SpeedMultiplier=wave.varied?.92f+(float)variation.NextDouble()*.16f:1,LateralOffset=lane,Position=match.Route.Position(0,lane)});
             unspawned--;

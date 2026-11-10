@@ -188,6 +188,41 @@ def gun(kind):
  muzzle=bpy.data.objects.new('Muzzle socket',None);bpy.context.collection.objects.link(muzzle);muzzle.parent=slide
  muzzle.location={'MachineGun':(0,.82,.56),'AntiTank':(0,1.36,.6),'Mortar':(0,.38,.612)}[kind]
 
+def upgraded_gun(kind,branch=''):
+ gun(kind)
+ pivot=next(o for o in bpy.context.scene.objects if o.name.startswith('Traverse'))
+ pivot.scale=(1.14,1.14,1.14) if not branch else (1.3,1.3,1.3)
+ before=set(bpy.context.scene.objects)
+ if kind=='MachineGun':
+  part('Armored receiver shield',(0,.35,.59),(.24,.035,.23),'Olive',edge=.015)
+  part('Shield brass strip',(0,.31,.8),(.24,.025,.025),'Sand',edge=.004)
+  if branch=='A':
+   for x in [-.13,.13]:barrel((x,.62,.6),.65,.045)
+   part('Linked ammo box',(-.3,0,.45),(.12,.22,.15),'Olive')
+  elif branch=='B':
+   barrel((0,.8,.65),.98,.065);part('AP sight',(.12,.18,.88),(.025,.13,.025),'Steel')
+ elif kind=='AntiTank':
+  part('Reinforced gun shield',(0,.02,.66),(.49,.04,.36),'Steel',edge=.02)
+  for x in [-.4,.4]:part('Identification band',(x,-.026,.65),(.025,.018,.23),'Sand')
+  if branch=='A':
+   barrel((0,.97,.68),1.9,.085);part('Long range optics',(.28,-.1,.94),(.035,.17,.035),'Dark')
+  elif branch=='B':
+   barrel((0,.61,.7),1,.14);part('Heavy muzzle collar',(0,1.07,.7),(.19,.1,.18),'Dark')
+ else:
+  part('Elevated base',(0,0,.18),(.36,.36,.12),'Olive','cylinder')
+  if branch=='B':
+   for x in [-.17,.17]:
+    part('Twin mortar tube',(x,.16,.61),(.105,.105,.44),'Steel','cylinder',(math.pi/2+.65,0,0))
+  elif branch=='A':part('Siege tube',(0,.18,.65),(.17,.17,.53),'Steel','cylinder',(math.pi/2+.65,0,0))
+  else:part('Mortar armored collar',(0,.18,.5),(.15,.15,.11),'Olive','cylinder',(math.pi/2+.65,0,0))
+ for obj in set(bpy.context.scene.objects)-before:
+  # Kit uses the same authored coordinates as the mechanism, and traverses with it.
+  obj.parent=pivot
+ muzzle=next(o for o in bpy.context.scene.objects if o.name.startswith('Muzzle socket'))
+ if branch:
+  muzzle.location=({'MachineGun':(0,.98,.6),'AntiTank':(0,1.94,.68),'Mortar':(0,.52,.94)} if branch=='A' else {'MachineGun':(0,1.31,.65),'AntiTank':(0,1.19,.7),'Mortar':(0,.43,.86)})[kind]
+ for x in [-.5,.5]:part('Additional supply crate',(x,-.4,.2),(.12,.16,.17),'Olive')
+
 def branch(a,b,radius=.04):
  delta=Vector(b)-Vector(a)
  rotation=delta.to_track_quat('Z','Y').to_euler()
@@ -378,6 +413,20 @@ def fieldstone():
  for v in o.data.vertices:v.co*=1+.12*math.sin(v.co.x*5+v.co.z*7)
  for p in o.data.polygons:p.use_smooth=True
 
+def barn():
+ part('Barn stone base',(0,0,.12),(1.25,1.75,.12),'Masonry',edge=.012)
+ part('Barn timber body',(0,0,1),(1.18,1.68,.88),'Wood',edge=.012)
+ for side in [-1,1]:
+  for y in [-1.5,-1,-.5,0,.5,1,1.5]:part('Barn siding',(side*1.19,y,1),(.018,.025,.86),'Bark',edge=.002)
+  part('Barn doors',(side*.47,-1.695,.89),(.45,.025,.77),'Shutter',edge=.006)
+  part('Door brace',(side*.47,-1.73,.88),(.025,.025,.7),'Sand',rot=(0,side*.47,0),edge=.003)
+  part('Roof pitch',(side*.62,0,2.12),(.77,1.87,.06),'RoofSlate',rot=(0,side*.5,0),edge=.008)
+  verts=[(-1.18,side*1.68,1.88),(1.18,side*1.68,1.88),(0,side*1.68,2.53)]
+  m=bpy.data.meshes.new('Barn gable');m.from_pydata(verts,[],[(0,1,2)] if side<0 else [(2,1,0)])
+  o=bpy.data.objects.new('Barn gable',m);bpy.context.collection.objects.link(o);m.materials.append(materials['Wood'])
+ part('Barn ridge',(0,0,2.51),(.07,1.9,.055),'RoofTrim',edge=.008)
+ combine_static('Barn')
+
 def batch_actor():
  # Keep moving wheel/leg hierarchies and muzzle/rifle landmarks; batch static surfaces by material.
  groups={}
@@ -392,7 +441,7 @@ def batch_actor():
   bpy.context.view_layer.objects.active=objects[0];bpy.ops.object.join();objects[0].name='Miniature '+mat
 
 only=set(sys.argv[sys.argv.index('--only')+1].split(',')) if '--only' in sys.argv else None
-for name,fn in [('Infantry',infantry),('Scout',scout),('AssaultInfantry',assault),('Truck',lambda:vehicle('Truck')),('ArmoredCar',lambda:vehicle('ArmoredCar')),('HeavyTank',heavy_tank),('LightTank',tank),('MachineGun',lambda:gun('MachineGun')),('AntiTank',lambda:gun('AntiTank')),('Mortar',lambda:gun('Mortar')),('Pine',tree),('Bush',bush),('Farmhouse',hut),('Crate',crate),('Sandbags',bags),('FieldGate',gate),('Checkpoint',checkpoint),('RoadSign',signpost),('FieldFence',fence),('BuildStake',stake),('Revetment',revetment),('Duckboard',duckboard),('FieldStone',fieldstone)]:
+for name,fn in [('Infantry',infantry),('Scout',scout),('AssaultInfantry',assault),('Truck',lambda:vehicle('Truck')),('ArmoredCar',lambda:vehicle('ArmoredCar')),('HeavyTank',heavy_tank),('LightTank',tank),('MachineGun',lambda:gun('MachineGun')),('AntiTank',lambda:gun('AntiTank')),('Mortar',lambda:gun('Mortar')),('MachineGunII',lambda:upgraded_gun('MachineGun')),('MachineGunRapid',lambda:upgraded_gun('MachineGun','A')),('MachineGunAP',lambda:upgraded_gun('MachineGun','B')),('AntiTankII',lambda:upgraded_gun('AntiTank')),('TankHunter',lambda:upgraded_gun('AntiTank','A')),('FieldHowitzer',lambda:upgraded_gun('AntiTank','B')),('MortarII',lambda:upgraded_gun('Mortar')),('SiegeMortar',lambda:upgraded_gun('Mortar','A')),('BarrageMortar',lambda:upgraded_gun('Mortar','B')),('Pine',tree),('Bush',bush),('Farmhouse',hut),('Barn',barn),('Crate',crate),('Sandbags',bags),('FieldGate',gate),('Checkpoint',checkpoint),('RoadSign',signpost),('FieldFence',fence),('BuildStake',stake),('Revetment',revetment),('Duckboard',duckboard),('FieldStone',fieldstone)]:
  scene=bpy.data.scenes.new(name); bpy.context.window.scene=scene; fn()
  if name in {'Infantry','Scout','AssaultInfantry','Truck','ArmoredCar','HeavyTank','LightTank'}:batch_actor()
  bpy.ops.object.select_all(action='SELECT');bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)

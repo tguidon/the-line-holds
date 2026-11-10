@@ -3,7 +3,11 @@ namespace TheLineHolds
 {
     public sealed class BattleAudio : MonoBehaviour
     {
-        public AudioClip placement, escape, wave, victory, defeat;
+        public AudioClip placement, escape, wave, victory, defeat, countryside;
+        [Range(0,1)] public float ambienceGain=.7f;
+        public bool AmbienceEnabled {get;private set;}=true;
+        AudioSource ambience;
+        public void ToggleAmbience(){AmbienceEnabled=!AmbienceEnabled;}
         public AudioClip[] machineGun, cannon, mortarLaunch, softHit, armorHit, shellImpact, mortarImpact;
         [Range(0, 1)] public float sfxGain = .65f;
         const int VoiceLimit = 24;
@@ -19,6 +23,7 @@ namespace TheLineHolds
         void Awake()
         {
             view = Camera.main;
+            ambience=gameObject.AddComponent<AudioSource>();ambience.playOnAwake=false;ambience.loop=true;ambience.spatialBlend=0;ambience.priority=220;
             ui = gameObject.AddComponent<AudioSource>(); ui.playOnAwake = false; ui.spatialBlend = 0;
             for (int i = 0; i < VoiceLimit; i++)
             {
@@ -29,6 +34,9 @@ namespace TheLineHolds
         }
         void LateUpdate()
         {
+            if(countryside && ambience.clip!=countryside){ambience.clip=countryside;ambience.Play();}
+            var game=GetComponent<BattleController>();float target=AmbienceEnabled?ambienceGain*(paused?.35f:game && game.Match!=null && game.Match.Phase==MatchPhase.Combat?.65f:1):0;
+            ambience.volume=Mathf.MoveTowards(ambience.volume,target,Time.unscaledDeltaTime*.45f);
             // Headless gain layer: no AudioMixer asset or UI authoring is required.
             ui.volume = .35f * sfxGain;
             for (int i = 0; i < VoiceLimit; i++) voices[i].volume = levels[i] * sfxGain;

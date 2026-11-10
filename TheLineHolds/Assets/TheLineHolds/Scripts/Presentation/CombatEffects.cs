@@ -7,7 +7,7 @@ namespace TheLineHolds
     public sealed class CombatEffects : MonoBehaviour
     {
         public Material flashMaterial, smokeMaterial, dustMaterial, sparkMaterial, brassMaterial, shellMaterial;
-        ParticleSystem flash, smoke, dust, sparks, brass;
+        ParticleSystem flash, smoke, dust, sparks, brass, fireball, fragments;
         readonly List<ParticleSystem> emitters = new List<ParticleSystem>();
         readonly Dictionary<int, Flight> flights = new Dictionary<int, Flight>();
         readonly List<int> expired = new List<int>();
@@ -32,6 +32,8 @@ namespace TheLineHolds
             dust = Emitter("Road dust", dustMaterial, 384, false);
             sparks = Emitter("Armor sparks", sparkMaterial, 192, true);
             brass = Emitter("Ejected cartridges", brassMaterial, 128, true);
+            fireball = Emitter("Vehicle fireball", flashMaterial, 128, false);
+            fragments = Emitter("Vehicle fragments", shellMaterial, 128, true);
             pool = new UnityEngine.Pool.ObjectPool<Flight>(CreateFlight, f => f.View.SetActive(true), f => f.View.SetActive(false), f => Destroy(f.View), true, 32, 128);
             var warm = new List<Flight>();
             for (int i = 0; i < 32; i++) warm.Add(pool.Get());
@@ -88,11 +90,11 @@ namespace TheLineHolds
         }
         public void Impact(ShotState shot)
         {
-            var style = WeaponStyles.For(shot.Definition); bool armor = !shot.Target.Resolved && shot.Target.Definition.armored;
+            var style = WeaponStyles.For(shot.Definition); bool armor = shot.Target.Definition.spawnSeparation>0;
             var p = shot.Destination;
             // Simulation hits the unit centre. Draw ricochets at the exposed hull edge.
             if (armor && style != WeaponStyle.Mortar)
-                p += Vector3.ProjectOnPlane(shot.Origin - p, Vector3.up).normalized * .75f + Vector3.up * .25f;
+                p += Vector3.ProjectOnPlane(shot.Origin - p, Vector3.up).normalized * .62f + Vector3.up * .22f;
             if (style == WeaponStyle.Mortar)
             {
                 p.y = BattleRoute.Ground(p.x, p.z) + .05f;
@@ -104,7 +106,8 @@ namespace TheLineHolds
             {
                 int count = style == WeaponStyle.Cannon ? 10 : 4;
                 for (int i = 0; i < count; i++) Puff(sparks, p, new Vector3(V(-1.5f, 1.5f), V(.5f, 2), V(-1.5f, 1.5f)), V(.055f, .12f), V(.13f, .3f), new Color(1.5f, 1.05f, .4f));
-                if (style == WeaponStyle.Cannon) { Puff(flash, p, Vector3.up * .1f, .42f, .08f, new Color(1.4f, .9f, .36f)); GroundDust(p, 7, .7f); }
+                Puff(flash, p, Vector3.up * .1f, style==WeaponStyle.Cannon?.65f:.18f, .10f, new Color(1.4f, .9f, .36f));
+                if(style==WeaponStyle.Cannon){Puff(smoke,p,Vector3.up*.5f,.55f,.45f,new Color(.3f,.29f,.25f,.8f));GroundDust(p,7,.7f);}
             }
             else GroundDust(p, style == WeaponStyle.Cannon ? 9 : 3, style == WeaponStyle.Cannon ? .7f : .27f);
             if (flights.Remove(shot.Id, out var flight)) pool.Release(flight);
@@ -122,7 +125,22 @@ namespace TheLineHolds
         public void Destruction(Vector3 p,bool vehicle)
         {
             GroundDust(p,vehicle?12:4,vehicle?1:.4f);
-            if(vehicle){Puff(flash,p+Vector3.up*.5f,Vector3.up*.2f,.9f,.14f,new Color(1,.7f,.3f));for(int i=0;i<10;i++)DamageSmoke(p+Vector3.up*V(.3f,.8f));}
+            if(vehicle)
+            {
+                Puff(flash,p+Vector3.up*.6f,Vector3.up*.2f,2.3f,.16f,new Color(2,1,.3f));
+                for(int i=0;i<12;i++)
+                {
+                    var velocity=new Vector3(V(-1.4f,1.4f),V(.7f,2.3f),V(-1.4f,1.4f));
+                    Puff(fireball,p+Vector3.up*.55f,velocity,V(.65f,1.2f),V(.28f,.52f),new Color(1.5f,V(.32f,.65f),.08f));
+                    Puff(smoke,p+Vector3.up*V(.5f,.9f),velocity*.6f,V(.8f,1.2f),V(.7f,1.1f),new Color(.2f,.21f,.18f,.85f));
+                    Puff(fragments,p+Vector3.up*.6f,velocity*2,V(.08f,.17f),V(.4f,.8f),new Color(.27f,.3f,.2f));
+                }
+            }
+        }
+        public void Upgrade(Vector3 p)
+        {
+            for(int i=0;i<18;i++){float a=i*Mathf.PI*2/18;Puff(sparks,p+new Vector3(Mathf.Cos(a)*.7f,.1f,Mathf.Sin(a)*.7f),new Vector3(Mathf.Cos(a)*.3f,1.1f,Mathf.Sin(a)*.3f),.11f,.65f,new Color(1,.83f,.36f));}
+            GroundDust(p,8,.6f);
         }
         public void Escape(Vector3 p) => GroundDust(p, 4, .4f);
         public void Tick(float dt, IReadOnlyList<ShotState> shots)

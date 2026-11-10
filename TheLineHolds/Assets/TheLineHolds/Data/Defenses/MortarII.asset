@@ -32,4 +32,4 @@ MonoBehaviour:
   infantryDamageMultiplier: 1
   armorDamageMultiplier: 0.4
   priority: 2
-  prefab: {fileID: 428005552416271594, guid: 1b448e76ab9a8421e8c41e793d795861, type: 3}
+  prefab: {fileID: 5134147343216738707, guid: 5d3cff231d23c4248ae38715694ed1ca, type: 3}

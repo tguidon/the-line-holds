@@ -55,7 +55,7 @@ namespace TheLineHolds.Editor
                 float n=Mathf.PerlinNoise(px*.28f+43,pz*.28f+17), fine=Mathf.PerlinNoise(px*8+17,pz*8+9);
                 Color c=Color.Lerp(moss,grass,Mathf.SmoothStep(.1f,.9f,n));
                 c=Color.Lerp(c,straw,Mathf.SmoothStep(.54f,.83f,Mathf.PerlinNoise(px*.8f+5,pz*.8f+32))*.35f);
-                float edge=.64f+(Mathf.PerlinNoise(px*3+80,pz*3+80)-.5f)*.17f;
+                float edge=.94f+(Mathf.PerlinNoise(px*3+80,pz*3+80)-.5f)*.17f;
                 float blend=1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(edge-.09f,edge+.16f,distance[i]));
                 Color road=Color.Lerp(dirt,rut,Mathf.Exp(-Mathf.Pow((Mathf.Abs(side[i])-.32f)/.10f,2))*.35f);
                 road*=.95f+fine*.09f;

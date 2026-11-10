@@ -15,11 +15,11 @@ namespace TheLineHolds
                         if(ahead!=enemy && ahead.Definition.spawnSeparation>0 && ahead.Distance>enemy.Distance)
                             next=UnityEngine.Mathf.Min(next,UnityEngine.Mathf.Max(enemy.Distance,ahead.Distance-UnityEngine.Mathf.Max(enemy.Definition.spawnSeparation,ahead.Definition.spawnSeparation)));
                 enemy.Distance=next;
-                float passing=0;
+                float passing=enemy.Definition.spawnSeparation<=0?UnityEngine.Mathf.Sin(enemy.Distance*.65f+enemy.Id*2.4f)*.12f:0;
                 if(enemy.Definition.spawnSeparation<=0)
                     foreach(var vehicle in match.Enemies)
                         if(vehicle.Definition.spawnSeparation>0 && UnityEngine.Mathf.Abs(vehicle.Distance-enemy.Distance)<2.4f)
-                        {float side=enemy.LateralOffset>.05f?1:enemy.LateralOffset<-.05f?-1:enemy.Id%2==0?1:-1;passing=side-enemy.LateralOffset;break;}
+                        {float side=enemy.LateralOffset>.05f?1:enemy.LateralOffset<-.05f?-1:enemy.Id%2==0?1:-1;passing=side*(1.02f+(enemy.Id%17)*.01f)-enemy.LateralOffset;break;}
                 enemy.AvoidanceOffset=UnityEngine.Mathf.MoveTowards(enemy.AvoidanceOffset,passing,dt*1.6f);
                 enemy.Position = match.Route.Position(enemy.Distance, enemy.LateralOffset+enemy.AvoidanceOffset);
                 if (enemy.Distance < match.Route.Length) continue;

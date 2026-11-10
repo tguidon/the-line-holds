@@ -7,7 +7,7 @@ namespace TheLineHolds
     [DefaultExecutionOrder(-50)]
     public sealed class MapCameraControls : MonoBehaviour
     {
-        public const float MinimumZoom = 5.5f, MaximumZoom = 18, OverviewZoom = 13.5f;
+        public const float MinimumZoom = 5.5f, MaximumZoom = 18, OverviewZoom = 10.8f;
         Camera view;
         BattleController game;
         Vector3 homeFocus, focus, homeOffset;

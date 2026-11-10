@@ -54,7 +54,7 @@ namespace TheLineHolds
             for(int i=0;i<surfaces.Length;i++)
             {
                 var c=colors[i]*Mathf.Lerp(.75f,1,health);c.a=1;
-                block.SetColor("_BaseColor",Color.Lerp(c,new Color(.95f,.83f,.57f),Mathf.Clamp01(hit/.16f)*.48f));surfaces[i].SetPropertyBlock(block);
+                block.SetColor("_BaseColor",Color.Lerp(c,new Color(.95f,.83f,.57f),vehicle?0:Mathf.Clamp01(hit/.16f)*.32f));surfaces[i].SetPropertyBlock(block);
             }
         }
     }

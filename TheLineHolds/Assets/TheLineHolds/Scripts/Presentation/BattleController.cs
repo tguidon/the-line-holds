@@ -68,7 +68,7 @@ namespace TheLineHolds
         public void Pause()
         {
             if(Match==null || Match.Ended) return;
-            if(Placement>=0) { Cancel(); return; }
+            if(Placement>=0 || SelectedPad>=0) { Cancel(); return; }
             Match.Paused=!Match.Paused; audioPlayer.SetPaused(Match.Paused);
         }
         public void StartNextWave()
@@ -82,7 +82,11 @@ namespace TheLineHolds
         public void UpgradeSelected(int option)
         {
             if(Match!=null && Match.Upgrade(SelectedPad,option))
-                Notice=Match.Towers[SelectedPad].Definition.displayName+" ready. Upgrade cost invested; selling returns half.";
+            {
+                EnsureTower(SelectedPad).GetComponent<TowerVisual>().Celebrate();
+                combatEffects.Upgrade(Match.Pads[SelectedPad]);audioPlayer.Play("place");
+                Notice=Match.Towers[SelectedPad].Definition.displayName+" ready.";
+            }
         }
         void Update()
         {
@@ -121,8 +125,9 @@ namespace TheLineHolds
         }
         public void ClickPad(int pad)
         {
-            if(Match==null || Match.Paused || Match.Ended || pad<0 || pad>=Match.Pads.Length) return;
-            if(Match.Towers[pad]!=null) { SelectedPad=pad; Placement=-1; Notice="Emplacement selected."; return; }
+            if(Match==null || Match.Paused || Match.Ended) return;
+            if(pad<0 || pad>=Match.Pads.Length){if(SelectedPad>=0)Cancel();return;}
+            if(Match.Towers[pad]!=null) { if(SelectedPad==pad){Cancel();return;} SelectedPad=pad; Placement=-1; Notice="Emplacement selected."; return; }
             if(Placement<0) { SelectedPad=-1; Notice="Select a defense from the supply bar first."; return; }
             if(!Match.Build(pad,defenses[Placement])) { Notice="Insufficient funds for this defense."; return; }
             Notice=defenses[Placement].displayName+" deployed. Right-click to finish building.";
@@ -162,6 +167,7 @@ namespace TheLineHolds
         }
         GameObject EnsureTower(int pad)
         {
+            if(towerViews.TryGetValue(pad,out var current) && current.GetComponent<TowerVisual>().Definition!=Match.Towers[pad].Definition){Destroy(current);towerViews.Remove(pad);}
             if(!towerViews.TryGetValue(pad,out var view))
             {
                 view=Instantiate(Match.Towers[pad].Definition.prefab,Match.Pads[pad]-Vector3.up*.015f,Quaternion.identity,dynamicRoot);

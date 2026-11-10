@@ -72,12 +72,7 @@ namespace TheLineHolds.Editor
             environment=new GameObject("Diorama landscape").transform;
             var turf=Material("Meadow and worn road","FFFFFF");turf.mainTexture=DioramaSurface.Paint();EditorUtility.SetDirty(turf);
             Surface("Continuous rolling meadow and road",SaveMesh(DioramaSurface.Terrain(),"Meadow"),turf);
-            var earthTexture=DioramaSurface.EarthPaint();
-            var strata=new[]{Material("Earth compact clay","514735"),Material("Earth sandy subsoil","816C4D"),Material("Earth rooted topsoil","464A31")};
-            foreach(var material in strata){material.mainTexture=earthTexture;material.SetFloat("_Smoothness",.05f);EditorUtility.SetDirty(material);}
-            strata[2].color=Color.white;strata[2].mainTexture=DioramaSurface.RootPaint();EditorUtility.SetDirty(strata[2]);
-            var earth=Surface("Exposed earth layers",SaveMesh(DioramaSurface.Earth(),"Earth"),strata[0]);earth.GetComponent<MeshRenderer>().sharedMaterials=strata;
-            var plinth=GameObject.CreatePrimitive(PrimitiveType.Cube);plinth.name="Miniature display plinth";plinth.transform.SetParent(environment);plinth.transform.position=new Vector3(0,-1.47f,0);plinth.transform.localScale=new Vector3(24.3f,.3f,14.3f);plinth.GetComponent<Renderer>().sharedMaterial=Material("Display charcoal","303B38");UnityEngine.Object.DestroyImmediate(plinth.GetComponent<Collider>());
+            CountrysideSurroundings.Build(environment);
             AssetDatabase.DeleteAsset(DioramaSurface.Root+"/RoadDiagnostic.asset");
             AssetDatabase.DeleteAsset(DioramaSurface.Root+"/Earth strata.mat");
             RefreshModels(new[]{"Pine","Bush","Farmhouse","Crate","Sandbags","FieldGate","Checkpoint","RoadSign","FieldFence","BuildStake","Revetment","Duckboard","FieldStone"});
@@ -122,7 +117,7 @@ namespace TheLineHolds.Editor
                     return authored?authored:Material(m.name,ExtraColor(m.name));
                 }).ToArray();
                 if(name=="Infantry" || name=="Scout" || name=="AssaultInfantry")go.AddComponent<InfantryVisual>();
-                if(name=="MachineGun" || name=="AntiTank" || name=="Mortar")go.AddComponent<TowerVisual>();
+                if(new[]{"MachineGun","AntiTank","Mortar","MachineGunII","MachineGunRapid","MachineGunAP","AntiTankII","TankHunter","FieldHowitzer","MortarII","SiegeMortar","BarrageMortar"}.Contains(name))go.AddComponent<TowerVisual>();
                 PrefabUtility.SaveAsPrefabAsset(go,Root+"/Prefabs/"+name+".prefab");UnityEngine.Object.DestroyImmediate(go);
             }
             AssetDatabase.SaveAssets();return "Updated "+string.Join(", ",names);

@@ -9,211 +9,151 @@ namespace TheLineHolds
     {
         public TMP_FontAsset font;
         BattleController game;
-        GameObject top, bottom, modal, sell, help, starRow, viewControls;
+        GameObject top,bottom,modal,sell,help,intel,starRow;
+        RectTransform dock,dispatch,card;
+        TextMeshProUGUI lives,funds,status,notice,waveInfo,selection,selectionStats,modalTitle,modalSubtitle,modalStats;
+        UnityEngine.UI.Button sellButton,speedButton,startWave,resume,retry,menu,play,quit,pauseButton,ambientButton;
+        readonly UnityEngine.UI.Button[] shops=new UnityEngine.UI.Button[3],upgradeButtons=new UnityEngine.UI.Button[2];
         readonly StarGraphic[] ratingStars=new StarGraphic[3];
-        TextMeshProUGUI status, notice, waveInfo, selection, modalTitle, modalSubtitle, modalStats, brandTitle, brandSubtitle, cameraHelp;
-        float layoutWidth=-1;
-        UnityEngine.UI.Button sellButton, speedButton, startWave, resume, retry, menu, play, quit;
-        readonly UnityEngine.UI.Button[] upgradeButtons=new UnityEngine.UI.Button[2];
-        readonly UnityEngine.UI.Button[] shops=new UnityEngine.UI.Button[3];
-        readonly Color ink=new Color(.085f,.105f,.095f,.97f), paper=new Color(.88f,.85f,.73f), accent=new Color(.78f,.67f,.36f);
+        readonly Color ink=new Color(.075f,.105f,.09f,.96f),paper=new Color(.94f,.92f,.83f),muted=new Color(.71f,.76f,.66f),accent=new Color(.91f,.75f,.39f);
+        bool showHelp,showIntel;string hint;
+        public void ShowHint(string value){hint=value;}
+        static Sprite rounded;
+        string lastNotice;float noticeUntil;
         public void Initialize(BattleController controller)
         {
-            game=controller;
-            var canvas=gameObject.AddComponent<Canvas>(); canvas.renderMode=RenderMode.ScreenSpaceOverlay;
-            var scaler=gameObject.AddComponent<UnityEngine.UI.CanvasScaler>(); scaler.uiScaleMode=UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution=new Vector2(1600,900); scaler.matchWidthOrHeight=.5f;
+            game=controller;var canvas=gameObject.AddComponent<Canvas>();canvas.renderMode=RenderMode.ScreenSpaceOverlay;
+            var scaler=gameObject.AddComponent<UnityEngine.UI.CanvasScaler>();scaler.uiScaleMode=UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;scaler.referenceResolution=new Vector2(1600,900);scaler.matchWidthOrHeight=.5f;
             gameObject.AddComponent<UnityEngine.UI.GraphicRaycaster>();
-            if(!EventSystem.current) { var events=new GameObject("EventSystem",typeof(EventSystem),typeof(InputSystemUIInputModule)); }
-            top=Panel("Command header",transform,new Vector2(0,1),new Vector2(1,1),new Vector2(0,-98),Vector2.zero,ink);
-            brandTitle=Label(top.transform,"THE LINE HOLDS",new Vector2(24,-14),new Vector2(300,32),26,accent);
-            brandSubtitle=Label(top.transform,"NORMANDY  /  FIELD OPERATIONS  /  1944",new Vector2(25,-53),new Vector2(430,24),13,paper);
-            status=Label(top.transform,"",new Vector2(490,-22),new Vector2(810,44),23,paper);
-            speedButton=Button(top.transform,"1x",new Vector2(-242,-23),new Vector2(80,48),()=>game.ToggleSpeed(),true);
-            Button(top.transform,"II   PAUSE",new Vector2(-150,-23),new Vector2(130,48),()=>game.Pause(),true);
-            bottom=Panel("Supply bar",transform,Vector2.zero,new Vector2(1,0),Vector2.zero,new Vector2(0,180),ink);
-            for(int i=0;i<3;i++) { int type=i; shops[i]=Button(bottom.transform,"",new Vector2(24+i*285,22),new Vector2(270,73),()=>game.Choose(type),false,true); shops[i].name="Shop "+controller.defenses[i].displayName; }
-            startWave=Button(bottom.transform,"START WAVE  1  >",new Vector2(-280,28),new Vector2(256,68),()=>game.StartNextWave(),true,true);
-            notice=Label(bottom.transform,"",new Vector2(24,104),new Vector2(1140,32),17,paper,true);
-            waveInfo=Label(bottom.transform,"",new Vector2(900,20),new Vector2(365,75),16,paper,true);
-            viewControls=Panel("Map controls",transform,Vector2.zero,new Vector2(1,0),new Vector2(24,190),new Vector2(-24,228),new Color(.08f,.1f,.09f,.9f));
-            string modifier=Application.platform==RuntimePlatform.OSXPlayer || Application.platform==RuntimePlatform.OSXEditor?"Cmd":"Ctrl";
-            cameraHelp=Label(viewControls.transform,$"Rotate: MMB / {modifier}+drag / Q E   Pan: Shift+MMB / WASD   Zoom: wheel   Reset: R",new Vector2(12,-8),new Vector2(1030,24),13,paper);
-            Button(viewControls.transform,"<",new Vector2(-360,-3),new Vector2(44,32),()=>game.CameraControls.Rotate(-45),true);
-            Button(viewControls.transform,">",new Vector2(-310,-3),new Vector2(44,32),()=>game.CameraControls.Rotate(45),true);
-            Button(viewControls.transform,"-",new Vector2(-250,-3),new Vector2(44,32),()=>game.CameraControls.Zoom(1),true);
-            Button(viewControls.transform,"+",new Vector2(-200,-3),new Vector2(44,32),()=>game.CameraControls.Zoom(-1),true);
-            var resetView=Button(viewControls.transform,"RESET VIEW",new Vector2(-144,-3),new Vector2(132,32),()=>game.CameraControls.ResetView(),true);
-            resetView.GetComponentInChildren<TextMeshProUGUI>().fontSize=14;
-            help=Panel("Field guide",transform,new Vector2(0,1),new Vector2(0,1),new Vector2(24,-222),new Vector2(399,-110),new Color(.08f,.1f,.09f,.86f));
-            Label(help.transform,"HOLD THE ROAD",new Vector2(16,-12),new Vector2(340,25),18,accent);
-            Label(help.transform,"Build on clearings. Click towers to upgrade.\nAmber bars: suppressed enemies.\nRight-click: cancel / Esc: pause",new Vector2(16,-44),new Vector2(345,59),14,paper);
-            sell=Panel("Inspection",transform,new Vector2(1,1),new Vector2(1,1),new Vector2(-360,-485),new Vector2(-24,-120),ink);
-            selection=Label(sell.transform,"",new Vector2(18,-12),new Vector2(300,95),16,paper);
-            for(int i=0;i<2;i++){int option=i;upgradeButtons[i]=Button(sell.transform,"UPGRADE",new Vector2(18,-120-i*83),new Vector2(298,76),()=>game.UpgradeSelected(option));var text=upgradeButtons[i].GetComponentInChildren<TextMeshProUGUI>();text.fontSize=14;text.enableAutoSizing=true;text.fontSizeMin=11;text.fontSizeMax=15;text.textWrappingMode=TextWrappingModes.Normal;}
-            sellButton=Button(sell.transform,"SELL",new Vector2(18,-310),new Vector2(298,38),()=>game.SellSelected());
-            modal=Panel("Overlay",transform,Vector2.zero,Vector2.one,Vector2.zero,Vector2.zero,new Color(.04f,.055f,.045f,.66f),true);
-            var card=Panel("Dispatch card",modal.transform,new Vector2(.5f,.5f),new Vector2(.5f,.5f),new Vector2(-330,-300),new Vector2(330,300),ink);
-            Label(card.transform,"T H E   L I N E   H O L D S",new Vector2(42,-30),new Vector2(580,28),17,accent);
-            modalTitle=Label(card.transform,"",new Vector2(42,-92),new Vector2(580,75),45,paper);
-            modalSubtitle=Label(card.transform,"",new Vector2(42,-183),new Vector2(570,87),19,accent);
-            starRow=new GameObject("Victory stars",typeof(RectTransform)); starRow.transform.SetParent(card.transform,false);
-            var starRect=(RectTransform)starRow.transform; starRect.anchorMin=starRect.anchorMax=new Vector2(0,1); starRect.pivot=new Vector2(0,1); starRect.anchoredPosition=new Vector2(42,-183); starRect.sizeDelta=new Vector2(165,42);
+            if(!EventSystem.current)new GameObject("EventSystem",typeof(EventSystem),typeof(InputSystemUIInputModule));
+            top=Group("HUD",transform);
+            var resources=Panel("Resources",top.transform,new Vector2(16,-16),new Vector2(416,54));
+            Icon(resources.transform,HudSymbol.Heart,new Vector2(16,-15),24,new Color(.9f,.55f,.45f));lives=Label(resources.transform,"20",new Vector2(50,-12),new Vector2(42,30),23,paper);
+            Icon(resources.transform,HudSymbol.Supply,new Vector2(112,-15),24,accent);funds=Label(resources.transform,"300",new Vector2(148,-12),new Vector2(83,30),23,paper);
+            Icon(resources.transform,HudSymbol.Wave,new Vector2(245,-15),24,muted);status=Label(resources.transform,"0 / 10",new Vector2(280,-13),new Vector2(121,30),21,paper);
+            var controls=Panel("Quick controls",top.transform,new Vector2(-240,-16),new Vector2(224,54),true);
+            speedButton=Button(controls.transform,"1x",new Vector2(4,-4),new Vector2(52,46),()=>game.ToggleSpeed());
+            pauseButton=IconButton(controls.transform,"Pause",HudSymbol.Pause,new Vector2(58,-4),()=>game.Pause());
+            ambientButton=IconButton(controls.transform,"Ambience",HudSymbol.Sound,new Vector2(112,-4),()=>game.audioPlayer.ToggleAmbience());
+            IconButton(controls.transform,"Help",HudSymbol.Help,new Vector2(166,-4),()=>{showHelp=!showHelp;});
+            bottom=Group("Build dock",transform);dock=(RectTransform)Panel("Build choices",bottom.transform,new Vector2(-202,104),new Vector2(404,88),false,true,.5f).transform;
+            string[] names={"MG nest","Anti-tank","Mortar"};var symbols=new[]{HudSymbol.Gun,HudSymbol.Cannon,HudSymbol.Mortar};
             for(int i=0;i<3;i++)
             {
-                var star=new GameObject("Rating star "+(i+1),typeof(RectTransform),typeof(StarGraphic)); star.transform.SetParent(starRow.transform,false);
-                var rect=(RectTransform)star.transform; rect.anchorMin=rect.anchorMax=new Vector2(0,1); rect.pivot=new Vector2(0,1); rect.anchoredPosition=new Vector2(i*54,0); rect.sizeDelta=new Vector2(40,40);
-                ratingStars[i]=star.GetComponent<StarGraphic>(); ratingStars[i].raycastTarget=false;
+                int type=i;shops[i]=Button(dock,names[i],new Vector2(8+i*132,-6),new Vector2(124,76),()=>game.Choose(type));shops[i].name="Shop "+names[i];
+                var shopHint=shops[i].gameObject.AddComponent<HudHint>();shopHint.owner=this;shopHint.hint=controller.defenses[i].description;
+                shops[i].GetComponentInChildren<TextMeshProUGUI>().rectTransform.offsetMin=new Vector2(4,3);shops[i].GetComponentInChildren<TextMeshProUGUI>().rectTransform.offsetMax=new Vector2(-4,-38);
+                Icon(shops[i].transform,symbols[i],new Vector2(47,-5),30,accent);
             }
-            modalStats=Label(card.transform,"",new Vector2(42,-280),new Vector2(570,95),18,paper);
-            play=Button(card.transform,"DEPLOY   >",new Vector2(42,-405),new Vector2(570,57),()=>game.NewMatch());
-            resume=Button(card.transform,"RESUME",new Vector2(42,-405),new Vector2(570,57),()=>game.Pause());
-            retry=Button(card.transform,"RETRY",new Vector2(42,-405),new Vector2(570,57),()=>game.NewMatch());
-            menu=Button(card.transform,"MAIN MENU",new Vector2(42,-480),new Vector2(570,45),()=>game.MainMenu());
-            quit=Button(card.transform,"QUIT",new Vector2(42,-480),new Vector2(570,45),Quit);
+            dispatch=(RectTransform)Panel("Wave orders",bottom.transform,new Vector2(-228,104),new Vector2(212,88),true,true).transform;
+            startWave=Button(dispatch,"Send wave",new Vector2(8,-8),new Vector2(196,42),()=>game.StartNextWave());
+            Button(dispatch,"Wave intel",new Vector2(8,-52),new Vector2(196,28),()=>showIntel=!showIntel).GetComponentInChildren<TextMeshProUGUI>().fontSize=13;
+            notice=Label(bottom.transform,"",new Vector2(16,120),new Vector2(650,25),15,paper,false,true);
+            intel=Panel("Wave intel",transform,new Vector2(-324,350),new Vector2(308,232),true,true);
+            waveInfo=Label(intel.transform,"",new Vector2(18,-18),new Vector2(272,196),16,paper);waveInfo.textWrappingMode=TextWrappingModes.Normal;
+            help=Panel("Help",transform,new Vector2(-324,-82),new Vector2(308,260),true);
+            Label(help.transform,"Field guide",new Vector2(18,-18),new Vector2(272,24),21,paper);
+            string modifier=Application.platform==RuntimePlatform.OSXPlayer || Application.platform==RuntimePlatform.OSXEditor?"Cmd":"Ctrl";
+            Label(help.transform,$"Click a clearing to build.\nClick a tower to upgrade.\nClick ground or Esc to deselect.\n\nRotate   MMB / {modifier}+drag / Q E\nMove     WASD / Shift+MMB\nZoom    Mouse wheel",new Vector2(18,-54),new Vector2(272,152),15,muted);
+            IconButton(help.transform,"Rotate left",HudSymbol.Left,new Vector2(16,-208),()=>game.CameraControls.Rotate(-45));
+            IconButton(help.transform,"Rotate right",HudSymbol.Right,new Vector2(66,-208),()=>game.CameraControls.Rotate(45));
+            IconButton(help.transform,"Zoom out",HudSymbol.Minus,new Vector2(116,-208),()=>game.CameraControls.Zoom(1));
+            IconButton(help.transform,"Zoom in",HudSymbol.Plus,new Vector2(166,-208),()=>game.CameraControls.Zoom(-1));
+            IconButton(help.transform,"Reset view",HudSymbol.Reset,new Vector2(216,-208),()=>game.CameraControls.ResetView());
+            sell=Panel("Inspection",transform,new Vector2(-324,-82),new Vector2(308,290),true);
+            selection=Label(sell.transform,"",new Vector2(18,-17),new Vector2(230,28),20,paper);
+            IconButton(sell.transform,"Close inspection",HudSymbol.Close,new Vector2(258,-6),()=>game.Cancel());
+            selectionStats=Label(sell.transform,"",new Vector2(18,-51),new Vector2(272,52),14,muted);
+            for(int i=0;i<2;i++){int option=i;upgradeButtons[i]=Button(sell.transform,"Upgrade",new Vector2(18,-110-i*66),new Vector2(272,58),()=>game.UpgradeSelected(option));upgradeButtons[i].name="Upgrade "+i;}
+            sellButton=Button(sell.transform,"Sell",new Vector2(18,-246),new Vector2(272,32),()=>game.SellSelected());sellButton.GetComponentInChildren<TextMeshProUGUI>().fontSize=14;
+            modal=Panel("Overlay",transform,Vector2.zero,Vector2.one,Vector2.zero,Vector2.zero,new Color(.025f,.045f,.03f,.48f),true);
+            card=(RectTransform)Panel("Dispatch card",modal.transform,new Vector2(-240,210),new Vector2(480,420),false,true,.5f,.5f).transform;
+            modalTitle=Label(card,"",new Vector2(32,-32),new Vector2(416,58),36,paper);
+            modalSubtitle=Label(card,"",new Vector2(32,-99),new Vector2(416,30),17,accent);
+            starRow=Group("Victory stars",card);var sr=(RectTransform)starRow.transform;Place(sr,new Vector2(32,-144),new Vector2(180,40));
+            for(int i=0;i<3;i++){var go=new GameObject("Rating star",typeof(RectTransform),typeof(StarGraphic));go.transform.SetParent(sr,false);Place((RectTransform)go.transform,new Vector2(i*50,0),new Vector2(34,34));ratingStars[i]=go.GetComponent<StarGraphic>();ratingStars[i].raycastTarget=false;}
+            modalStats=Label(card,"",new Vector2(32,-201),new Vector2(416,76),19,paper);
+            play=Button(card,"Play",new Vector2(32,-294),new Vector2(416,48),()=>game.NewMatch());
+            resume=Button(card,"Resume",new Vector2(32,-294),new Vector2(416,48),()=>game.Pause());
+            retry=Button(card,"Play again",new Vector2(32,-294),new Vector2(416,48),()=>game.NewMatch());
+            menu=Button(card,"Main menu",new Vector2(32,-354),new Vector2(200,38),()=>game.MainMenu());
+            quit=Button(card,"Quit",new Vector2(248,-354),new Vector2(200,38),Quit);
         }
         public void Refresh()
         {
-            LayoutHud();
-            var m=game.Match; bool inMatch=!game.InMenu && m!=null;
-            viewControls.SetActive(inMatch && !m.Paused && !m.Ended);
-            top.SetActive(inMatch); bottom.SetActive(inMatch); help.SetActive(inMatch && m.Wave==0 && !m.Paused);
-            bool inspect=inMatch && game.SelectedPad>=0 && m.Towers[game.SelectedPad]!=null && !m.Ended && !m.Paused;
-            sell.SetActive(inspect);
-            if(inspect)
+            var m=game.Match;bool active=!game.InMenu && m!=null;bool playing=active && !m.Paused && !m.Ended;
+            top.SetActive(active);bottom.SetActive(playing);help.SetActive(playing && showHelp);intel.SetActive(playing && showIntel && !showHelp);
+            bool inspect=playing && game.SelectedPad>=0 && m.Towers[game.SelectedPad]!=null;sell.SetActive(inspect && !showHelp);
+            if(active)
             {
-                var tower=m.Towers[game.SelectedPad];var d=tower.Definition;
-                selection.text=$"{d.displayName.ToUpper()}  ·  TIER {d.tier}\n{d.damage:0} damage / {1/d.interval:0.0} shots/s / {d.range:0.0} m\nSell ${tower.SellValue} of ${tower.Invested} invested";
-                if(d.upgrades.Length==0)selection.text+="\nSPECIALIZATION COMPLETE";
-                float sellY=d.upgrades.Length==0?125:d.upgrades.Length==1?215:310;
-                ((RectTransform)sellButton.transform).anchoredPosition=new Vector2(18,-sellY);
-                ((RectTransform)sell.transform).offsetMin=new Vector2(-360,-120-sellY-55);
-                for(int i=0;i<2;i++)
-                {
-                    bool exists=i<d.upgrades.Length;upgradeButtons[i].gameObject.SetActive(exists);if(!exists)continue;
-                    var u=d.upgrades[i];upgradeButtons[i].interactable=m.Funds>=u.price;
-                    upgradeButtons[i].GetComponentInChildren<TextMeshProUGUI>().text=$"{u.defense.displayName.ToUpper()}  ${u.price}\n<size=12>{u.defense.description}</size>";
-                }
-            }
-            if(inMatch)
-            {
-                string divider=layoutWidth<1500?"\n":"     •     ";
+                lives.text=m.Lives.ToString();funds.text=m.Funds.ToString();status.text=$"{m.Wave} / {m.TotalWaves}";
                 speedButton.GetComponentInChildren<TextMeshProUGUI>().text=game.GameSpeed+"x";
-                status.text=$"LIVES  {m.Lives:00}     •     FUNDS  ${m.Funds}{divider}WAVE  {m.Wave} / {m.TotalWaves}     •     HOSTILES  {m.Remaining}";
-                notice.text=game.Notice;
-                var next=m.NextWave;
-                string roster=string.Join(" · ",System.Array.ConvertAll(next.spawns,e=>$"{e.UnitCount} {e.enemy.displayName}"));
-                waveInfo.text=m.Phase==MatchPhase.Preparation?$"NEXT {Mathf.Min(m.Wave+1,m.TotalWaves)}: {next.title.ToUpper()} · {next.formation}\n{roster}\n{next.briefing}":$"{game.waves[m.Wave-1].title.ToUpper()} · {game.waves[m.Wave-1].formation}\nBuild, upgrade and sell during combat. Click a tower to inspect it.";
-                startWave.interactable=m.Phase==MatchPhase.Preparation && !m.Paused;
-                startWave.GetComponentInChildren<TextMeshProUGUI>().text=m.Phase==MatchPhase.Combat?"WAVE IN PROGRESS":$"START WAVE  {Mathf.Min(m.Wave+1,m.TotalWaves)}  >";
+                ambientButton.GetComponentInChildren<HudIcon>().color=game.audioPlayer.AmbienceEnabled?paper:muted*.6f;
+                if(lastNotice!=game.Notice){lastNotice=game.Notice;noticeUntil=Time.unscaledTime+3.2f;}
+                notice.text=hint??(Time.unscaledTime<noticeUntil?ShortNotice(game.Notice):"");
+                var next=m.NextWave;string roster=string.Join("\n",System.Array.ConvertAll(next.spawns,e=>$"{e.UnitCount}  {e.enemy.displayName}"));
+                waveInfo.text=$"<b>{next.title}</b>\n<size=13>{next.formation}</size>\n{roster}";
+                bool prep=m.Phase==MatchPhase.Preparation;startWave.interactable=prep && !m.Paused;
+                startWave.GetComponentInChildren<TextMeshProUGUI>().text=prep?$"Send wave {Mathf.Min(m.Wave+1,m.TotalWaves)}":"Wave underway";
                 for(int i=0;i<3;i++)
                 {
-                    var d=game.defenses[i]; shops[i].interactable=!m.Ended && !m.Paused;
-                    shops[i].GetComponentInChildren<TextMeshProUGUI>().text=$"{(game.Placement==i?"> ":"")}{d.displayName.ToUpper()}   ${d.cost}\n<size=14>{d.description}</size>";
-                    shops[i].GetComponent<UnityEngine.UI.Image>().color=game.Placement==i?new Color(.38f,.38f,.23f):m.Funds<d.cost?new Color(.22f,.23f,.2f):new Color(.25f,.29f,.23f);
+                    var d=game.defenses[i];shops[i].interactable=playing;
+                    shops[i].GetComponentInChildren<TextMeshProUGUI>().text=$"{new[]{"MG nest","Anti-tank","Mortar"}[i]}  <color=#E8BF64>${d.cost}</color>";
+                    shops[i].GetComponent<UnityEngine.UI.Image>().color=game.Placement==i?new Color(.35f,.41f,.27f):m.Funds<d.cost?new Color(.12f,.16f,.13f):new Color(.19f,.25f,.2f);
+                }
+                if(inspect)
+                {
+                    var t=m.Towers[game.SelectedPad];var d=t.Definition;selection.text=ShortName(d);selectionStats.text=$"Tier {d.tier}   •   {d.damage:0} damage   •   {d.range:0.0}m range\n{RoleHint(d)}";
+                    float y=110+d.upgrades.Length*66;((RectTransform)sell.transform).sizeDelta=new Vector2(308,y+54);Place((RectTransform)sellButton.transform,new Vector2(18,-y),new Vector2(272,32));
+                    sellButton.GetComponentInChildren<TextMeshProUGUI>().text=$"Sell  +${t.SellValue}";
+                    for(int i=0;i<2;i++){bool exists=i<d.upgrades.Length;upgradeButtons[i].gameObject.SetActive(exists);if(!exists)continue;var u=d.upgrades[i];upgradeButtons[i].interactable=m.Funds>=u.price;upgradeButtons[i].GetComponentInChildren<TextMeshProUGUI>().text=$"{ShortName(u.defense)}   <color=#E8BF64>${u.price}</color>\n<size=12>{RoleHint(u.defense)}</size>";}
                 }
             }
-            bool show=game.InMenu || (m!=null && (m.Paused || m.Ended)); modal.SetActive(show);
-            if(!show) return;
-            play.gameObject.SetActive(game.InMenu); quit.gameObject.SetActive(game.InMenu);
-            resume.gameObject.SetActive(!game.InMenu && m.Paused && !m.Ended);
-            retry.gameObject.SetActive(!game.InMenu && m.Ended); menu.gameObject.SetActive(!game.InMenu);
-            // Pause offers restart as well as resume and menu.
-            if(!game.InMenu && m.Paused && !m.Ended)
-            {
-                retry.gameObject.SetActive(true); var r=(RectTransform)retry.transform; r.anchoredPosition=new Vector2(42,-474); r.sizeDelta=new Vector2(275,43);
-                var mr=(RectTransform)menu.transform; mr.anchoredPosition=new Vector2(337,-474); mr.sizeDelta=new Vector2(275,43);
-                retry.GetComponentInChildren<TextMeshProUGUI>().text="RESTART";
-            }
-            else
-            {
-                var r=(RectTransform)retry.transform; r.anchoredPosition=new Vector2(42,-405); r.sizeDelta=new Vector2(570,57);
-                var mr=(RectTransform)menu.transform; mr.anchoredPosition=new Vector2(42,-480); mr.sizeDelta=new Vector2(570,45);
-                retry.GetComponentInChildren<TextMeshProUGUI>().text="RETRY";
-            }
-            bool showStars=!game.InMenu && m.Ended && m.Stars>0;
-            starRow.SetActive(showStars);
-            ((RectTransform)modalSubtitle.transform).anchoredPosition=new Vector2(42,showStars?-235:-183);
-            for(int i=0;i<3;i++)ratingStars[i].color=showStars && i<m.Stars?accent:new Color(.28f,.3f,.25f);
-            if(game.InMenu)
-            {
-                modalTitle.text="A road worth holding.";
-                modalSubtitle.text="One country road. Ten varied attacks.\nEvery emplacement matters.";
-                modalStats.text="Place defenses • Protect the exit • Hold all ten waves\nMachine guns for infantry. Anti-tank for armor.\nUpgrade towers and choose specializations.";
-            }
-            else if(m.Ended)
-            {
-                modalTitle.text=m.Phase==MatchPhase.Victory?"THE LINE HELD.":"THE LINE BROKE.";
-                modalSubtitle.text=m.Phase==MatchPhase.Victory?$"VICTORY   /   {m.Stars} OF 3 STARS":"DEFEAT   /   REGROUP AND TRY AGAIN";
-                modalStats.text=$"LIVES REMAINING   {m.Lives} / 20      WAVES HELD   {m.CompletedWaves} / {m.TotalWaves}\nENEMIES KILLED    {m.Killed}       ESCAPED    {m.Escaped}\n18+ lives: 3 stars  •  10–17: 2 stars  •  1–9: 1 star";
-            }
-            else { modalTitle.text="ORDERS ON HOLD."; modalSubtitle.text="Combat is paused."; modalStats.text="Take a breath. Inspect the battlefield.\nResume when you are ready."; }
+            bool show=game.InMenu || active && (m.Paused || m.Ended);modal.SetActive(show);if(!show)return;
+            bool end=active && m.Ended;play.gameObject.SetActive(game.InMenu);resume.gameObject.SetActive(active && m.Paused && !end);retry.gameObject.SetActive(end);menu.gameObject.SetActive(active);quit.gameObject.SetActive(game.InMenu);
+            // Restart stays available on pause without a second full-width call to action.
+            if(active && m.Paused && !end){retry.gameObject.SetActive(true);Place((RectTransform)retry.transform,new Vector2(248,-354),new Vector2(200,38));retry.GetComponentInChildren<TextMeshProUGUI>().text="Restart";}
+            else {Place((RectTransform)retry.transform,new Vector2(32,-294),new Vector2(416,48));retry.GetComponentInChildren<TextMeshProUGUI>().text="Play again";}
+            starRow.SetActive(end && m.Stars>0);for(int i=0;i<3;i++)ratingStars[i].color=end && i<m.Stars?accent:new Color(.27f,.33f,.28f);
+            if(game.InMenu){modalTitle.text="The Line Holds";modalSubtitle.text="Normandy, 1944";modalStats.text="Hold the road through 10 attacks.\nBuild. Upgrade. Adapt.";}
+            else if(end){modalTitle.text=m.Phase==MatchPhase.Victory?"The line held.":"Regroup.";modalSubtitle.text=m.Phase==MatchPhase.Victory?"Victory":"The defenses fell";modalStats.text=$"{m.Lives} lives saved     {m.CompletedWaves} / {m.TotalWaves} waves\n{m.Killed} defeated     {m.Escaped} escaped";}
+            else {modalTitle.text="Paused";modalSubtitle.text="Take your time.";modalStats.text="Resume the battle when ready.";}
         }
-        // Reserve disjoint regions at every canvas width, including tall/narrow resized windows.
-        void LayoutHud()
-        {
-            float width=((RectTransform)transform).rect.width;
-            if(width<=0 || Mathf.Abs(width-layoutWidth)<.5f)return;
-            layoutWidth=width;
-            float headerLeft=Mathf.Clamp(width*.3f,240,450);
-            brandTitle.rectTransform.sizeDelta=new Vector2(headerLeft-48,32);
-            brandSubtitle.rectTransform.sizeDelta=new Vector2(headerLeft-48,24);
-            Fit(brandTitle,16,26);Fit(brandSubtitle,9,13);
-            var sr=status.rectTransform;sr.anchorMin=new Vector2(0,1);sr.anchorMax=Vector2.one;
-            sr.offsetMin=new Vector2(headerLeft,-82);sr.offsetMax=new Vector2(-255,-14);
-            status.alignment=TextAlignmentOptions.MidlineLeft;Fit(status,16,23);
-            float column=(width-48-36)/4;
-            for(int i=0;i<3;i++)
-            {
-                Place((RectTransform)shops[i].transform,new Vector2(24+i*(column+12),16),new Vector2(column,68));
-                var label=shops[i].GetComponentInChildren<TextMeshProUGUI>();label.enableAutoSizing=true;label.fontSizeMin=13;label.fontSizeMax=18;
-            }
-            Place((RectTransform)startWave.transform,new Vector2(24+3*(column+12),16),new Vector2(column,68));
-            Fit(startWave.GetComponentInChildren<TextMeshProUGUI>(),13,18);
-            Place(notice.rectTransform,new Vector2(24,148),new Vector2(width-48,26));Fit(notice,13,17);
-            Place(waveInfo.rectTransform,new Vector2(24,88),new Vector2(width-48,58));
-            waveInfo.enableAutoSizing=true;waveInfo.fontSizeMin=11;waveInfo.fontSizeMax=14;waveInfo.textWrappingMode=TextWrappingModes.NoWrap;
-            cameraHelp.rectTransform.sizeDelta=new Vector2(Mathf.Max(100,width-440),24);Fit(cameraHelp,10,13);
-        }
-        static void Fit(TextMeshProUGUI label,int minimum,int maximum)
-        {
-            label.enableAutoSizing=true;label.fontSizeMin=minimum;label.fontSizeMax=maximum;
-            label.textWrappingMode=TextWrappingModes.NoWrap;label.overflowMode=TextOverflowModes.Ellipsis;
-        }
-        static void Place(RectTransform rect,Vector2 position,Vector2 size)
-        {
-            rect.anchorMin=rect.anchorMax=rect.pivot=Vector2.zero;
-            rect.anchoredPosition=position;rect.sizeDelta=size;
-        }
-        void Quit()
-        {
+        static string ShortName(DefenseDefinition d)=>d.tier==1?(d.role==DefenseRole.MachineGun?"MG nest":d.role==DefenseRole.Cannon?"Anti-tank":"Mortar"):d.displayName.Replace("machine gun","MG").Replace("anti-tank","gun").Replace(" nest","");
+        static string RoleHint(DefenseDefinition d)=>d.slowDuration>0?"Suppresses movement":d.role==DefenseRole.Mortar?"Area bombardment":d.splashRadius>0?"Explosive shells":d.role==DefenseRole.Cannon?"Armor specialist":d.armorDamageMultiplier>.5f?"Pierces light armor":"Infantry specialist";
+        static string ShortNotice(string s){if(string.IsNullOrEmpty(s))return "";int i=s.IndexOf('.');return i>=0?s.Substring(0,i+1):s;}
+        void Quit(){
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying=false;
 #else
             Application.Quit();
 #endif
         }
-        GameObject Panel(string name,Transform parent,Vector2 min,Vector2 max,Vector2 offsetMin,Vector2 offsetMax,Color color,bool blocks=false)
+        GameObject Group(string name,Transform parent){var go=new GameObject(name,typeof(RectTransform));go.transform.SetParent(parent,false);var r=(RectTransform)go.transform;r.anchorMin=Vector2.zero;r.anchorMax=Vector2.one;r.offsetMin=r.offsetMax=Vector2.zero;return go;}
+        GameObject Panel(string name,Transform parent,Vector2 pos,Vector2 size,bool right=false,bool bottom=false,float ax=-1,float ay=-1)
         {
-            var go=new GameObject(name,typeof(RectTransform),typeof(UnityEngine.UI.Image)); go.transform.SetParent(parent,false);
-            var rt=(RectTransform)go.transform; rt.anchorMin=min; rt.anchorMax=max; rt.offsetMin=offsetMin; rt.offsetMax=offsetMax;
-            go.GetComponent<UnityEngine.UI.Image>().color=color; go.GetComponent<UnityEngine.UI.Image>().raycastTarget=blocks; return go;
+            var go=Panel(name,parent,Vector2.zero,Vector2.zero,Vector2.zero,Vector2.zero,ink,true);var r=(RectTransform)go.transform;r.anchorMin=r.anchorMax=new Vector2(ax>=0?ax:right?1:0,ay>=0?ay:bottom?0:1);r.pivot=new Vector2(0,1);r.anchoredPosition=pos;r.sizeDelta=size;return go;
         }
-        TextMeshProUGUI Label(Transform parent,string text,Vector2 pos,Vector2 size,int fontSize,Color color,bool fromBottom=false)
+        GameObject Panel(string name,Transform parent,Vector2 min,Vector2 max,Vector2 low,Vector2 high,Color color,bool blocks)
+        {var go=new GameObject(name,typeof(RectTransform),typeof(UnityEngine.UI.Image));go.transform.SetParent(parent,false);var r=(RectTransform)go.transform;r.anchorMin=min;r.anchorMax=max;r.offsetMin=low;r.offsetMax=high;var image=go.GetComponent<UnityEngine.UI.Image>();image.color=color;image.raycastTarget=blocks;
+            if(name!="Overlay"){image.sprite=Rounded();image.type=UnityEngine.UI.Image.Type.Sliced;}return go;}
+        static Sprite Rounded()
         {
-            var go=new GameObject("Label",typeof(RectTransform),typeof(TextMeshProUGUI)); go.transform.SetParent(parent,false);
-            var rt=(RectTransform)go.transform; rt.anchorMin=rt.anchorMax=new Vector2(0,fromBottom?0:1); rt.pivot=new Vector2(0,fromBottom?0:1); rt.anchoredPosition=pos; rt.sizeDelta=size;
-            var label=go.GetComponent<TextMeshProUGUI>(); label.font=font; label.text=text; label.fontSize=fontSize; label.color=color; label.raycastTarget=false; label.textWrappingMode=TextWrappingModes.Normal; return label;
+            if(rounded)return rounded;const int n=32;var texture=new Texture2D(n,n,TextureFormat.RGBA32,false);texture.name="HUD soft corners";
+            for(int y=0;y<n;y++)for(int x=0;x<n;x++){var q=new Vector2(Mathf.Max(0,8-Mathf.Min(x,n-1-x)),Mathf.Max(0,8-Mathf.Min(y,n-1-y)));texture.SetPixel(x,y,new Color(1,1,1,Mathf.Clamp01(8.5f-q.magnitude)));}texture.Apply();
+            rounded=Sprite.Create(texture,new Rect(0,0,n,n),Vector2.one*.5f,100,0,SpriteMeshType.FullRect,new Vector4(9,9,9,9));return rounded;
         }
-        UnityEngine.UI.Button Button(Transform parent,string text,Vector2 pos,Vector2 size,UnityAction action,bool right=false,bool fromBottom=false)
+        static void Place(RectTransform r,Vector2 p,Vector2 s){r.anchorMin=r.anchorMax=new Vector2(0,1);r.pivot=new Vector2(0,1);r.anchoredPosition=p;r.sizeDelta=s;}
+        TextMeshProUGUI Label(Transform parent,string text,Vector2 pos,Vector2 size,int fontSize,Color color,bool right=false,bool bottom=false)
         {
-            var go=new GameObject(text,typeof(RectTransform),typeof(UnityEngine.UI.Image),typeof(UnityEngine.UI.Button)); go.transform.SetParent(parent,false);
-            var rt=(RectTransform)go.transform; rt.anchorMin=rt.anchorMax=new Vector2(right?1:0,fromBottom?0:1); rt.pivot=new Vector2(0,fromBottom?0:1); rt.anchoredPosition=pos; rt.sizeDelta=size;
-            go.GetComponent<UnityEngine.UI.Image>().color=new Color(.25f,.29f,.23f);
-            var b=go.GetComponent<UnityEngine.UI.Button>(); b.targetGraphic=go.GetComponent<UnityEngine.UI.Image>(); b.onClick.AddListener(action);
-            var colors=b.colors; colors.highlightedColor=new Color(1.25f,1.2f,1.05f); colors.disabledColor=new Color(.5f,.5f,.5f); b.colors=colors;
-            var label=Label(go.transform,text,Vector2.zero,size,18,paper); var lr=(RectTransform)label.transform; lr.anchorMin=Vector2.zero; lr.anchorMax=Vector2.one; lr.offsetMin=new Vector2(12,2); lr.offsetMax=new Vector2(-12,-2); label.alignment=TextAlignmentOptions.Center;
-            return b;
+            var go=new GameObject("Label",typeof(RectTransform),typeof(TextMeshProUGUI));go.transform.SetParent(parent,false);var r=(RectTransform)go.transform;Place(r,pos,size);r.anchorMin=r.anchorMax=new Vector2(right?1:0,bottom?0:1);var l=go.GetComponent<TextMeshProUGUI>();l.font=font;l.text=text;l.fontSize=fontSize;l.color=color;l.raycastTarget=false;l.textWrappingMode=TextWrappingModes.NoWrap;l.overflowMode=TextOverflowModes.Ellipsis;return l;
+        }
+        HudIcon Icon(Transform parent,HudSymbol symbol,Vector2 pos,float size,Color color){var go=new GameObject(symbol.ToString(),typeof(RectTransform),typeof(HudIcon));go.transform.SetParent(parent,false);Place((RectTransform)go.transform,pos,Vector2.one*size);var i=go.GetComponent<HudIcon>();i.symbol=symbol;i.color=color;i.raycastTarget=false;return i;}
+        UnityEngine.UI.Button IconButton(Transform parent,string name,HudSymbol symbol,Vector2 pos,UnityAction action){var b=Button(parent,"",pos,new Vector2(46,46),action);b.name=name;var hint=b.gameObject.AddComponent<HudHint>();hint.owner=this;hint.hint=name;Icon(b.transform,symbol,new Vector2(12,-12),22,paper);return b;}
+        UnityEngine.UI.Button Button(Transform parent,string text,Vector2 pos,Vector2 size,UnityAction action)
+        {
+            var go=Panel(text,parent,pos,size);var b=go.AddComponent<UnityEngine.UI.Button>();var image=go.GetComponent<UnityEngine.UI.Image>();image.color=new Color(.19f,.25f,.2f);b.targetGraphic=image;b.onClick.AddListener(action);var colors=b.colors;colors.highlightedColor=new Color(1.3f,1.3f,1.18f);colors.pressedColor=new Color(.8f,.88f,.72f);colors.disabledColor=new Color(.48f,.55f,.48f);b.colors=colors;
+            var l=Label(go.transform,text,Vector2.zero,size,16,paper);l.alignment=TextAlignmentOptions.Center;l.rectTransform.anchorMin=Vector2.zero;l.rectTransform.anchorMax=Vector2.one;l.rectTransform.offsetMin=new Vector2(8,2);l.rectTransform.offsetMax=new Vector2(-8,-2);return b;
         }
     }
 }
