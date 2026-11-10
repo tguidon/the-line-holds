@@ -6,7 +6,7 @@ namespace TheLineHolds
     // A fixed set of world-space emitters and a warmed projectile pool. No damage logic lives here.
     public sealed class CombatEffects : MonoBehaviour
     {
-        public Material flashMaterial, smokeMaterial, dustMaterial, sparkMaterial, brassMaterial, shellMaterial;
+        public Material fireballMaterial,flashMaterial, smokeMaterial, dustMaterial, sparkMaterial, brassMaterial, shellMaterial;
         ParticleSystem flash, smoke, dust, sparks, brass, fireball, fragments;
         readonly List<ParticleSystem> emitters = new List<ParticleSystem>();
         readonly Dictionary<int, Flight> flights = new Dictionary<int, Flight>();
@@ -32,8 +32,9 @@ namespace TheLineHolds
             dust = Emitter("Road dust", dustMaterial, 384, false);
             sparks = Emitter("Armor sparks", sparkMaterial, 192, true);
             brass = Emitter("Ejected cartridges", brassMaterial, 128, true);
-            fireball = Emitter("Vehicle fireball", flashMaterial, 128, false);
+            fireball = Emitter("Vehicle fireball", fireballMaterial?fireballMaterial:flashMaterial, 128, false);
             fragments = Emitter("Vehicle fragments", shellMaterial, 128, true);
+            var chunk=GameObject.CreatePrimitive(PrimitiveType.Cube);chunk.SetActive(false);var debrisRenderer=fragments.GetComponent<ParticleSystemRenderer>();debrisRenderer.renderMode=ParticleSystemRenderMode.Mesh;debrisRenderer.mesh=chunk.GetComponent<MeshFilter>().sharedMesh;Destroy(chunk);
             pool = new UnityEngine.Pool.ObjectPool<Flight>(CreateFlight, f => f.View.SetActive(true), f => f.View.SetActive(false), f => Destroy(f.View), true, 32, 128);
             var warm = new List<Flight>();
             for (int i = 0; i < 32; i++) warm.Add(pool.Get());
@@ -133,7 +134,7 @@ namespace TheLineHolds
                     var velocity=new Vector3(V(-1.4f,1.4f),V(.7f,2.3f),V(-1.4f,1.4f));
                     Puff(fireball,p+Vector3.up*.55f,velocity,V(.65f,1.2f),V(.28f,.52f),new Color(1.5f,V(.32f,.65f),.08f));
                     Puff(smoke,p+Vector3.up*V(.5f,.9f),velocity*.6f,V(.8f,1.2f),V(.7f,1.1f),new Color(.2f,.21f,.18f,.85f));
-                    Puff(fragments,p+Vector3.up*.6f,velocity*2,V(.08f,.17f),V(.4f,.8f),new Color(.27f,.3f,.2f));
+                    Puff(fragments,p+Vector3.up*.6f,velocity*2,V(.035f,.075f),V(.4f,.8f),new Color(.27f,.3f,.2f));
                 }
             }
         }

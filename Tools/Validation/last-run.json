@@ -1,10 +1,10 @@
 {
-  "date": "2026-11-09",
+  "date": "2026-11-10",
   "unity": "6000.6.7f1",
   "urp": "17.6.0",
   "unity_cli": "1.0.0-beta.17",
   "pipeline": "0.10.0-exp.1",
-  "runtime_source_sha256": "9eda9235b7770e96d55a5bafb3ccee24ca5a35af0fba945bd2030d54b62998eb",
+  "runtime_source_sha256": "4377591ede224ee82c3e1bcfa42b1806d282a05077c94b0935a5015b8f91c6d1",
   "source_hash_method": "Sorted UTF-8 paths relative to Assets/TheLineHolds/Scripts, each followed by file bytes",
   "checkpoints": {
     "enemy_presentation": "cd48407",
@@ -14,7 +14,7 @@
   "roadmap": {
     "5": "Complete",
     "6": "Complete",
-    "7_final_player_playtesting": "Pending"
+    "7_final_player_playtesting": "In progress; first feedback implemented, next player review pending"
   },
   "campaign": {
     "waves": 10,
@@ -31,7 +31,12 @@
     ],
     "seeded_replay": "Passed",
     "minimum_measured_vehicle_centre_gap_m": 2.76,
-    "infantry_vehicle_verge_passing": true
+    "infantry_vehicle_verge_passing": true,
+    "infantry_continuous_lane_bins_0_1m": [
+      17,
+      16,
+      17
+    ]
   },
   "focused_checks": {
     "compilation": "Passed",
@@ -74,26 +79,26 @@
   "native_campaign": {
     "outcome": "Victory",
     "waves": 10,
-    "lives": 16,
-    "kills": 455,
-    "escapes": 4,
-    "upgrades": 19,
+    "lives": 17,
+    "kills": 456,
+    "escapes": 3,
+    "upgrades": 20,
     "archetypes_exercised": 7,
     "final_route_fraction": 0.997,
     "rear_shots": 198,
-    "real_seconds": 217,
-    "frames": 12422,
+    "real_seconds": 216,
+    "frames": 12825,
     "verification_time_scale": 4,
     "normal_speed_busy_sample_seconds": 3,
-    "normal_speed_sample_average_fps": 57.5,
-    "peak_enemies": 38,
-    "peak_retiring_actors": 7,
+    "normal_speed_sample_average_fps": 59.4,
+    "peak_enemies": 39,
+    "peak_retiring_actors": 10,
     "retiring_actor_limit": 24,
-    "actors_created_and_reused": 80,
+    "actors_created_and_reused": 81,
     "projectile_objects": 32,
     "peak_world_voices": 24,
     "world_voice_limit": 24,
-    "sampled_audio_peak": 0.5199,
+    "sampled_audio_peak": 0.533,
     "console_errors": 0,
     "console_warnings": 1,
     "log_note": "URP emits unused stripped depth-of-field/Panini pass notices; these effects are not authored. No gameplay exception.",
@@ -101,29 +106,29 @@
   },
   "builds": {
     "qa": {
-      "buildId": "build_4e9329f9e239",
+      "buildId": "build_2bb897850240",
       "result": "Succeeded",
       "platform": "StandaloneOSX",
-      "totalSizeBytes": 229787989,
-      "buildTimeMs": 5203,
+      "totalSizeBytes": 393841159,
+      "buildTimeMs": 9286,
       "totalWarnings": 0,
       "totalErrors": 0
     },
     "mac": {
-      "buildId": "build_9e11938300d9",
+      "buildId": "build_e1a0ec18662f",
       "result": "Succeeded",
       "platform": "StandaloneOSX",
-      "totalSizeBytes": 122839539,
-      "buildTimeMs": 6665,
+      "totalSizeBytes": 286890837,
+      "buildTimeMs": 12696,
       "totalWarnings": 0,
       "totalErrors": 0
     },
     "windows": {
-      "buildId": "build_c5f56296958b",
+      "buildId": "build_1ba454d42cd1",
       "result": "Succeeded",
       "platform": "StandaloneWindows64",
-      "totalSizeBytes": 149452974,
-      "buildTimeMs": 8089,
+      "totalSizeBytes": 312167662,
+      "buildTimeMs": 8952,
       "totalWarnings": 0,
       "totalErrors": 0
     }
@@ -131,14 +136,14 @@
   "packages": [
     {
       "file": "The-Line-Holds-Windows.zip",
-      "bytes": 56260780,
+      "bytes": 115880094,
       "crc": "pass",
       "credits": true,
       "debugAndPipelineServerExcluded": true
     },
     {
       "file": "The-Line-Holds-macOS.zip",
-      "bytes": 46151213,
+      "bytes": 107025314,
       "crc": "pass",
       "credits": true,
       "debugAndPipelineServerExcluded": true
@@ -155,9 +160,40 @@
   "windows_runtime": "Deferred by user to future Windows VM",
   "computer_use": false,
   "captures": [
-    "campaign-native-roster.png",
-    "campaign-native-upgrades.png",
-    "campaign-native-combat.png",
-    "campaign-native-victory.png"
-  ]
+    "polish-native-map.png",
+    "polish-native-upgrades.png",
+    "polish-native-explosion.png",
+    "polish-native-ui-1024x768.png",
+    "polish-native-combat.png",
+    "polish-native-victory.png"
+  ],
+  "full_native_match_runtime_source_sha256": "ab917e3d892f36f9f288f6bc1b356e3918c83c8ee0b25e0bbce99b76b0f3df8c",
+  "presentation_checkpoint": "346797c",
+  "final_visual_fix": "Normalized pasture field masks; soft fireball material and small 3D destruction fragments. No combat/economy changes after full match.",
+  "native_final_probe": {
+    "result": "Passed",
+    "console": {
+      "error": 0,
+      "warn": 0,
+      "log": 6
+    },
+    "layout": "Four real window sizes; worst-case wave intel and two upgrades",
+    "soundscape": "Original 48-second stereo wind/leaves/birds with mute and ducking",
+    "upgrade_models": 9,
+    "vehicle_impact": "No whole-model flash; localized sparks/puff",
+    "vehicle_destruction": "Bounded pooled soft fire/smoke/3D fragments",
+    "pasture_source_edge_rgb": {
+      "core": [
+        0.506,
+        0.545,
+        0.353
+      ],
+      "outer": [
+        0.489,
+        0.531,
+        0.34
+      ]
+    },
+    "startup_log_note": "Unused stripped URP DOF/Panini pass notices remain; authored grade does not use them."
+  }
 }

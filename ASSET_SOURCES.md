@@ -20,3 +20,7 @@ No historical faction insignia or third-party reference art is included.
 - Flash, smoke, dust, spark and brass textures: original code-generated alpha stamps in `CombatPresentationBuilder`. Runtime emitters and projectiles are pooled. No external VFX package.
 
 - Expanded enemy roster: original Blender scouts, assault infantry, transport trucks, armored cars and heavy tanks, with editable generation/source retained. Static surfaces combine by material; limb, carry and wheel hierarchies remain articulated. No external models or Kingdom Rush assets/code were imported.
+
+## November 10 additions
+
+Nine tower tier/branch models and the barn are original procedural Blender assets in `Tools/Blender/generate_assets.py` and `miniatures.blend`. The countryside ambience is original generated PCM; its repeatable source is `Tools/Audio/generate_ambience.py`, with no third-party samples. See `Tools/Audio/AMBIENCE.md`. The app icon is generated with the built-in imagegen tool; the selected project PNG and complete prompt are recorded in `Tools/Blender/APP_ICON.md`. No new external game assets or packages were added.

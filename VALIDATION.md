@@ -1,8 +1,20 @@
 # Prototype validation
 
-Checked on Apple silicon macOS, November 7 and 9, 2026, with Unity 6000.6.7f1, URP 17.6.0, Unity CLI 1.0.0-beta.17, and Pipeline 0.10.0-exp.1. All authoring, play checks, captures, and builds used Blender scripts and Unity CLI. No computer-use automation was used.
+Checked on Apple silicon macOS, November 7, 9 and 10, 2026, with Unity 6000.6.7f1, URP 17.6.0, Unity CLI 1.0.0-beta.17, and Pipeline 0.10.0-exp.1. All authoring, play checks, captures, and builds used Blender scripts and Unity CLI. No computer-use automation was used.
 
-## Current: steps 5 and 6 — November 9
+## Current: November 10 player-feedback polish
+
+Implementation checkpoint `346797c` adds the compact icon-led HUD, independent ambience mute, continuous countryside, wider road pigment, nine distinct tower upgrade models, upgrade purchase feedback, organic infantry lanes/gaps, closable inspection, local vehicle hits and pooled destruction. Ground clicks, repeated tower clicks and Escape deselection are locked down by a check that failed before the controller fix. Real injected-input checks pass placement/selling, UI scroll isolation, the camera/help controls, Cmd drag, pause/resume/restart/menu. Upgrade cost and branch callbacks, ambient playback/mute, and all 18 seeded balance strategies pass. Continuous infantry spread covers 17, 16 and 17 distinct 0.1 m road bins for seeds 1944, 42 and 2026, replacing three repeated lanes. Vehicle minimum centre separation remains 2.76 m.
+
+The native full campaign passes at four-times time acceleration: **216 real seconds / 12,825 frames, ten waves, 17 lives, 456 kills, three escapes, 20 upgrades and all seven archetypes**. Final-wave route depth reaches 99.7%, with 198 rear shots. The three-second normal-speed busy-scene sample averages **59.4 fps**. Peak actors alive: 39; retiring: 10/24; created/reused: 81; world voices: 24/24; sampled audio peak: 0.5330, below clipping. Projectile allocation remains 32. These measurements verify operation; fun and full normal-speed pacing remain a user playtest.
+
+Final native review then corrects only the apron mask and fire texture/debris appearance. The saved pigment seam check passes (core RGB 0.506/0.545/0.353; adjoining pasture 0.489/0.531/0.340). A rebuilt native probe passes all nine distinct upgrade references, ambience/mute, absence of whole-vehicle flashes, local impact particles and constant explosion-emitter count. Four real window sizes pass counters, worst-case wave intel and two branch controls. Final QA console reports zero errors/warnings; the startup log still includes notices for unused stripped URP depth-of-field/Panini passes, which the authored grade does not use. Full-match and final-source hashes are recorded separately in `last-run.json`.
+
+QA, macOS release and Windows cross-builds all succeed without build errors/warnings. ZIP CRC, shipped credits and exclusion of Pipeline server/compiler/backups/symbols pass (macOS about 102.1 MiB; Windows 110.5 MiB). Windows execution remains deferred. One updated macOS release is opened after closing QA/editor and discarding the generated font cache. No computer-use automation, new package or AudioMixer was used.
+
+Native `polish-native-map.png`, `polish-native-upgrades.png`, `polish-native-explosion.png` and `polish-native-ui-1024x768.png` show the final presentation. The funded upgrade and explosion close-ups are temporary showcases. The UI stress capture deliberately substitutes one final-wave fixture, so its 0/1 header is not campaign data. `polish-native-combat.png` and `polish-native-victory.png` are the actual earned-funds campaign before the last presentation-only correction. The imagegen app icon and complete final prompt are recorded in `Tools/Blender/APP_ICON.md`.
+
+## Historical November 9: steps 5 and 6
 
 Steps 5 and 6 are complete. Step 7 is the pending human playtest. The current campaign contains ten waves and 459 enemies across riflemen, runners, assault troops, trucks, armored cars, light tanks and heavy tanks. See `GAMEPLAY.md` for stats, compositions, counters and incremental upgrade prices. Historical five-wave results below describe earlier checkpoints.
 

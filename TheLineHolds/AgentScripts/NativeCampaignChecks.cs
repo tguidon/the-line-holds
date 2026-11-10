@@ -29,13 +29,15 @@ try
   var texts=g.hud.GetComponentsInChildren<Component>().Where(c=>c.GetType().Name=="TextMeshProUGUI").ToArray();
   string Text(Component c)=>(string)c.GetType().GetProperty("text").GetValue(c);
   bool Truncated(Component c)=>(bool)c.GetType().GetProperty("isTextTruncated").GetValue(c);
-  var status=texts.Single(t=>Text(t).StartsWith("LIVES"));var intel=texts.Single(t=>Text(t).StartsWith("NEXT"));
+  var status=texts.Single(t=>Text(t)=="0 / 1");if(!texts.Any(t=>Text(t).Contains("The final push")))g.hud.GetComponentsInChildren<Button>().Single(b=>b.name=="Wave intel").onClick.Invoke();g.hud.Refresh();Canvas.ForceUpdateCanvases();
+  texts=g.hud.GetComponentsInChildren<Component>().Where(c=>c.GetType().Name=="TextMeshProUGUI").ToArray();var intel=texts.Single(t=>Text(t).Contains("The final push"));
   Check(!Truncated(status) && !Truncated(intel),"Truncated native counters/intel at "+size);
-  var upgrades=g.hud.GetComponentsInChildren<Button>().Where(b=>b.name=="UPGRADE").ToArray();Check(upgrades.Length==2 && upgrades.All(b=>!b.interactable),"Native branch UI/affordability");
-  ScreenCapture.CaptureScreenshot(System.IO.Path.Combine(System.IO.Path.GetTempPath(),$"campaign-native-ui-{size.x}x{size.y}.png"));await Task.Delay(120);
+  var upgrades=g.hud.GetComponentsInChildren<Button>().Where(b=>b.name.StartsWith("Upgrade ")).ToArray();Check(g.hud.GetComponentsInChildren<HudIcon>().All(i=>i.GetComponent<CanvasRenderer>()!=null),"Icon renderer missing");
+  Check(upgrades.Length==2 && upgrades.All(b=>!b.interactable),"Native branch UI/affordability");
+  ScreenCapture.CaptureScreenshot(System.IO.Path.Combine(System.IO.Path.GetTempPath(),$"polish-native-ui-{size.x}x{size.y}.png"));await Task.Delay(120);
  }
  g.waves=authored;g.NewMatch(42);g.audioPlayer.Fire(g.defenses[1],g.Match.Pads[0]);await Task.Delay(60);Check(g.audioPlayer.ActiveWorldVoices>0,"Combat audio unavailable");
- g.Pause();Check(g.Match.Paused && g.audioPlayer.ActiveWorldVoices==0,"Native pause failed");g.Pause();
+ g.Cancel();g.Pause();Check(g.Match.Paused && g.audioPlayer.ActiveWorldVoices==0,"Native pause failed");g.Pause();
  string result="PASS native seven actors/shaders/root isolation/damage/defeat/reset; ten waves; four resized worst-case intel/branch views; prices, audio and pause";Debug.Log("[Native campaign] "+result);return result;
 }
 finally{g.waves=authored;UnityEngine.Object.Destroy(review);Screen.SetResolution(originalSize.x,originalSize.y,FullScreenMode.Windowed);g.MainMenu();}

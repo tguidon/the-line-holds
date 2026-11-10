@@ -40,6 +40,11 @@ public static class CheckInput
         }
         async Task Button(string prefix)
         {
+            prefix=prefix switch {"DEPLOY"=>"Play","Shop Machine"=>"Shop MG","SELL"=>"Sell","RESET VIEW"=>"Reset view",">"=>"Rotate right","+"=>"Zoom in","-"=>"Zoom out","START WAVE"=>"Send wave","RESUME"=>"Resume","RETRY"=>"Play again","MAIN MENU"=>"Main menu",_=>prefix};
+            bool camera=prefix=="Reset view" || prefix=="Rotate right" || prefix=="Zoom in" || prefix=="Zoom out";
+            var all=UnityEngine.Object.FindObjectsByType<Button>(FindObjectsInactive.Include);
+            if(camera && !all.Single(b=>b.name==prefix).gameObject.activeInHierarchy)await Button("Help");
+            if((prefix.StartsWith("Shop ") || prefix=="Send wave") && all.Single(b=>b.name=="Reset view").gameObject.activeInHierarchy)await Button("Help");
             var button = UnityEngine.Object.FindObjectsByType<Button>().Single(b => b.name.StartsWith(prefix, StringComparison.Ordinal));
             var rect = (RectTransform)button.transform;
             await Click(RectTransformUtility.WorldToScreenPoint(null, rect.TransformPoint(rect.rect.center)));

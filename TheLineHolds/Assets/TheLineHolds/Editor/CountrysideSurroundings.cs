@@ -72,8 +72,8 @@ namespace TheLineHolds.Editor
                 float px=x*180f/(n-1)-90,pz=z*180f/(n-1)-90;float noise=Mathf.PerlinNoise(px*.28f+43,pz*.28f+17),fine=Mathf.PerlinNoise(px*8+17,pz*8+9);
                 var c=Color.Lerp(moss,grass,Mathf.SmoothStep(.1f,.9f,noise));c=Color.Lerp(c,straw,Mathf.SmoothStep(.54f,.83f,Mathf.PerlinNoise(px*.8f+5,pz*.8f+32))*.35f);
                 // Continue entry/exit into quiet farm lanes. No new navigable route is introduced.
-                float dz=Mathf.Min(Mathf.Abs(pz+5),Mathf.Abs(pz-5));float lane=(Mathf.Abs(px)>11.8f?1:0)*(1-Mathf.SmoothStep(.6f,1.1f,dz));c=Color.Lerp(c,road,lane);
-                float field=0;foreach(var center in fields){float dx=Mathf.Abs(px-center.x),fieldZ=Mathf.Abs(pz-center.y);field=Mathf.Max(field,(1-Mathf.SmoothStep(4,5,dx))*(1-Mathf.SmoothStep(2.5f,3.5f,fieldZ)));}c=Color.Lerp(c,straw,field*.18f);c*=.965f+fine*.07f;pixels[z*n+x]=c;
+                float dz=Mathf.Min(Mathf.Abs(pz+5),Mathf.Abs(pz-5));float lane=(Mathf.Abs(px)>11.8f?1:0)*(1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.6f,1.1f,dz)));c=Color.Lerp(c,road,lane);
+                float field=0;foreach(var center in fields){float dx=Mathf.Abs(px-center.x),fieldZ=Mathf.Abs(pz-center.y);field=Mathf.Max(field,(1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(4,5,dx)))*(1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(2.5f,3.5f,fieldZ))));}c=Color.Lerp(c,straw,field*.18f);c*=.965f+fine*.07f;pixels[z*n+x]=c;
             }
             var texture=new Texture2D(n,n,TextureFormat.RGB24,true);texture.SetPixels32(pixels);texture.Apply();string path=DioramaSurface.Root+"/SurroundingPasture.png";File.WriteAllBytes(path,texture.EncodeToPNG());UnityEngine.Object.DestroyImmediate(texture);AssetDatabase.ImportAsset(path);
             var importer=(TextureImporter)AssetImporter.GetAtPath(path);importer.maxTextureSize=2048;importer.anisoLevel=8;importer.textureCompression=TextureImporterCompression.CompressedHQ;importer.SaveAndReimport();return AssetDatabase.LoadAssetAtPath<Texture2D>(path);

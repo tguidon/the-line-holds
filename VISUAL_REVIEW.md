@@ -86,3 +86,20 @@ The upgrade inspection panel fits its available choices, shows actual invested s
 References reused: Unity CLI/Pipeline script/build/capture/runtime docs; game-craft character motion, VFX, game feel and visual scorecard; uGUI layout guidance. Unity 6.6 MaterialPropertyBlock/ObjectPool API pages and Ironhide's original Kingdom Rush description were checked. The reference informs complementary counters and upgrade specializations; no external game art/code, new packages or computer-use tools were added.
 
 Final native evidence: `campaign-native-roster.png` shows the seven final miniatures in a temporary showcase. `campaign-native-upgrades.png` shows a real earned-funds inspection; `campaign-native-combat.png` and `campaign-native-victory.png` record the actual ten-wave run. That verification completed with 16 lives, 455 kills/four escapes and 19 upgrades; late enemies reached 99.7% of the route and drew 198 rear shots. A three-second normal-speed busy-scene sample averaged 57.5 fps; the remainder was accelerated for verification. Native UI checks pass four window sizes. QA reports zero errors/one warning, with unused stripped URP depth-of-field/Panini pass notices in the player log. Those effects are not used by the authored grade. Human visual, sound and fun review remains pending step 7.
+
+## November 10: expanded-campaign feedback
+
+The user's six screenshots are the baseline: large persistent text bars, indistinguishable upgrades, regular infantry lanes and a floating slab. The polish pass retains the painted Normandy palette and light. It replaces slab sides with continuous countryside, adds barns/hamlets, widens road pigment and vegetation clearance, makes all nine upgrade profiles distinct miniatures and reduces the default HUD to small resource/pace controls and a build dock. Help and intel are requested when needed. Inspection has a close control; ground, repeated tower clicks, right-click and Escape also dismiss it. Pause/menu/results copy is shortened. Original line icons share one stroke weight; tooltips preserve control labels.
+
+First review fixes: missing CanvasRenderer on icon graphics, excessive field stripes, a field mask that clamped to straw across the apron, and flat destruction fragments. The pigment seam regression now compares actual saved core/outer pixels; terrain heights match along apron edges. Final explosions use soft fire puffs and small 3D fragments. Vehicle whole-model flashes are removed; localized surface sparks/puffs remain. Infantry use continuous seeded lanes/gaps and a slight road drift rather than three repeating columns. The core centreline and all ten sites are retained.
+
+Scoped internal board after fixes (not user approval):
+
+palette discipline: 3/5 — established meadow, olive, earth and warm gold palette.
+style uniformity: 3/5 — matched miniature farms, trees and upgrade kits.
+lighting depth: 3/5 — retained warm/cool light and authored grade.
+silhouette: 4/5 — reinforced shields, long guns and twin/heavy tubes distinguish upgrades.
+UI intentionality: 4/5 — compact icons, short copy, requested help/intel and closable inspection.
+feedback visibility: 4/5 — upgrade burst/scale recovery, localized armor hits and bounded fire/smoke/debris.
+
+References used: game-craft audio, VFX and visual-scorecard; uGUI and Unity CLI/Pipeline script/build/runtime/capture guidance; Impeccable distill and craft-floor (the mechanical detector reports no findings, but does not understand all Unity layout behavior). Engine API pages checked: [AudioSource](https://docs.unity.com/en-us/engine/6000.6/script-reference/unityengine/audiosource), [ParticleSystem.Emit](https://docs.unity.com/en-us/engine/6000.6/script-reference/unityengine/particlesystem/emit). The attempted UI.Graphic API link was unavailable; the existing StarGraphic and installed uGUI API supplied the CanvasRenderer check. No new package, AudioMixer or computer-use automation was added. The ambient bed is original synthesized wind/foliage/birds, not a licensed song. The app icon uses built-in imagegen; prompt/source details are in `Tools/Blender/APP_ICON.md`.
