@@ -4,7 +4,7 @@
   "urp": "17.6.0",
   "unity_cli": "1.0.0-beta.17",
   "pipeline": "0.10.0-exp.1",
-  "runtime_source_sha256": "4377591ede224ee82c3e1bcfa42b1806d282a05077c94b0935a5015b8f91c6d1",
+  "runtime_source_sha256": "45cebfbb1b54dbf356c9f5c5562fba0773ce9cea0b053fcf431e62cc0ca7643e",
   "source_hash_method": "Sorted UTF-8 paths relative to Assets/TheLineHolds/Scripts, each followed by file bytes",
   "checkpoints": {
     "enemy_presentation": "cd48407",
@@ -106,29 +106,29 @@
   },
   "builds": {
     "qa": {
-      "buildId": "build_2bb897850240",
+      "buildId": "build_69e1ade36971",
       "result": "Succeeded",
       "platform": "StandaloneOSX",
-      "totalSizeBytes": 393841159,
-      "buildTimeMs": 9286,
+      "totalSizeBytes": 393841994,
+      "buildTimeMs": 14183,
       "totalWarnings": 0,
       "totalErrors": 0
     },
     "mac": {
-      "buildId": "build_e1a0ec18662f",
+      "buildId": "build_6b3378e0d7bb",
       "result": "Succeeded",
       "platform": "StandaloneOSX",
-      "totalSizeBytes": 286890837,
-      "buildTimeMs": 12696,
+      "totalSizeBytes": 286891225,
+      "buildTimeMs": 3534,
       "totalWarnings": 0,
       "totalErrors": 0
     },
     "windows": {
-      "buildId": "build_1ba454d42cd1",
+      "buildId": "build_24a2c949ea31",
       "result": "Succeeded",
       "platform": "StandaloneWindows64",
-      "totalSizeBytes": 312167662,
-      "buildTimeMs": 8952,
+      "totalSizeBytes": 312168110,
+      "buildTimeMs": 9228,
       "totalWarnings": 0,
       "totalErrors": 0
     }
@@ -136,14 +136,14 @@
   "packages": [
     {
       "file": "The-Line-Holds-Windows.zip",
-      "bytes": 115880094,
+      "bytes": 115880648,
       "crc": "pass",
       "credits": true,
       "debugAndPipelineServerExcluded": true
     },
     {
       "file": "The-Line-Holds-macOS.zip",
-      "bytes": 107025314,
+      "bytes": 107025855,
       "crc": "pass",
       "credits": true,
       "debugAndPipelineServerExcluded": true
@@ -169,7 +169,7 @@
   ],
   "full_native_match_runtime_source_sha256": "ab917e3d892f36f9f288f6bc1b356e3918c83c8ee0b25e0bbce99b76b0f3df8c",
   "presentation_checkpoint": "346797c",
-  "final_visual_fix": "Normalized pasture field masks; soft fireball material and small 3D destruction fragments. No combat/economy changes after full match.",
+  "final_visual_fix": "Normalized pasture field masks; soft fireball material and small 3D destruction fragments. No combat/economy changes after full match. Adaptive startup/reset camera fit; desktop identity/icon registration. Gameplay rules remain unchanged.",
   "native_final_probe": {
     "result": "Passed",
     "console": {
@@ -195,5 +195,6 @@
       ]
     },
     "startup_log_note": "Unused stripped URP DOF/Panini pass notices remain; authored grade does not use them."
-  }
+  },
+  "startup_corrections": "startup-fixes.json"
 }

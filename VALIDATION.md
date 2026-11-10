@@ -2,7 +2,17 @@
 
 Checked on Apple silicon macOS, November 7, 9 and 10, 2026, with Unity 6000.6.7f1, URP 17.6.0, Unity CLI 1.0.0-beta.17, and Pipeline 0.10.0-exp.1. All authoring, play checks, captures, and builds used Blender scripts and Unity CLI. No computer-use automation was used.
 
-## Current: November 10 player-feedback polish
+## Current: November 10 startup camera and Dock icon corrections
+
+The previous native overview used one fixed orthographic size, which clipped the entry at 4:3 and narrower window shapes. `CheckOverview.All` failed before the fix with viewport X=0.02 for the entry margin. Startup/Reset now project the route, sites and landmark headroom into the original camera axes and fit both dimensions within HUD-safe margins. Resizing the untouched overview refits it; a manually panned, rotated or zoomed view stays under player control until Reset.
+
+Five projection aspects and five native window sizes pass the complete route/endpoint checks: 1600×900 (size 8.84), 1516×1324 (13.72), 1024×768 (11.79), 1024×1280 (19.64) and 1920×1080 (8.84). The 1516×1324 view matches the reported screenshot proportions. The native check also verifies resize preserves manual camera changes and Reset fits again. Actual injected-input checks pass placement, orbit, modifier drag, pan, zoom, help controls, pause/restart/menu. No gameplay/economy data changed; the previous full-campaign result remains gameplay evidence rather than a new run.
+
+The generated icon was already present in the bundle. The app still carried Unity's template identifier, while direct CLI launches lacked explicit bundle registration. The desktop now has ID `com.thelineholds.game`, version 0.1.1/build 2, explicit Standalone icon slots, and a macOS post-build registration callback. The built ICNS, OS-resolved icon, and actual running NSApplication icon were extracted and inspected: the running gun-and-sandbags image is correct. This uses file/platform API reads through CLI, without desktop UI automation.
+
+Native evidence: `overview-fit-1516x1324.png`, `overview-fit-1600x900.png`, `overview-fit-1024x1280.png` and `running-app-icon.png` under `TheLineHolds/Screenshots/`. QA/macOS/Windows builds pass with zero build errors/warnings; Windows execution remains deferred. Final runtime, package and startup records are in `Tools/Validation/startup-fixes.json`.
+
+## Historical: November 10 player-feedback polish
 
 Implementation checkpoint `346797c` adds the compact icon-led HUD, independent ambience mute, continuous countryside, wider road pigment, nine distinct tower upgrade models, upgrade purchase feedback, organic infantry lanes/gaps, closable inspection, local vehicle hits and pooled destruction. Ground clicks, repeated tower clicks and Escape deselection are locked down by a check that failed before the controller fix. Real injected-input checks pass placement/selling, UI scroll isolation, the camera/help controls, Cmd drag, pause/resume/restart/menu. Upgrade cost and branch callbacks, ambient playback/mute, and all 18 seeded balance strategies pass. Continuous infantry spread covers 17, 16 and 17 distinct 0.1 m road bins for seeds 1944, 42 and 2026, replacing three repeated lanes. Vehicle minimum centre separation remains 2.76 m.
 

@@ -1,0 +1,99 @@
+{
+  "date": "2026-11-10",
+  "implementation_checkpoint": "f61a2b3",
+  "projection_regression": "Failed before fix at 4:3, passes five aspects after",
+  "native_windows": [
+    {
+      "width": 1600,
+      "height": 900,
+      "overview": 8.84
+    },
+    {
+      "width": 1516,
+      "height": 1324,
+      "overview": 13.72
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "overview": 11.79
+    },
+    {
+      "width": 1024,
+      "height": 1280,
+      "overview": 19.64
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "overview": 8.84
+    }
+  ],
+  "fit_covers": "Full route, sites and endpoint margins inside HUD clearance",
+  "auto_resize": "Untouched overview refits",
+  "manual_view": "Preserved on resize; Reset fits again",
+  "frame_driven_input": "Passed",
+  "icon": {
+    "identifier": "com.thelineholds.game",
+    "version": "0.1.1",
+    "build": "2",
+    "explicit_standalone_sizes": true,
+    "postbuild_macos_registration": "Passed",
+    "running_NSApplication_image": "Extracted and visually verified gun/sandbags",
+    "running_image_sha256": "931ad7bb3b232967a2136b383d295abe88ac127fa0fea4eea8583a23595a6032",
+    "os_resolved_icon": "Verified on final release"
+  },
+  "native_console": {
+    "error": 0,
+    "warn": 0,
+    "log": 5
+  },
+  "builds": {
+    "qa": {
+      "buildId": "build_69e1ade36971",
+      "result": "Succeeded",
+      "platform": "StandaloneOSX",
+      "totalSizeBytes": 393841994,
+      "buildTimeMs": 14183,
+      "totalWarnings": 0,
+      "totalErrors": 0
+    },
+    "mac": {
+      "buildId": "build_6b3378e0d7bb",
+      "result": "Succeeded",
+      "platform": "StandaloneOSX",
+      "totalSizeBytes": 286891225,
+      "buildTimeMs": 3534,
+      "totalWarnings": 0,
+      "totalErrors": 0
+    },
+    "windows": {
+      "buildId": "build_24a2c949ea31",
+      "result": "Succeeded",
+      "platform": "StandaloneWindows64",
+      "totalSizeBytes": 312168110,
+      "buildTimeMs": 9228,
+      "totalWarnings": 0,
+      "totalErrors": 0
+    }
+  },
+  "packages": [
+    {
+      "file": "The-Line-Holds-Windows.zip",
+      "bytes": 115880648,
+      "crc": "pass",
+      "credits": true,
+      "debugAndPipelineServerExcluded": true
+    },
+    {
+      "file": "The-Line-Holds-macOS.zip",
+      "bytes": 107025855,
+      "crc": "pass",
+      "credits": true,
+      "debugAndPipelineServerExcluded": true
+    }
+  ],
+  "windows_execution": "Deferred",
+  "computer_use": false,
+  "gameplay_changes": false
+}
