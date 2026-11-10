@@ -122,7 +122,7 @@ namespace TheLineHolds.Editor
             }
             AssetDatabase.SaveAssets();return "Updated "+string.Join(", ",names);
         }
-        static string ExtraColor(string name)=>name=="Masonry"?"A39D88":name=="RoofSlate"?"56635F":name=="RoofSlateLight"?"6B7770":name=="RoofTrim"?"394641":name=="WindowGlass"?"344E55":name=="Shutter"?"526D4C":name.Contains("BagCloth")?"A18C60":name.Contains("LeafLight")?"738451":name.Contains("LeafDark")?"4C633E":name.Contains("Bark")?"71604A":name.Contains("Leather")?"604B36":name.Contains("Edge")?"6F7859":name.Contains("Badge")?"D0C4A0":"747C60";
+        static string ExtraColor(string name)=>name=="RoofClay"?"8A6652":name=="RoofClayLight"?"9B7858":name=="StuccoCream"?"B9AE8B":name=="ShedPaint"?"697F70":name=="Masonry"?"A39D88":name=="RoofSlate"?"56635F":name=="RoofSlateLight"?"6B7770":name=="RoofTrim"?"394641":name=="WindowGlass"?"344E55":name=="Shutter"?"526D4C":name.Contains("BagCloth")?"A18C60":name.Contains("LeafLight")?"738451":name.Contains("LeafDark")?"4C633E":name.Contains("Bark")?"71604A":name.Contains("Leather")?"604B36":name.Contains("Edge")?"6F7859":name.Contains("Badge")?"D0C4A0":"747C60";
         static void Lighting(Camera camera)
         {
             var light=UnityEngine.Object.FindObjectsByType<Light>().First(l=>l.type==LightType.Directional);

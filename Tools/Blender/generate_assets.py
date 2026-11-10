@@ -7,7 +7,7 @@ root = sys.argv[sys.argv.index('--')+1]
 out = os.path.join(root, 'TheLineHolds/Assets/TheLineHolds/Art/Models')
 os.makedirs(out, exist_ok=True)
 materials={}
-for name,c in {'Olive':(.25,.29,.16,1),'Dark':(.075,.085,.065,1),'Steel':(.19,.22,.19,1),'Cloth':(.36,.39,.25,1),'Skin':(.59,.43,.3,1),'Sand':(.51,.44,.29,1),'Wood':(.25,.17,.10,1),'Leaf':(.25,.32,.15,1),'Plaster':(.62,.57,.43,1),'Roof':(.27,.24,.20,1),'LeafLight':(.48,.56,.32,1),'LeafDark':(.18,.29,.17,1),'Bark':(.36,.28,.18,1),'Leather':(.28,.21,.13,1),'Edge':(.39,.44,.28,1),'Badge':(.72,.67,.49,1),'BagCloth':(.51,.44,.29,1),'Masonry':(.57,.55,.47,1),'RoofSlate':(.28,.33,.32,1),'RoofSlateLight':(.34,.39,.36,1),'RoofTrim':(.19,.23,.22,1),'WindowGlass':(.13,.2,.22,1),'Shutter':(.27,.35,.26,1),'SignPaint':(.65,.6,.43,1)}.items():
+for name,c in {'Olive':(.25,.29,.16,1),'Dark':(.075,.085,.065,1),'Steel':(.19,.22,.19,1),'Cloth':(.36,.39,.25,1),'Skin':(.59,.43,.3,1),'Sand':(.51,.44,.29,1),'Wood':(.25,.17,.10,1),'Leaf':(.25,.32,.15,1),'Plaster':(.62,.57,.43,1),'Roof':(.27,.24,.20,1),'LeafLight':(.48,.56,.32,1),'LeafDark':(.18,.29,.17,1),'Bark':(.36,.28,.18,1),'Leather':(.28,.21,.13,1),'Edge':(.39,.44,.28,1),'Badge':(.72,.67,.49,1),'BagCloth':(.51,.44,.29,1),'Masonry':(.57,.55,.47,1),'RoofSlate':(.28,.33,.32,1),'RoofSlateLight':(.34,.39,.36,1),'RoofTrim':(.19,.23,.22,1),'WindowGlass':(.13,.2,.22,1),'Shutter':(.27,.35,.26,1),'SignPaint':(.65,.6,.43,1),'RoofClay':(.43,.25,.16,1),'RoofClayLight':(.49,.31,.21,1),'StuccoCream':(.67,.62,.49,1),'ShedPaint':(.28,.37,.32,1)}.items():
  m=bpy.data.materials.new(name); m.diffuse_color=c; materials[name]=m
 
 def part(name,loc,scale,mat='Olive',shape='cube',rot=None,edge=None):
@@ -427,6 +427,98 @@ def barn():
  part('Barn ridge',(0,0,2.51),(.07,1.9,.055),'RoofTrim',edge=.008)
  combine_static('Barn')
 
+def roof_gable(hx,hy,eave,rise,mat='RoofSlate'):
+ angle=math.atan2(rise,hx);slope=math.hypot(hx,rise)/2
+ for side in [-1,1]:
+  part('Sloping roof',(side*hx/2,0,eave+rise/2),(slope+.1,hy+.16,.045),mat,rot=(0,side*angle,0),edge=.008)
+ for side in [-1,1]:
+  m=bpy.data.meshes.new('Closed gable');m.from_pydata([(-hx,side*hy,eave),(hx,side*hy,eave),(0,side*hy,eave+rise)],[],[(0,1,2)] if side<0 else [(2,1,0)])
+  o=bpy.data.objects.new('Closed gable',m);bpy.context.collection.objects.link(o);m.materials.append(materials['StuccoCream'])
+ # Small overlapping courses echo the original farmhouse rather than a smooth toy roof.
+ for side in [-1,1]:
+  for row in range(6):
+   t=(row+.5)/6
+   for col in range(8):
+    y=-hy+(col+.5)*hy/4;normal=Vector((side*math.sin(angle),0,math.cos(angle)));centre=Vector((side*hx*t,y,eave+rise*(1-t)))+normal*.052
+    light=(row*7+col*3)%9==0
+    tile=('RoofClayLight' if light else 'RoofClay') if mat=='RoofClay' else ('RoofSlateLight' if light else 'RoofSlate')
+    part('Roof tile',centre,(math.hypot(hx,rise)/12+.006,hy/8-.006,.01),tile,rot=(0,side*angle,0),edge=.002)
+ part('Roof ridge',(0,0,eave+rise),(.055,hy+.18,.045),'RoofTrim',edge=.008)
+
+def country_building(kind):
+ if kind=='ToolShed':
+  part('Shed footing',(0,0,.08),(1.2,.85,.08),'Masonry',edge=.012)
+  for x in [-1.1,1.1]:
+   for y in [-.74,.74]:part('Exposed shed post',(x,y,.79),(.055,.055,.75),'Wood',edge=.005)
+  for i in range(15):part('Rear siding',(-1.05+i*.15,.77,.8),(.07,.035,.7),'ShedPaint',edge=.003)
+  part('Lean roof',(0,0,1.58),(1.3,.98,.045),'RoofSlate',rot=(.12,0,0),edge=.006)
+  for x in [-.68,0,.68]:part('Stored timber',(x,.31,.26),(.22,.31,.18),'Wood',edge=.006)
+  part('Shed brace',(0,.72,1.1),(1.12,.04,.045),'Wood',rot=(0,.2,0),edge=.004)
+  combine_static('Open tool shed');return
+ hx,hy,height=(1.1,1.28,1.28) if kind=='StoneCottage' else (1.72,1.03,2.35) if kind=='VillageInn' else (1.85,.9,1.25)
+ part('Stone footing',(0,0,.13),(hx+.08,hy+.08,.13),'Masonry',edge=.014)
+ part('Plaster walls',(0,0,height/2+.15),(hx,hy,height/2),'StuccoCream',edge=.006)
+ roof_gable(hx,hy,height+.15,.7 if kind!='Dairy' else .5,'RoofClay' if kind=='VillageInn' else 'RoofSlate')
+ # Hand-authored facade: different floor count, window spacing, doorway and trim.
+ rows=[.85,1.87] if kind=='VillageInn' else [.83]
+ for level in rows:
+  for x in [-hx*.64,hx*.64]:
+   part('Window dark inset',(x,-hy-.014,level),(.22,.026,.25),'WindowGlass',edge=.003)
+   for dx in [-.24,.24]:part('Window stone jamb',(x+dx,-hy-.045,level),(.03,.026,.29),'Masonry',edge=.003)
+   part('Window sill',(x,-hy-.055,level-.27),(.28,.065,.025),'Masonry',edge=.004)
+   part('Window mullion',(x,-hy-.05,level),(.018,.02,.24),'Sand',edge=.003)
+   if kind=='StoneCottage':
+    for side in [-1,1]:part('Open blue green shutter',(x+side*.36,-hy-.045,level),(.1,.025,.26),'Shutter',edge=.003)
+ # The orbit camera sees every facade. Give the rear and both gables real openings too.
+ for level in rows:
+  for x in [-hx*.64,hx*.64]:
+   part('Rear window frame',(x,hy+.024,level),(.24,.024,.28),'Wood',edge=.004)
+   part('Rear window glass',(x,hy+.055,level),(.205,.012,.24),'WindowGlass',edge=.002)
+   part('Rear window crossbar',(x,hy+.072,level),(.205,.014,.015),'Wood',edge=.002)
+   part('Rear window mullion',(x,hy+.072,level),(.015,.014,.24),'Wood',edge=.002)
+   part('Rear sill',(x,hy+.07,level-.29),(.29,.07,.025),'Masonry',edge=.004)
+   if kind=='StoneCottage':
+    for side in [-1,1]:part('Rear shutter',(x+side*.36,hy+.04,level),(.1,.025,.27),'Shutter',edge=.003)
+  for side in [-1,1]:
+   part('Gable window frame',(side*(hx+.024),0,level),(.024,.24,.28),'Wood',edge=.004)
+   part('Gable glass',(side*(hx+.055),0,level),(.012,.205,.24),'WindowGlass',edge=.002)
+   part('Gable crossbar',(side*(hx+.072),0,level),(.014,.205,.015),'Wood',edge=.002)
+   part('Gable mullion',(side*(hx+.072),0,level),(.014,.015,.24),'Wood',edge=.002)
+   part('Gable sill',(side*(hx+.07),0,level-.29),(.07,.29,.025),'Masonry',edge=.004)
+ part('Rear doorway surround',(0,hy+.024,.64),(.29,.04,.53),'Masonry',edge=.004)
+ part('Rear plank door',(0,hy+.07,.62),(.235,.02,.48),'Wood',edge=.004)
+ for x in [-.12,0,.12]:part('Rear plank joint',(x,hy+.096,.62),(.005,.005,.46),'RoofTrim',edge=.001)
+ part('Rear doorstep',(0,hy+.24,.13),(.38,.26,.1),'Masonry',edge=.01)
+ if kind=='VillageInn':
+  part('Upper floor timber band',(0,hy+.032,1.36),(hx,.03,.035),'Wood',edge=.004)
+  for side in [-1,1]:part('Side floor band',(side*(hx+.032),0,1.36),(.03,hy,.035),'Wood',edge=.004)
+ part('Timber door',(0,-hy-.022,.62),(.23,.04,.48),'Wood',edge=.005)
+ part('Door step',(0,-hy-.24,.13),(.4,.27,.1),'Masonry',edge=.012)
+ if kind=='VillageInn':
+  for x in [-1.52,1.52]:part('Porch post',(x,-hy-.64,.83),(.055,.055,.78),'Wood',edge=.005)
+  part('Porch canopy',(0,-hy-.4,1.62),(1.65,.5,.05),'RoofClay',rot=(.14,0,0),edge=.006)
+  part('Inn beam',(0,-hy-.69,1.5),(1.65,.04,.055),'Wood',edge=.005)
+ elif kind=='Dairy':
+  for x in [-1.28,1.28]:part('Roof ventilator',(x,0,height+.72),(.13,.15,.17),'Steel')
+  for x in [-.55,.55]:
+   part('Milk churn',(x,-hy-.3,.35),(.12,.12,.22),'Steel','cylinder')
+   part('Milk churn lid',(x,-hy-.3,.59),(.14,.14,.025),'Steel','cylinder')
+ else:
+  part('Cottage chimney',(-.57,.35,height+.67),(.16,.2,.52),'Masonry',edge=.008)
+  part('Chimney cap',(-.57,.35,height+1.2),(.2,.24,.04),'RoofTrim',edge=.007)
+ combine_static(kind)
+
+def village_well():
+ for row in range(3):
+  for i in range(12):
+   a=(i+row*.5)*math.tau/12;part('Well stone',(math.cos(a)*.47,math.sin(a)*.47,.12+row*.18),(.145,.13,.085),'Masonry',rot=(0,0,a+math.pi/2),edge=.022)
+ for x in [-.65,.65]:part('Well upright',(x,0,.83),(.065,.065,.83),'Wood',edge=.005)
+ part('Windlass',(0,0,1.2),(.055,.055,.75),'Wood','cylinder',(0,math.pi/2,0))
+ part('Rope',(0,0,.77),(.012,.012,.42),'Sand','cylinder')
+ part('Bucket',(0,0,.44),(.15,.15,.19),'Wood','cylinder')
+ roof_gable(.81,.65,1.65,.39,'RoofClay')
+ combine_static('Village well')
+
 def batch_actor():
  # Keep moving wheel/leg hierarchies and muzzle/rifle landmarks; batch static surfaces by material.
  groups={}
@@ -441,7 +533,7 @@ def batch_actor():
   bpy.context.view_layer.objects.active=objects[0];bpy.ops.object.join();objects[0].name='Miniature '+mat
 
 only=set(sys.argv[sys.argv.index('--only')+1].split(',')) if '--only' in sys.argv else None
-for name,fn in [('Infantry',infantry),('Scout',scout),('AssaultInfantry',assault),('Truck',lambda:vehicle('Truck')),('ArmoredCar',lambda:vehicle('ArmoredCar')),('HeavyTank',heavy_tank),('LightTank',tank),('MachineGun',lambda:gun('MachineGun')),('AntiTank',lambda:gun('AntiTank')),('Mortar',lambda:gun('Mortar')),('MachineGunII',lambda:upgraded_gun('MachineGun')),('MachineGunRapid',lambda:upgraded_gun('MachineGun','A')),('MachineGunAP',lambda:upgraded_gun('MachineGun','B')),('AntiTankII',lambda:upgraded_gun('AntiTank')),('TankHunter',lambda:upgraded_gun('AntiTank','A')),('FieldHowitzer',lambda:upgraded_gun('AntiTank','B')),('MortarII',lambda:upgraded_gun('Mortar')),('SiegeMortar',lambda:upgraded_gun('Mortar','A')),('BarrageMortar',lambda:upgraded_gun('Mortar','B')),('Pine',tree),('Bush',bush),('Farmhouse',hut),('Barn',barn),('Crate',crate),('Sandbags',bags),('FieldGate',gate),('Checkpoint',checkpoint),('RoadSign',signpost),('FieldFence',fence),('BuildStake',stake),('Revetment',revetment),('Duckboard',duckboard),('FieldStone',fieldstone)]:
+for name,fn in [('Infantry',infantry),('Scout',scout),('AssaultInfantry',assault),('Truck',lambda:vehicle('Truck')),('ArmoredCar',lambda:vehicle('ArmoredCar')),('HeavyTank',heavy_tank),('LightTank',tank),('MachineGun',lambda:gun('MachineGun')),('AntiTank',lambda:gun('AntiTank')),('Mortar',lambda:gun('Mortar')),('MachineGunII',lambda:upgraded_gun('MachineGun')),('MachineGunRapid',lambda:upgraded_gun('MachineGun','A')),('MachineGunAP',lambda:upgraded_gun('MachineGun','B')),('AntiTankII',lambda:upgraded_gun('AntiTank')),('TankHunter',lambda:upgraded_gun('AntiTank','A')),('FieldHowitzer',lambda:upgraded_gun('AntiTank','B')),('MortarII',lambda:upgraded_gun('Mortar')),('SiegeMortar',lambda:upgraded_gun('Mortar','A')),('BarrageMortar',lambda:upgraded_gun('Mortar','B')),('Pine',tree),('Bush',bush),('Farmhouse',hut),('Barn',barn),('StoneCottage',lambda:country_building('StoneCottage')),('VillageInn',lambda:country_building('VillageInn')),('Dairy',lambda:country_building('Dairy')),('ToolShed',lambda:country_building('ToolShed')),('VillageWell',village_well),('Crate',crate),('Sandbags',bags),('FieldGate',gate),('Checkpoint',checkpoint),('RoadSign',signpost),('FieldFence',fence),('BuildStake',stake),('Revetment',revetment),('Duckboard',duckboard),('FieldStone',fieldstone)]:
  scene=bpy.data.scenes.new(name); bpy.context.window.scene=scene; fn()
  if name in {'Infantry','Scout','AssaultInfantry','Truck','ArmoredCar','HeavyTank','LightTank'}:batch_actor()
  bpy.ops.object.select_all(action='SELECT');bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
