@@ -78,6 +78,7 @@ namespace TheLineHolds
         {
             if (enemy.Resolved) return;
             enemy.Health -= amount;
+            match.NotifyEnemyDamaged(enemy);
             if (enemy.Health <= 0) match.ResolveKill(enemy);
         }
     }

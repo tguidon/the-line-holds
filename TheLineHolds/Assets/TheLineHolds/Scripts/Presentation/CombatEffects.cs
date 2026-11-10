@@ -118,6 +118,12 @@ namespace TheLineHolds
                 Puff(dust, p, new Vector3(Mathf.Cos(angle) * speed, V(.2f, .7f) * spread, Mathf.Sin(angle) * speed), V(.2f, .42f) * (.6f + spread * .5f), V(.25f, .65f), new Color(.63f, .55f, .39f, .8f));
             }
         }
+        public void DamageSmoke(Vector3 p) => Puff(smoke,p,Vector3.up*.5f,.55f,.7f,new Color(.25f,.24f,.2f,.6f));
+        public void Destruction(Vector3 p,bool vehicle)
+        {
+            GroundDust(p,vehicle?12:4,vehicle?1:.4f);
+            if(vehicle){Puff(flash,p+Vector3.up*.5f,Vector3.up*.2f,.9f,.14f,new Color(1,.7f,.3f));for(int i=0;i<10;i++)DamageSmoke(p+Vector3.up*V(.3f,.8f));}
+        }
         public void Escape(Vector3 p) => GroundDust(p, 4, .4f);
         public void Tick(float dt, IReadOnlyList<ShotState> shots)
         {

@@ -19,8 +19,7 @@ namespace TheLineHolds
         public int SelectedPad { get; private set; } = -1;
         public string Notice { get; private set; } = "Choose a defense, then click a cleared gun site.";
         public bool InMenu { get; private set; } = true;
-        readonly Dictionary<int, GameObject> enemyViews = new Dictionary<int, GameObject>();
-        readonly Dictionary<int, Transform> healthViews = new Dictionary<int, Transform>();
+        public EnemyViewPool EnemyViews {get;private set;}
         readonly Dictionary<int, GameObject> towerViews = new Dictionary<int, GameObject>();
         public CombatEffects combatEffects;
         GameObject preview;
@@ -34,13 +33,14 @@ namespace TheLineHolds
             ring.sharedMaterial=rangeMaterial; ring.positionCount=97; ring.loop=false; ring.widthMultiplier=.055f; ring.useWorldSpace=true;
             CameraControls=battleCamera.gameObject.AddComponent<MapCameraControls>();
             CameraControls.Initialize(battleCamera,this);
+            EnemyViews=new EnemyViewPool(dynamicRoot,battleCamera,healthMaterial,combatEffects);
             hud.Initialize(this); MainMenu();
         }
         public void NewMatch()
         {
             Unsubscribe(); ClearViews(); audioPlayer.ResetAudio(); InMenu=false; Placement=SelectedPad=-1;
             Match=new MatchState(waves,new BattleRoute(BattleRoute.DefaultPoints),BattleRoute.DefaultPads);
-            Match.Cue += OnCue; Match.ShotFired += OnShotFired; Match.ShotImpacted += OnShotImpacted;
+            Match.Cue += OnCue; Match.ShotFired += OnShotFired; Match.ShotImpacted += OnShotImpacted; Match.EnemyDamaged+=EnemyViews.Hit; Match.EnemyKilled+=EnemyViews.Kill;
             CameraControls.ResetView(); Notice="Deploy your defenses. Wave 1 waits for your order.";
         }
         public void MainMenu()
@@ -50,7 +50,7 @@ namespace TheLineHolds
         }
         void ClearViews()
         {
-            foreach(var v in enemyViews.Values) Destroy(v); enemyViews.Clear(); healthViews.Clear();
+            EnemyViews?.Clear();
             foreach(var v in towerViews.Values) Destroy(v); towerViews.Clear();
             if(combatEffects) combatEffects.Clear();
             if(preview) Destroy(preview); previewType=-1; hover=-1;
@@ -96,8 +96,8 @@ namespace TheLineHolds
                 {
                     float remaining=Mathf.Min(Time.deltaTime,.25f);
                     while(remaining>0) { float dt=Mathf.Min(remaining,1f/60); Match.Step(dt); remaining-=dt; }
-                    combatEffects.Tick(Time.deltaTime,Match.Shots);
                 }
+                if(!Match.Paused)combatEffects.Tick(Time.deltaTime,Match.Shots);
                 SyncViews();
             }
             UpdatePreview(); hud.Refresh();
@@ -122,25 +122,7 @@ namespace TheLineHolds
         }
         void SyncViews()
         {
-            var active=new HashSet<int>();
-            foreach(var e in Match.Enemies)
-            {
-                active.Add(e.Id);
-                if(!enemyViews.TryGetValue(e.Id,out var view))
-                {
-                    view=Instantiate(e.Definition.prefab,dynamicRoot); enemyViews.Add(e.Id,view);
-                    var bar=GameObject.CreatePrimitive(PrimitiveType.Cube); Destroy(bar.GetComponent<Collider>()); bar.name="Health";
-                    bar.transform.SetParent(view.transform,false); bar.transform.localPosition=Vector3.up*1.35f; bar.GetComponent<Renderer>().sharedMaterial=healthMaterial;
-                    healthViews[e.Id]=bar.transform;
-                }
-                view.transform.position=e.Position;
-                view.GetComponent<InfantryVisual>()?.Pose(e.Distance,e.Id);
-                var direction=Match.Route.Position(e.Distance+.1f,e.LateralOffset)-e.Position;
-                if(direction.sqrMagnitude>.00001f) view.transform.rotation=Quaternion.LookRotation(direction);
-                healthViews[e.Id].rotation=battleCamera.transform.rotation;
-                healthViews[e.Id].localScale=new Vector3(.65f*Mathf.Clamp01(e.Health/e.Definition.health),.055f,.07f);
-            }
-            RemoveMissing(enemyViews,active,healthViews);
+            EnemyViews.Sync(Match,Match.Paused?0:Time.deltaTime);
             for(int i=0;i<Match.Towers.Length;i++)
             {
                 var t=Match.Towers[i];
@@ -150,11 +132,6 @@ namespace TheLineHolds
                 if(visual)visual.Aim(target!=null?target.Position-view.transform.position:Vector3.zero,Match.Paused || Match.Ended?0:Time.deltaTime);
                 else if(target!=null) { var d=target.Position-view.transform.position; d.y=0; view.transform.rotation=Quaternion.LookRotation(d); }
             }
-        }
-        void RemoveMissing(Dictionary<int,GameObject> views,HashSet<int> active,Dictionary<int,Transform> extra)
-        {
-            var remove=new List<int>(); foreach(var pair in views) if(!active.Contains(pair.Key)) { Destroy(pair.Value); remove.Add(pair.Key); }
-            foreach(int id in remove) { views.Remove(id); extra?.Remove(id); }
         }
         void UpdatePreview()
         {
@@ -205,7 +182,7 @@ namespace TheLineHolds
         void Unsubscribe()
         {
             if(Match==null)return;
-            Match.Cue-=OnCue; Match.ShotFired-=OnShotFired; Match.ShotImpacted-=OnShotImpacted;
+            Match.Cue-=OnCue; Match.ShotFired-=OnShotFired; Match.ShotImpacted-=OnShotImpacted; Match.EnemyDamaged-=EnemyViews.Hit; Match.EnemyKilled-=EnemyViews.Kill;
         }
         void OnDestroy() { Unsubscribe(); }
     }

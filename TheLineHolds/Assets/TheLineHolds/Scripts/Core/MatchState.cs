@@ -45,6 +45,7 @@ namespace TheLineHolds
         readonly WaveSpawner spawner = new WaveSpawner();
         readonly CombatSystem combat = new CombatSystem();
         public event Action<string, Vector3> Cue;
+        public event Action<EnemyState> EnemyDamaged, EnemyKilled;
         public event Action<ShotState> ShotFired;
         public event Action<ShotState> ShotImpacted;
         public event Action<string> Journal;
@@ -100,6 +101,7 @@ namespace TheLineHolds
             Enemies.Remove(enemy);
             Killed++;
             economy.Credit(enemy.Definition.reward);
+            EnemyKilled?.Invoke(enemy);
         }
         internal void ResolveEscape(EnemyState enemy)
         {
@@ -112,6 +114,7 @@ namespace TheLineHolds
             if (Lives <= 0) Finish(MatchPhase.Defeat);
         }
         internal void Emit(string cue, Vector3 position) => Cue?.Invoke(cue, position);
+        internal void NotifyEnemyDamaged(EnemyState enemy) => EnemyDamaged?.Invoke(enemy);
         internal void NotifyShotFired(ShotState shot) => ShotFired?.Invoke(shot);
         internal void NotifyShotImpacted(ShotState shot) => ShotImpacted?.Invoke(shot);
         void Finish(MatchPhase phase)
