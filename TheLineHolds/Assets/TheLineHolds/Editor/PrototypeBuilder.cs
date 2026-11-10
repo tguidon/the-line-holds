@@ -22,7 +22,7 @@ namespace TheLineHolds.Editor
             foreach(var dir in new[]{"Data/Enemies","Data/Defenses","Data/Waves","Art/Materials","Prefabs","Scenes","Audio","UI"}) Directory.CreateDirectory(Root+"/"+dir);
             AssetDatabase.Refresh();
             SetupMaterials(); fieldFont=BuildFont();
-            var waves=TuneCombat();
+            var waves=LegacyCombat();
             var mg=Asset<DefenseDefinition>("Data/Defenses/MachineGun");
             var at=Asset<DefenseDefinition>("Data/Defenses/AntiTank");
             var mortar=Asset<DefenseDefinition>("Data/Defenses/Mortar");
@@ -56,11 +56,12 @@ namespace TheLineHolds.Editor
             EditorUtility.SetDirty(profile); EditorUtility.SetDirty(urp);
             EditorSceneManager.SaveScene(scene,Root+"/Scenes/Countryside.unity");
             EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene(Root+"/Scenes/Countryside.unity",true)};
-            AssetDatabase.SaveAssets(); DioramaBuilder.Map(); DioramaBuilder.RefreshModels(new[]{"Infantry","LightTank"}); CombatPresentationBuilder.Build(); Debug.Log("[Builder] Countryside saved: 10 pads, 5 waves, 3 defenses, 2 enemies; URP HDR and camera postprocessing enabled.");
+            AssetDatabase.SaveAssets(); DioramaBuilder.Map(); DioramaBuilder.RefreshModels(new[]{"Infantry","LightTank"}); CombatPresentationBuilder.Build(); CampaignBuilder.Build(); Debug.Log("[Builder] Countryside saved: 10 pads, 5 waves, 3 defenses, 2 enemies; URP HDR and camera postprocessing enabled.");
         }
         // Apply balance without rebuilding the map, materials, prefabs, or audio.
         [MenuItem("The Line Holds/Apply Combat Tuning")]
-        public static WaveDefinition[] TuneCombat()
+        public static WaveDefinition[] TuneCombat() { CampaignBuilder.Build(); return UnityEngine.Object.FindAnyObjectByType<BattleController>().waves; }
+        static WaveDefinition[] LegacyCombat()
         {
             if(EditorApplication.isPlaying) throw new InvalidOperationException("Stop Play Mode before tuning assets.");
             var infantry=Enemy("Infantry",80,1.5f,4);

@@ -1,5 +1,7 @@
 # The Line Holds — Prototype
 
+> Historical initial milestone: the five-wave enemy/economy/upgrade limits below were superseded by the user’s November 9 expansion. [GAMEPLAY.md](GAMEPLAY.md) describes the current ten-wave campaign, seven enemy types and upgrade trees. The original plan is retained for context.
+
 ## Goal
 
 Build one complete, replayable WWII tower defense level to test placement, tower roles, pacing, and the diorama presentation. Aim for a 5–10 minute match. All numbers below are starting values to tune through playtesting.

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef4e2bbb5e5c345089f78a010b68cf65, type: 3}
+  m_Name: Wave8
+  m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.WaveDefinition
+  briefing: Dense infantry. Blast radius and suppression earn their cost.
+  title: Infantry surge
+  formation: 2
+  varied: 1
+  healthMultiplier: 2.5
+  spawns:
+  - enemy: {fileID: 11400000, guid: 2aff5128a45154928abd51dfe3bbffa3, type: 2}
+    delay: 1
+    count: 54
+    interval: 0.2
+  - enemy: {fileID: 11400000, guid: 0ca85b0c38e5a41e59d567165c7d3441, type: 2}
+    delay: 1
+    count: 14
+    interval: 0.2
+  - enemy: {fileID: 11400000, guid: 2b309ccda0d1242f1adf5a4a3cf49552, type: 2}
+    delay: 1
+    count: 18
+    interval: 0.2

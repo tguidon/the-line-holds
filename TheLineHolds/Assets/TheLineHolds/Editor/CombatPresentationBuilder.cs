@@ -141,8 +141,9 @@ namespace TheLineHolds.Editor
         {
             string path = Art + "/" + name + ".mat"; var material = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (!material) { material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit")); AssetDatabase.CreateAsset(material, path); }
-            material.SetTexture("_BaseMap", texture); material.SetColor("_BaseColor", color);
+            material.SetTexture("_BaseMap", texture); material.SetColor("_BaseColor", color); material.SetColor("_Color",color);
             material.SetFloat("_Surface", 1); material.SetFloat("_Blend", additive ? 2 : 0); material.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha); material.SetFloat("_DstBlend", (float)(additive ? BlendMode.One : BlendMode.OneMinusSrcAlpha));
+            material.SetFloat("_SrcBlendAlpha",1);material.SetFloat("_DstBlendAlpha",(float)(additive?BlendMode.One:BlendMode.OneMinusSrcAlpha));
             material.SetFloat("_ZWrite", 0); material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT"); material.renderQueue = (int)RenderQueue.Transparent;
             EditorUtility.SetDirty(material); return material;
         }

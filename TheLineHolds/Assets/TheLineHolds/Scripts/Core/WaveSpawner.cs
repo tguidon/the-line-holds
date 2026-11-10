@@ -1,45 +1,49 @@
+using System.Collections.Generic;
 using UnityEngine;
 namespace TheLineHolds
 {
-    // An authored entry releases a compact squad, then waits before the next entry.
     public sealed class WaveSpawner
     {
-        WaveDefinition wave;
-        int next, member, enemyId, unspawned;
-        float clock;
-        public int Unspawned => unspawned;
-        public bool Complete => wave != null && unspawned == 0;
-        public void Begin(WaveDefinition definition)
+        struct Ticket { public EnemyDefinition Enemy; public float At; public int Member; }
+        readonly List<Ticket> infantry=new List<Ticket>(),vehicles=new List<Ticket>();
+        WaveDefinition wave;System.Random variation;int nextFoot,nextVehicle,enemyId,unspawned;float clock;
+        public int Unspawned=>unspawned;
+        public bool Complete=>wave!=null && unspawned==0;
+        public void Begin(WaveDefinition definition,int seed=1944)
         {
-            wave = definition; next = member = 0; unspawned = wave.UnitCount;
-            clock = wave.spawns.Length == 0 ? 0 : wave.spawns[0].delay;
-        }
-        public void Step(MatchState match, float dt)
-        {
-            clock -= dt;
-            while (next < wave.spawns.Length && clock <= 0)
+            wave=definition;variation=new System.Random(seed^731);nextFoot=nextVehicle=0;clock=0;unspawned=wave.UnitCount;infantry.Clear();vehicles.Clear();float at=0;
+            foreach(var entry in WavePlanner.Create(wave,seed))
             {
-                var entry = wave.spawns[next];
-                // Delay the whole following column rather than releasing a catch-up burst.
-                // This applies across authored entries as well as within a vehicle section.
-                bool blocked=false;
-                if(entry.enemy.spawnSeparation>0)
-                    foreach(var active in match.Enemies)
-                        if(active.Definition==entry.enemy && active.Distance<entry.enemy.spawnSeparation) { blocked=true;break; }
-                if(blocked) { clock=0;return; }
-                float lane = entry.enemy.armored ? 0 : (member % 2 == 0 ? -.27f : .27f);
-                match.Enemies.Add(new EnemyState {
-                    Id = ++enemyId, Definition = entry.enemy, Health = entry.enemy.health,
-                    LateralOffset = lane, Position = match.Route.Position(0, lane)
-                });
-                unspawned--; member++;
-                if (member < entry.UnitCount) clock += Mathf.Max(.01f, entry.interval);
-                else
+                at+=entry.delay;
+                for(int member=0;member<entry.UnitCount;member++)
                 {
-                    next++; member = 0;
-                    if (next < wave.spawns.Length) clock += wave.spawns[next].delay;
+                    var ticket=new Ticket{Enemy=entry.enemy,At=at,Member=member};
+                    (entry.enemy.spawnSeparation>0?vehicles:infantry).Add(ticket);
+                    if(member<entry.UnitCount-1)at+=Mathf.Max(.01f,entry.interval);
                 }
             }
+        }
+        public void Step(MatchState match,float dt)
+        {
+            clock+=dt;
+            // Infantry escort the convoy while queued vehicles wait for a safe road gap.
+            while(nextFoot<infantry.Count && infantry[nextFoot].At<=clock)Spawn(match,infantry[nextFoot++]);
+            while(nextVehicle<vehicles.Count && vehicles[nextVehicle].At<=clock)
+            {
+                var ticket=vehicles[nextVehicle];bool blocked=false;
+                foreach(var active in match.Enemies)
+                    if(active.Definition.spawnSeparation>0 && active.Distance<Mathf.Max(ticket.Enemy.spawnSeparation,active.Definition.spawnSeparation)){blocked=true;break;}
+                if(blocked)break;
+                Spawn(match,ticket);nextVehicle++;
+            }
+        }
+        void Spawn(MatchState match,Ticket ticket)
+        {
+            var enemy=ticket.Enemy;
+            float lane=enemy.spawnSeparation>0?0:wave.varied?((ticket.Member%3)-1)*.38f+(float)(variation.NextDouble()-.5)*.08f:(ticket.Member%2==0?-.27f:.27f);
+            float hp=enemy.health*wave.healthMultiplier;
+            match.Enemies.Add(new EnemyState{Id=++enemyId,Definition=enemy,Health=hp,MaxHealth=hp,SpeedMultiplier=wave.varied?.92f+(float)variation.NextDouble()*.16f:1,LateralOffset=lane,Position=match.Route.Position(0,lane)});
+            unspawned--;
         }
     }
 }

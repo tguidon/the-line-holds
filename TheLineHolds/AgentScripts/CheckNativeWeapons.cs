@@ -21,7 +21,7 @@ try
         var p=game.Match.Pads[3+i];var view=Object.Instantiate(game.defenses[i].prefab,p,Quaternion.identity,root.transform);
         var visual=view.GetComponent<TowerVisual>();var destination=BattleRoute.OnGround(p.x+.3f,p.z-2.5f)+Vector3.up*.4f;
         visual.FireAt(destination);
-        var target=new EnemyState{Definition=i==1?game.waves[2].spawns.First(e=>e.enemy.armored).enemy:game.waves[0].spawns[0].enemy,Position=destination-Vector3.up*.4f,Health=100};
+        var target=new EnemyState{Definition=i==1?game.waves[4].spawns.First(e=>e.enemy.armored).enemy:game.waves[0].spawns[0].enemy,Position=destination-Vector3.up*.4f,Health=100};
         Object.Instantiate(target.Definition.prefab,target.Position,Quaternion.identity,root.transform);
         var shot=new ShotState{Id=1000+i,Definition=game.defenses[i],Target=target,Origin=p+Vector3.up*.65f,Destination=destination};
         shots.Add(shot);fx.Fire(shot,visual);audio.Fire(shot.Definition,visual.MuzzlePosition);

@@ -6,12 +6,16 @@ namespace TheLineHolds
     public enum MatchPhase { Preparation, Combat, Victory, Defeat }
     public sealed class EnemyState
     {
-        public int Id; public EnemyDefinition Definition; public float Health, Distance, LateralOffset; public bool Resolved;
+        public int Id; public EnemyDefinition Definition; public float Health, Distance, LateralOffset;
+        public float MaxHealth, SpeedMultiplier=1, SlowMultiplier=1, SlowRemaining;
+        public float MaximumHealth => MaxHealth>0?MaxHealth:Definition.health;
+        public float Speed => Definition.speed*SpeedMultiplier*(SlowRemaining>0?SlowMultiplier:1); public bool Resolved;
         public Vector3 Position;
     }
     public sealed class TowerState
     {
-        public int Pad; public DefenseDefinition Definition; public float Cooldown;
+        public int Pad; public DefenseDefinition Definition; public float Cooldown; public int Invested;
+        public int SellValue => Invested/2;
     }
     public sealed class ShotState
     {
@@ -22,7 +26,10 @@ namespace TheLineHolds
     public sealed class MatchState
     {
         public const int StartingFunds = 300, StartingLives = 20;
-        public static int WaveReward(int wave) => 60 + 10 * Mathf.Clamp(wave,1,5);
+        public static int WaveReward(int wave) => 60 + 10 * Mathf.Clamp(wave,1,10);
+        public int TotalWaves => waves.Length;
+        public int Seed {get;}
+        public WaveDefinition NextWave => waves[Mathf.Min(Wave,waves.Length-1)];
         public int Funds => economy.Funds;
         public int Lives { get; private set; } = StartingLives;
         public int Wave { get; private set; }
@@ -49,32 +56,43 @@ namespace TheLineHolds
         public event Action<ShotState> ShotFired;
         public event Action<ShotState> ShotImpacted;
         public event Action<string> Journal;
-        public MatchState(WaveDefinition[] waves, BattleRoute route, Vector3[] pads)
+        public MatchState(WaveDefinition[] waves, BattleRoute route, Vector3[] pads,int seed=1944)
         {
             if (waves == null || waves.Length == 0) throw new ArgumentException("Waves required.");
-            this.waves = waves; Route = route; Pads = (Vector3[])pads.Clone(); Towers = new TowerState[pads.Length];
+            Seed=seed; this.waves = waves; Route = route; Pads = (Vector3[])pads.Clone(); Towers = new TowerState[pads.Length];
         }
         public bool Build(int pad, DefenseDefinition defense)
         {
             if (Ended || Paused || defense == null || pad < 0 || pad >= Towers.Length || Towers[pad] != null) return false;
             if (!economy.TrySpend(defense.cost)) return false;
-            Towers[pad] = new TowerState { Pad = pad, Definition = defense };
+            Towers[pad] = new TowerState { Pad = pad, Definition = defense, Invested=defense.cost };
             Emit("place", Pads[pad]);
             return true;
         }
         public bool Sell(int pad)
         {
             if (Ended || Paused || pad < 0 || pad >= Towers.Length || Towers[pad] == null) return false;
-            economy.Credit(Towers[pad].Definition.SellValue);
+            economy.Credit(Towers[pad].SellValue);
             Towers[pad] = null;
             Emit("place", Pads[pad]);
             return true;
+        }
+        public bool Upgrade(int pad,int option)
+        {
+            if(Ended || Paused || pad<0 || pad>=Towers.Length || Towers[pad]==null)return false;
+            var tower=Towers[pad];var options=tower.Definition.upgrades;
+            if(option<0 || option>=options.Length || options[option].defense==null || options[option].price<=0)return false;
+            var upgrade=options[option];if(!economy.TrySpend(upgrade.price))return false;
+            tower.Invested+=upgrade.price;tower.Definition=upgrade.defense;
+            // Retain elapsed cooldown: upgrading cannot grant a free extra shot.
+            tower.Cooldown=Mathf.Min(tower.Cooldown,tower.Definition.interval);
+            Emit("place",Pads[pad]);return true;
         }
         public bool StartWave()
         {
             if (Paused || Phase != MatchPhase.Preparation) return false;
             Wave++;
-            spawner.Begin(waves[Wave - 1]);
+            spawner.Begin(waves[Wave - 1],Seed+Wave*7919);
             Phase = MatchPhase.Combat;
             Journal?.Invoke($"Wave {Wave} started; funds={Funds}, lives={Lives}");
             return true;

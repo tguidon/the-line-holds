@@ -6,9 +6,11 @@ To play without the Unity Editor, unzip `TheLineHolds/Builds/Packages/The-Line-H
 
 Open `TheLineHolds/` in Unity. The playable scene is `Assets/TheLineHolds/Scenes/Countryside.unity`. Press Play, then **Deploy**. Buy a defense from the supply bar and click a cleared gun site. Start each wave when ready. Click an occupied emplacement to inspect its range or sell it for half its price. Right-click cancels placement; Escape cancels placement first, otherwise pauses; the mouse wheel zooms from a close view to the full map. Middle-drag, Command+left-drag on macOS, Ctrl+left-drag on Windows, or Q/E rotates through 360 degrees; Shift+middle-drag or WASD pans; R restores the overview. The view strip also has rotate, zoom, and reset buttons.
 
-Enemies arrive as compact six-soldier squads, with individual health and rewards. Machine guns pick off infantry; anti-tank guns prioritize armor; mortars lead moving clusters and damage multiple soldiers. Armor resists machine guns and mortar fragments. Later waves add stronger tank columns and more squads. Tank spacing stays safe through bends. This is the baseline difficulty for the next playtest.
+Ten attacks mix irregular patrols, runner streams, infantry clusters, vehicle columns and combined assaults. Seven enemy types have distinct speeds and durability: riflemen, runners, assault troops, trucks, armored cars, light tanks and heavy tanks. The next attack's composition and tactical hint are shown before you call it. Formations and individual speeds vary within that announced plan. Vehicles retain safe spacing through bends.
 
-The match starts with 300 funds and 20 lives. Infantry pay 4 funds and tanks pay 16; completed waves pay 70, 80, 90, 100, and 110 funds. Reinvest in overlapping coverage and mixed defenses—one early tower cannot hold the map. Survive all five waves to win. Every escape costs one life. Victory earns three stars at 18–20 lives, two at 10–17, and one at 1–9.
+Click a deployed tower to buy its veteran upgrade, then choose one of two specializations. Machine guns can suppress infantry or use AP rounds; anti-tank guns can become tank hunters or field howitzers; mortars can specialize in heavy shells or group suppression. Amber health bars mark suppressed enemies. Selling returns half of the actual investment. Use the header's 1x/2x control to change pace.
+
+The match starts with 300 funds and 20 lives. Kill rewards depend on enemy type; completed waves pay 70–160 funds. Reinvest in overlapping coverage and counter the announced attack. Survive all ten waves to win. Every escape costs one life. Victory earns three stars at 18–20 lives, two at 10–17, and one at 1–9. See [GAMEPLAY.md](GAMEPLAY.md) for the current campaign and upgrade tables.
 
 ## Project structure
 

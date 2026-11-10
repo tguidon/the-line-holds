@@ -12,10 +12,15 @@ namespace TheLineHolds
         public SpawnEntry(EnemyDefinition enemy, float delay, int count = 1, float interval = .2f)
         { this.enemy = enemy; this.delay = delay; this.count = count; this.interval = interval; }
     }
+    public enum WaveFormation { Patrol, Stream, Clusters, Convoy, Mixed }
     [CreateAssetMenu(menuName = "The Line Holds/Wave")]
     public sealed class WaveDefinition : ScriptableObject
     {
         public string briefing;
+        public string title;
+        public WaveFormation formation;
+        public bool varied;
+        public float healthMultiplier=1;
         // Each entry is a squad or vehicle section. Members retain individual health and rewards.
         public SpawnEntry[] spawns;
         public int UnitCount

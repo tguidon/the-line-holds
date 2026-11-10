@@ -5,6 +5,7 @@ namespace TheLineHolds
     public sealed class EnemyDefinition : ScriptableObject
     {
         public string displayName;
+        [TextArea] public string description;
         public bool armored;
         [Min(0)] public float spawnSeparation;
         [Min(1)] public float health = 40;

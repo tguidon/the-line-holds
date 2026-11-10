@@ -110,7 +110,7 @@ namespace TheLineHolds.Editor
                     // Preserve that imported transform below a clean placement root.
                     var imported=go;go=new GameObject(name);imported.name="Model";imported.transform.SetParent(go.transform,false);
                 }
-                if(name=="Infantry" || name=="LightTank")
+                if(new[]{"Infantry","LightTank","Scout","AssaultInfantry","Truck","ArmoredCar","HeavyTank"}.Contains(name))
                 {
                     // Blender +Y exports as Unity -Z. Keep gameplay roots +Z-forward.
                     var miniature=go;go=new GameObject(name);miniature.name="Miniature";
@@ -121,7 +121,7 @@ namespace TheLineHolds.Editor
                     var authored=AssetDatabase.LoadAssetAtPath<Material>(Root+"/Art/Materials/"+m.name.Replace(" (Instance)","")+".mat");
                     return authored?authored:Material(m.name,ExtraColor(m.name));
                 }).ToArray();
-                if(name=="Infantry")go.AddComponent<InfantryVisual>();
+                if(name=="Infantry" || name=="Scout" || name=="AssaultInfantry")go.AddComponent<InfantryVisual>();
                 if(name=="MachineGun" || name=="AntiTank" || name=="Mortar")go.AddComponent<TowerVisual>();
                 PrefabUtility.SaveAsPrefabAsset(go,Root+"/Prefabs/"+name+".prefab");UnityEngine.Object.DestroyImmediate(go);
             }

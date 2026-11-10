@@ -13,6 +13,13 @@ MonoBehaviour:
   m_Name: Mortar
   m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.DefenseDefinition
   displayName: Mortar
+  role: 2
+  tier: 1
+  upgrades:
+  - defense: {fileID: 11400000, guid: f10f602b9a1c74fa6bdda28667da2fd1, type: 2}
+    price: 160
+  slowMultiplier: 1
+  slowDuration: 0
   description: Targets clusters / splash damage
   cost: 150
   range: 4.8

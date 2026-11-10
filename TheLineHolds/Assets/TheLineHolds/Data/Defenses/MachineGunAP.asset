@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07bc0a4d61dce4c42b00552797dbff75, type: 3}
+  m_Name: MachineGunAP
+  m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.DefenseDefinition
+  displayName: AP machine gun
+  role: 0
+  tier: 3
+  upgrades: []
+  slowMultiplier: 1
+  slowDuration: 0
+  description: Longer reach / strong against light armor
+  cost: 355
+  range: 4.4
+  interval: 0.25
+  damage: 21
+  splashRadius: 0
+  flightTime: 0.12
+  infantryDamageMultiplier: 1
+  armorDamageMultiplier: 0.75
+  priority: 0
+  prefab: {fileID: 2428180657874920360, guid: ad86b3cc2802f442da509543cd16c084, type: 3}

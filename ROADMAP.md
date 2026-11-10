@@ -1,6 +1,6 @@
 # Prototype Improvement Roadmap
 
-Created November 4, 2026. Steps 1, 2a, 2b, 2c, 3, and 4 are complete. Step 5 is in progress. Steps 6–7 are pending.
+Created November 4, 2026. Steps 1, 2a, 2b, 2c, 3, and 4 are complete. Steps 5 and 6 are in progress. Step 7 is pending.
 
 Follow the steps in order. Update each status to In progress or Complete as work advances. Record findings, validation results, and commit references in the progress log.
 
@@ -13,7 +13,7 @@ Follow the steps in order. Update each status to In progress or Complete as work
 | 3 | Complete | Extend the approved map detail | Build on the map-wide terrain base with authored hedgerows, farm boundaries, field positions, and local prop details. Keep the route and tower sites readable from different camera angles and zoom levels. |
 | 4 | Complete | Extend tower presentation | Refine the step 2b target with richer firing motion, operation details, and combat effects. Give weapons and hits distinct sounds. Keep each tower role easy to identify during combat. |
 | 5 | In progress | Extend enemy presentation | Build on the step 2c miniatures with richer movement, damage feedback, and death effects. Keep squads, armor, and individual targets readable during busy waves. |
-| 6 | Pending | Expand the campaign and gameplay | Add tower upgrades/specializations, seven enemy archetypes, a varied ten-wave campaign, fair formation randomness, useful previews, and tuned economy/pressure. Verify that deployments and upgrades matter. |
+| 6 | In progress | Expand the campaign and gameplay | Add tower upgrades/specializations, seven enemy archetypes, a varied ten-wave campaign, fair formation randomness, useful previews, and tuned economy/pressure. Verify that deployments and upgrades matter. |
 | 7 | Pending | Final player playtesting | Play the expanded campaign, assess fun, readability, progression and difficulty, and record feedback for the next tuning pass. |
 
 Fix readability issues throughout all steps. Step 2 establishes the visual target; later passes extend and refine it. Gameplay upgrades and balance remain deferred to step 6.
@@ -60,3 +60,5 @@ November 9, 2026 — Step 4 implementation checkpoint: Added authored muzzle soc
 November 9, 2026 — Step 4 complete: `dddf6cc` records the implementation checkpoint. A full normal-speed native match passed in 314 seconds and 18,701 frames: three stars, 18 lives, 214 kills, two escapes, 100% final-wave route depth and 109 rear shots. All three weapon roles fired and impacted; allocation stayed at 32 projectiles, with peak particles 124 and world voices 14/24. Mixed output peak was 0.3265, without clipping; console errors/warnings were zero. The final visual-only fix brightens muzzle flashes, raises mortar smoke and moves sparks onto exposed armor; the fresh native probe passes, including the surface-position regression. QA/macOS/Windows builds and package checks pass; audio credits ship. Step 5, richer enemy movement/damage/death feedback, is next. Gameplay and tower upgrades remain step 6; Windows execution remains deferred.
 
 November 9, 2026 — Step 5 checkpoint: Added distance-driven body sway, wheel motion, warm hit reactions, visible damage wear/smoke, timed infantry falls and vehicle destruction/retirement. Actor models and bars are reused across waves, with at most 24 retiring actors. Read-only hit/kill notifications preserve combat rules. Editor checks pass root isolation, pause, fall timing, reset and 20 reuse cycles; the prior core regression suite passes. Final native review will include the expanded roster from step 6. Player playtesting is now a separate pending step 7.
+
+November 9, 2026 — Step 6 gameplay checkpoint: Added riflemen, runners, assault troops, trucks, armored cars, light tanks and heavy tanks; ten announced wave compositions contain 459 enemies. Seeded patrol/stream/cluster/convoy/mixed formations vary group sizes, timing, lanes and individual speeds. Infantry can escort queued vehicles, whose spacing remains safe through bends. Each tower has a veteran tier and two mutually exclusive specializations, including suppression and armor/area counters. Purchases retain cooldowns and refund half of actual investment on sale. Added next-wave intel, upgrade inspection, visible tier markings, amber suppression bars and 1x/2x pace. Eighteen seeded strategy runs accept upgraded mixed layouts and reject static, single-role and neglected defenses. Core and upgrade/UI checks pass; native campaign verification follows.

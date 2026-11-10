@@ -13,7 +13,8 @@ namespace TheLineHolds
         readonly StarGraphic[] ratingStars=new StarGraphic[3];
         TextMeshProUGUI status, notice, waveInfo, selection, modalTitle, modalSubtitle, modalStats, brandTitle, brandSubtitle, cameraHelp;
         float layoutWidth=-1;
-        UnityEngine.UI.Button startWave, resume, retry, menu, play, quit;
+        UnityEngine.UI.Button sellButton, speedButton, startWave, resume, retry, menu, play, quit;
+        readonly UnityEngine.UI.Button[] upgradeButtons=new UnityEngine.UI.Button[2];
         readonly UnityEngine.UI.Button[] shops=new UnityEngine.UI.Button[3];
         readonly Color ink=new Color(.085f,.105f,.095f,.97f), paper=new Color(.88f,.85f,.73f), accent=new Color(.78f,.67f,.36f);
         public void Initialize(BattleController controller)
@@ -28,13 +29,14 @@ namespace TheLineHolds
             brandTitle=Label(top.transform,"THE LINE HOLDS",new Vector2(24,-14),new Vector2(300,32),26,accent);
             brandSubtitle=Label(top.transform,"NORMANDY  /  FIELD OPERATIONS  /  1944",new Vector2(25,-53),new Vector2(430,24),13,paper);
             status=Label(top.transform,"",new Vector2(490,-22),new Vector2(810,44),23,paper);
+            speedButton=Button(top.transform,"1x",new Vector2(-242,-23),new Vector2(80,48),()=>game.ToggleSpeed(),true);
             Button(top.transform,"II   PAUSE",new Vector2(-150,-23),new Vector2(130,48),()=>game.Pause(),true);
-            bottom=Panel("Supply bar",transform,Vector2.zero,new Vector2(1,0),Vector2.zero,new Vector2(0,160),ink);
+            bottom=Panel("Supply bar",transform,Vector2.zero,new Vector2(1,0),Vector2.zero,new Vector2(0,180),ink);
             for(int i=0;i<3;i++) { int type=i; shops[i]=Button(bottom.transform,"",new Vector2(24+i*285,22),new Vector2(270,73),()=>game.Choose(type),false,true); shops[i].name="Shop "+controller.defenses[i].displayName; }
             startWave=Button(bottom.transform,"START WAVE  1  >",new Vector2(-280,28),new Vector2(256,68),()=>game.StartNextWave(),true,true);
             notice=Label(bottom.transform,"",new Vector2(24,104),new Vector2(1140,32),17,paper,true);
             waveInfo=Label(bottom.transform,"",new Vector2(900,20),new Vector2(365,75),16,paper,true);
-            viewControls=Panel("Map controls",transform,Vector2.zero,new Vector2(1,0),new Vector2(24,170),new Vector2(-24,208),new Color(.08f,.1f,.09f,.9f));
+            viewControls=Panel("Map controls",transform,Vector2.zero,new Vector2(1,0),new Vector2(24,190),new Vector2(-24,228),new Color(.08f,.1f,.09f,.9f));
             string modifier=Application.platform==RuntimePlatform.OSXPlayer || Application.platform==RuntimePlatform.OSXEditor?"Cmd":"Ctrl";
             cameraHelp=Label(viewControls.transform,$"Rotate: MMB / {modifier}+drag / Q E   Pan: Shift+MMB / WASD   Zoom: wheel   Reset: R",new Vector2(12,-8),new Vector2(1030,24),13,paper);
             Button(viewControls.transform,"<",new Vector2(-360,-3),new Vector2(44,32),()=>game.CameraControls.Rotate(-45),true);
@@ -45,10 +47,11 @@ namespace TheLineHolds
             resetView.GetComponentInChildren<TextMeshProUGUI>().fontSize=14;
             help=Panel("Field guide",transform,new Vector2(0,1),new Vector2(0,1),new Vector2(24,-222),new Vector2(399,-110),new Color(.08f,.1f,.09f,.86f));
             Label(help.transform,"HOLD THE ROAD",new Vector2(16,-12),new Vector2(340,25),18,accent);
-            Label(help.transform,"Build overlapping defenses on cleared gun sites.\nRight-click: cancel  /  Esc: pause",new Vector2(16,-44),new Vector2(345,59),14,paper);
-            sell=Panel("Inspection",transform,new Vector2(1,1),new Vector2(1,1),new Vector2(-360,-280),new Vector2(-24,-120),ink);
-            selection=Label(sell.transform,"",new Vector2(18,-12),new Vector2(300,66),18,paper);
-            Button(sell.transform,"SELL",new Vector2(18,-91),new Vector2(298,48),()=>game.SellSelected());
+            Label(help.transform,"Build on clearings. Click towers to upgrade.\nAmber bars: suppressed enemies.\nRight-click: cancel / Esc: pause",new Vector2(16,-44),new Vector2(345,59),14,paper);
+            sell=Panel("Inspection",transform,new Vector2(1,1),new Vector2(1,1),new Vector2(-360,-485),new Vector2(-24,-120),ink);
+            selection=Label(sell.transform,"",new Vector2(18,-12),new Vector2(300,95),16,paper);
+            for(int i=0;i<2;i++){int option=i;upgradeButtons[i]=Button(sell.transform,"UPGRADE",new Vector2(18,-120-i*83),new Vector2(298,76),()=>game.UpgradeSelected(option));var text=upgradeButtons[i].GetComponentInChildren<TextMeshProUGUI>();text.fontSize=14;text.enableAutoSizing=true;text.fontSizeMin=11;text.fontSizeMax=15;text.textWrappingMode=TextWrappingModes.Normal;}
+            sellButton=Button(sell.transform,"SELL",new Vector2(18,-310),new Vector2(298,38),()=>game.SellSelected());
             modal=Panel("Overlay",transform,Vector2.zero,Vector2.one,Vector2.zero,Vector2.zero,new Color(.04f,.055f,.045f,.66f),true);
             var card=Panel("Dispatch card",modal.transform,new Vector2(.5f,.5f),new Vector2(.5f,.5f),new Vector2(-330,-300),new Vector2(330,300),ink);
             Label(card.transform,"T H E   L I N E   H O L D S",new Vector2(42,-30),new Vector2(580,28),17,accent);
@@ -77,15 +80,32 @@ namespace TheLineHolds
             top.SetActive(inMatch); bottom.SetActive(inMatch); help.SetActive(inMatch && m.Wave==0 && !m.Paused);
             bool inspect=inMatch && game.SelectedPad>=0 && m.Towers[game.SelectedPad]!=null && !m.Ended && !m.Paused;
             sell.SetActive(inspect);
-            if(inspect) { var d=m.Towers[game.SelectedPad].Definition; selection.text=$"{d.displayName}\nRange {d.range:0.0} m  /  Sell ${d.SellValue}"; }
+            if(inspect)
+            {
+                var tower=m.Towers[game.SelectedPad];var d=tower.Definition;
+                selection.text=$"{d.displayName.ToUpper()}  ·  TIER {d.tier}\n{d.damage:0} damage / {1/d.interval:0.0} shots/s / {d.range:0.0} m\nSell ${tower.SellValue} of ${tower.Invested} invested";
+                if(d.upgrades.Length==0)selection.text+="\nSPECIALIZATION COMPLETE";
+                float sellY=d.upgrades.Length==0?125:d.upgrades.Length==1?215:310;
+                ((RectTransform)sellButton.transform).anchoredPosition=new Vector2(18,-sellY);
+                ((RectTransform)sell.transform).offsetMin=new Vector2(-360,-120-sellY-55);
+                for(int i=0;i<2;i++)
+                {
+                    bool exists=i<d.upgrades.Length;upgradeButtons[i].gameObject.SetActive(exists);if(!exists)continue;
+                    var u=d.upgrades[i];upgradeButtons[i].interactable=m.Funds>=u.price;
+                    upgradeButtons[i].GetComponentInChildren<TextMeshProUGUI>().text=$"{u.defense.displayName.ToUpper()}  ${u.price}\n<size=12>{u.defense.description}</size>";
+                }
+            }
             if(inMatch)
             {
                 string divider=layoutWidth<1500?"\n":"     •     ";
-                status.text=$"LIVES  {m.Lives:00}     •     FUNDS  ${m.Funds}{divider}WAVE  {m.Wave} / 5     •     HOSTILES  {m.Remaining}";
+                speedButton.GetComponentInChildren<TextMeshProUGUI>().text=game.GameSpeed+"x";
+                status.text=$"LIVES  {m.Lives:00}     •     FUNDS  ${m.Funds}{divider}WAVE  {m.Wave} / {m.TotalWaves}     •     HOSTILES  {m.Remaining}";
                 notice.text=game.Notice;
-                waveInfo.text=m.Phase==MatchPhase.Preparation?(m.Wave==0?"ORDERS REQUIRED\n":$"ROUND BONUS +${MatchState.WaveReward(m.Wave)} / ORDERS REQUIRED\n")+game.waves[Mathf.Min(m.Wave,4)].briefing:"ENGAGEMENT IN PROGRESS\nBuild and sell during combat.";
+                var next=m.NextWave;
+                string roster=string.Join(" · ",System.Array.ConvertAll(next.spawns,e=>$"{e.UnitCount} {e.enemy.displayName}"));
+                waveInfo.text=m.Phase==MatchPhase.Preparation?$"NEXT {Mathf.Min(m.Wave+1,m.TotalWaves)}: {next.title.ToUpper()} · {next.formation}\n{roster}\n{next.briefing}":$"{game.waves[m.Wave-1].title.ToUpper()} · {game.waves[m.Wave-1].formation}\nBuild, upgrade and sell during combat. Click a tower to inspect it.";
                 startWave.interactable=m.Phase==MatchPhase.Preparation && !m.Paused;
-                startWave.GetComponentInChildren<TextMeshProUGUI>().text=m.Phase==MatchPhase.Combat?"WAVE IN PROGRESS":$"START WAVE  {Mathf.Min(m.Wave+1,5)}  >";
+                startWave.GetComponentInChildren<TextMeshProUGUI>().text=m.Phase==MatchPhase.Combat?"WAVE IN PROGRESS":$"START WAVE  {Mathf.Min(m.Wave+1,m.TotalWaves)}  >";
                 for(int i=0;i<3;i++)
                 {
                     var d=game.defenses[i]; shops[i].interactable=!m.Ended && !m.Paused;
@@ -118,14 +138,14 @@ namespace TheLineHolds
             if(game.InMenu)
             {
                 modalTitle.text="A road worth holding.";
-                modalSubtitle.text="One country road. Five enemy waves.\nEvery emplacement matters.";
-                modalStats.text="Place defenses • Protect the exit • Hold all five waves\nMachine guns for infantry. Anti-tank for armor.\nMortars for clustered advances.";
+                modalSubtitle.text="One country road. Ten varied attacks.\nEvery emplacement matters.";
+                modalStats.text="Place defenses • Protect the exit • Hold all ten waves\nMachine guns for infantry. Anti-tank for armor.\nUpgrade towers and choose specializations.";
             }
             else if(m.Ended)
             {
                 modalTitle.text=m.Phase==MatchPhase.Victory?"THE LINE HELD.":"THE LINE BROKE.";
                 modalSubtitle.text=m.Phase==MatchPhase.Victory?$"VICTORY   /   {m.Stars} OF 3 STARS":"DEFEAT   /   REGROUP AND TRY AGAIN";
-                modalStats.text=$"LIVES REMAINING   {m.Lives} / 20      WAVES HELD   {m.CompletedWaves} / 5\nENEMIES KILLED    {m.Killed}       ESCAPED    {m.Escaped}\n18+ lives: 3 stars  •  10–17: 2 stars  •  1–9: 1 star";
+                modalStats.text=$"LIVES REMAINING   {m.Lives} / 20      WAVES HELD   {m.CompletedWaves} / {m.TotalWaves}\nENEMIES KILLED    {m.Killed}       ESCAPED    {m.Escaped}\n18+ lives: 3 stars  •  10–17: 2 stars  •  1–9: 1 star";
             }
             else { modalTitle.text="ORDERS ON HOLD."; modalSubtitle.text="Combat is paused."; modalStats.text="Take a breath. Inspect the battlefield.\nResume when you are ready."; }
         }
@@ -140,7 +160,7 @@ namespace TheLineHolds
             brandSubtitle.rectTransform.sizeDelta=new Vector2(headerLeft-48,24);
             Fit(brandTitle,16,26);Fit(brandSubtitle,9,13);
             var sr=status.rectTransform;sr.anchorMin=new Vector2(0,1);sr.anchorMax=Vector2.one;
-            sr.offsetMin=new Vector2(headerLeft,-82);sr.offsetMax=new Vector2(-170,-14);
+            sr.offsetMin=new Vector2(headerLeft,-82);sr.offsetMax=new Vector2(-255,-14);
             status.alignment=TextAlignmentOptions.MidlineLeft;Fit(status,16,23);
             float column=(width-48-36)/4;
             for(int i=0;i<3;i++)
@@ -150,9 +170,9 @@ namespace TheLineHolds
             }
             Place((RectTransform)startWave.transform,new Vector2(24+3*(column+12),16),new Vector2(column,68));
             Fit(startWave.GetComponentInChildren<TextMeshProUGUI>(),13,18);
-            Place(notice.rectTransform,new Vector2(24,128),new Vector2(width-48,26));Fit(notice,13,17);
-            Place(waveInfo.rectTransform,new Vector2(24,88),new Vector2(width-48,36));
-            waveInfo.fontSize=15;waveInfo.textWrappingMode=TextWrappingModes.NoWrap;
+            Place(notice.rectTransform,new Vector2(24,148),new Vector2(width-48,26));Fit(notice,13,17);
+            Place(waveInfo.rectTransform,new Vector2(24,88),new Vector2(width-48,58));
+            waveInfo.enableAutoSizing=true;waveInfo.fontSizeMin=11;waveInfo.fontSizeMax=14;waveInfo.textWrappingMode=TextWrappingModes.NoWrap;
             cameraHelp.rectTransform.sizeDelta=new Vector2(Mathf.Max(100,width-440),24);Fit(cameraHelp,10,13);
         }
         static void Fit(TextMeshProUGUI label,int minimum,int maximum)

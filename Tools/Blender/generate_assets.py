@@ -39,7 +39,9 @@ def tank():
  for x in [-.45,.45]:
   part('Track',(x,0,.24),(.15,.7,.19),'Dark')
   for y in [-.48,-.24,0,.24,.48]:
-   part('RoadWheel',(x*1.29,y,.24),(.115,.115,.065),'Steel','cylinder',(0,math.pi/2,0))
+   wheel=part('RoadWheel',(x*1.29,y,.24),(.115,.115,.065),'Steel','cylinder',(0,math.pi/2,0))
+   bolt=part('Wheel bolt',(x*1.45,y+.06,.24),(.018,.018,.018),'Edge','sphere')
+   matrix=bolt.matrix_world.copy();bolt.parent=wheel;bolt.matrix_world=matrix
    part('Wheel hub',(x*1.44,y,.24),(.045,.045,.02),'Edge','cylinder',(0,math.pi/2,0))
   for y in [-.57,-.4,-.23,-.06,.11,.28,.45,.62]:
    part('Tread shoe',(x,y,.426),(.15,.025,.016),'Steel')
@@ -82,6 +84,54 @@ def infantry():
  for x in [-.115,.115]:part('Pack strap',(x,.134,.6),(.018,.014,.14),'Leather',rot=(0,x,0))
  for x in [-.12,.12]:part('Belt pouch',(x,.15,.46),(.05,.033,.05),'Sand')
  part('Rifle stock',(.18,.16,.49),(.03,.16,.035),'Wood');barrel((.18,.32,.57),.48,.023)
+ limb('Carry',[o for o in bpy.context.scene.objects if o.type=='MESH' and o.name.startswith(('Sleeve','Hand','Rifle stock','Barrel'))],(0,0,.6))
+
+def scout():
+ infantry()
+ for o in list(bpy.context.scene.objects):
+  if o.type=='MESH' and (o.name.startswith('Pack') or o.name.startswith('Helmet')):bpy.data.objects.remove(o,do_unlink=True)
+  elif o.type=='MESH' and o.name.startswith(('Coat','Sleeve','Trouser')):o.data.materials[0]=materials['Sand']
+ part('Field cap',(0,0,.95),(.125,.13,.055),'Cloth','sphere')
+ part('Cap peak',(0,.12,.93),(.11,.075,.015),'Cloth')
+
+def assault():
+ infantry()
+ part('Armored vest',(0,.13,.57),(.16,.045,.14),'Steel',edge=.012)
+ for x in [-.2,.2]:part('Shoulder pad',(x,.02,.76),(.09,.11,.05),'Olive','sphere')
+
+def vehicle(kind):
+ for x in [-.42,.42]:
+  for y in [-.55,.55]:
+   wheel=part('Rolling wheel',(x,y,.23),(.18,.18,.09),'Dark','cylinder',(0,math.pi/2,0))
+   details=[part('Wheel hub',(x*1.23,y,.23),(.055,.055,.02),'Steel','cylinder',(0,math.pi/2,0))]
+   for z in [-.08,.08]:details.append(part('Wheel lug',(x*1.25,y,.23+z),(.02,.02,.02),'Sand','sphere'))
+   for detail in details:
+    matrix=detail.matrix_world.copy();detail.parent=wheel;detail.matrix_world=matrix
+ part('Chassis',(0,0,.31),(.42,.86,.08),'Steel',edge=.015)
+ if kind=='Truck':
+  part('Cab',(0,.47,.63),(.34,.27,.27),'Olive',edge=.025)
+  part('Windshield',(0,.745,.71),(.27,.012,.1),'WindowGlass',edge=.003)
+  part('Bonnet',(0,.8,.49),(.34,.15,.12),'Olive',edge=.018)
+  part('Canvas bed',(0,-.32,.65),(.37,.48,.28),'Sand',edge=.07)
+  for y in [-.7,-.35,0]:part('Canvas rib',(0,y,.91),(.375,.014,.024),'Leather')
+  part('Tailgate',(0,-.825,.48),(.38,.03,.14),'Wood')
+ else:
+  part('Angled hull',(0,0,.53),(.38,.69,.22),'Edge',edge=.04)
+  part('Scout turret',(0,-.1,.8),(.22,.22,.13),'Olive','cylinder')
+  barrel((0,.3,.83),.65,.035)
+  part('Aerial',(-.24,-.42,.98),(.012,.012,.3),'Steel','cylinder')
+  part('Hatch',(0,-.1,.94),(.12,.12,.02),'Steel','cylinder')
+ for x in [-.25,.25]:part('Headlight',(x,.9,.5),(.045,.025,.045),'Sand','sphere')
+
+def heavy_tank():
+ tank()
+ part('Turret cheek L',(-.28,.11,.78),(.09,.3,.14),'Steel',edge=.018)
+ part('Turret cheek R',(.28,.11,.78),(.09,.3,.14),'Steel',edge=.018)
+ part('Heavy muzzle',(0,1.28,.82),(.08,.11,.08),'Steel')
+ root=bpy.data.objects.new('Heavy chassis',None);bpy.context.collection.objects.link(root)
+ for o in list(bpy.context.scene.objects):
+  if o!=root and o.parent is None:o.parent=root
+ root.scale=(1.1,1.1,1.1)
 
 def bags(radius=.68,count=14):
  # Complete, staggered courses; long axes follow the circle instead of radiating like petals.
@@ -328,9 +378,23 @@ def fieldstone():
  for v in o.data.vertices:v.co*=1+.12*math.sin(v.co.x*5+v.co.z*7)
  for p in o.data.polygons:p.use_smooth=True
 
+def batch_actor():
+ # Keep moving wheel/leg hierarchies and muzzle/rifle landmarks; batch static surfaces by material.
+ groups={}
+ for obj in list(bpy.context.scene.objects):
+  if obj.type!='MESH' or obj.name.startswith(('RoadWheel','Rolling wheel','Muzzle','Rifle stock','Barrel')):continue
+  key=(obj.parent,obj.data.materials[0].name)
+  groups.setdefault(key,[]).append(obj)
+ for (parent,mat),objects in groups.items():
+  if len(objects)<2:continue
+  bpy.ops.object.select_all(action='DESELECT')
+  for obj in objects:obj.select_set(True)
+  bpy.context.view_layer.objects.active=objects[0];bpy.ops.object.join();objects[0].name='Miniature '+mat
+
 only=set(sys.argv[sys.argv.index('--only')+1].split(',')) if '--only' in sys.argv else None
-for name,fn in [('Infantry',infantry),('LightTank',tank),('MachineGun',lambda:gun('MachineGun')),('AntiTank',lambda:gun('AntiTank')),('Mortar',lambda:gun('Mortar')),('Pine',tree),('Bush',bush),('Farmhouse',hut),('Crate',crate),('Sandbags',bags),('FieldGate',gate),('Checkpoint',checkpoint),('RoadSign',signpost),('FieldFence',fence),('BuildStake',stake),('Revetment',revetment),('Duckboard',duckboard),('FieldStone',fieldstone)]:
+for name,fn in [('Infantry',infantry),('Scout',scout),('AssaultInfantry',assault),('Truck',lambda:vehicle('Truck')),('ArmoredCar',lambda:vehicle('ArmoredCar')),('HeavyTank',heavy_tank),('LightTank',tank),('MachineGun',lambda:gun('MachineGun')),('AntiTank',lambda:gun('AntiTank')),('Mortar',lambda:gun('Mortar')),('Pine',tree),('Bush',bush),('Farmhouse',hut),('Crate',crate),('Sandbags',bags),('FieldGate',gate),('Checkpoint',checkpoint),('RoadSign',signpost),('FieldFence',fence),('BuildStake',stake),('Revetment',revetment),('Duckboard',duckboard),('FieldStone',fieldstone)]:
  scene=bpy.data.scenes.new(name); bpy.context.window.scene=scene; fn()
+ if name in {'Infantry','Scout','AssaultInfantry','Truck','ArmoredCar','HeavyTank','LightTank'}:batch_actor()
  bpy.ops.object.select_all(action='SELECT');bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
  if only and name not in only: continue
  bpy.ops.export_scene.fbx(filepath=os.path.join(out,name+'.fbx'),use_selection=True,axis_forward='-Z',axis_up='Y',apply_unit_scale=True,bake_anim=False,add_leaf_bones=False)

@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 769d371ce75084085a2455795b1eff98, type: 3}
   m_Name: LightTank
   m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.EnemyDefinition
-  displayName: Light tank
+  displayName: Light tanks
+  description: Slow armor. Anti-tank guns are the main counter.
   armored: 1
-  spawnSeparation: 4.8
-  health: 650
-  speed: 1.05
-  reward: 16
+  spawnSeparation: 4.4
+  health: 530
+  speed: 1.15
+  reward: 22
   prefab: {fileID: 7481327880319199643, guid: 9bf6beda9ef4e4dbaa2011d35b5ae44f, type: 3}

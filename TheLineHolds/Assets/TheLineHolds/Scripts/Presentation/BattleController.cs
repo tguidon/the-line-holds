@@ -18,6 +18,8 @@ namespace TheLineHolds
         public int Placement { get; private set; } = -1;
         public int SelectedPad { get; private set; } = -1;
         public string Notice { get; private set; } = "Choose a defense, then click a cleared gun site.";
+        public int GameSpeed {get;private set;}=1;
+        public void ToggleSpeed(){GameSpeed=GameSpeed==1?2:1;}
         public bool InMenu { get; private set; } = true;
         public EnemyViewPool EnemyViews {get;private set;}
         readonly Dictionary<int, GameObject> towerViews = new Dictionary<int, GameObject>();
@@ -36,10 +38,10 @@ namespace TheLineHolds
             EnemyViews=new EnemyViewPool(dynamicRoot,battleCamera,healthMaterial,combatEffects);
             hud.Initialize(this); MainMenu();
         }
-        public void NewMatch()
+        public void NewMatch(int seed=0)
         {
             Unsubscribe(); ClearViews(); audioPlayer.ResetAudio(); InMenu=false; Placement=SelectedPad=-1;
-            Match=new MatchState(waves,new BattleRoute(BattleRoute.DefaultPoints),BattleRoute.DefaultPads);
+            Match=new MatchState(waves,new BattleRoute(BattleRoute.DefaultPoints),BattleRoute.DefaultPads,seed==0?System.Environment.TickCount:seed);GameSpeed=1;
             Match.Cue += OnCue; Match.ShotFired += OnShotFired; Match.ShotImpacted += OnShotImpacted; Match.EnemyDamaged+=EnemyViews.Hit; Match.EnemyKilled+=EnemyViews.Kill;
             CameraControls.ResetView(); Notice="Deploy your defenses. Wave 1 waits for your order.";
         }
@@ -77,6 +79,11 @@ namespace TheLineHolds
         {
             if(Match!=null && Match.Sell(SelectedPad)) { Notice="Defense sold. Half its purchase cost returned."; SelectedPad=-1; }
         }
+        public void UpgradeSelected(int option)
+        {
+            if(Match!=null && Match.Upgrade(SelectedPad,option))
+                Notice=Match.Towers[SelectedPad].Definition.displayName+" ready. Upgrade cost invested; selling returns half.";
+        }
         void Update()
         {
             if(Keyboard.current!=null && Keyboard.current.escapeKey.wasPressedThisFrame) Pause();
@@ -94,10 +101,10 @@ namespace TheLineHolds
                 // Bound individual simulation steps for low frame rates; simulation and effects share the pause gate.
                 if(!Match.Paused && !Match.Ended)
                 {
-                    float remaining=Mathf.Min(Time.deltaTime,.25f);
+                    float remaining=Mathf.Min(Time.deltaTime*GameSpeed,.25f);
                     while(remaining>0) { float dt=Mathf.Min(remaining,1f/60); Match.Step(dt); remaining-=dt; }
                 }
-                if(!Match.Paused)combatEffects.Tick(Time.deltaTime,Match.Shots);
+                if(!Match.Paused)combatEffects.Tick(Time.deltaTime*GameSpeed,Match.Shots);
                 SyncViews();
             }
             UpdatePreview(); hud.Refresh();
@@ -122,14 +129,14 @@ namespace TheLineHolds
         }
         void SyncViews()
         {
-            EnemyViews.Sync(Match,Match.Paused?0:Time.deltaTime);
+            EnemyViews.Sync(Match,Match.Paused?0:Time.deltaTime*GameSpeed);
             for(int i=0;i<Match.Towers.Length;i++)
             {
                 var t=Match.Towers[i];
                 if(t==null) { if(towerViews.TryGetValue(i,out var old)) { Destroy(old); towerViews.Remove(i); } continue; }
                 var view=EnsureTower(i);
                 var target=Match.Target(t);var visual=view.GetComponent<TowerVisual>();
-                if(visual)visual.Aim(target!=null?target.Position-view.transform.position:Vector3.zero,Match.Paused || Match.Ended?0:Time.deltaTime);
+                if(visual)visual.Aim(target!=null?target.Position-view.transform.position:Vector3.zero,Match.Paused || Match.Ended?0:Time.deltaTime*GameSpeed);
                 else if(target!=null) { var d=target.Position-view.transform.position; d.y=0; view.transform.rotation=Quaternion.LookRotation(d); }
             }
         }
@@ -160,6 +167,7 @@ namespace TheLineHolds
                 view=Instantiate(Match.Towers[pad].Definition.prefab,Match.Pads[pad]-Vector3.up*.015f,Quaternion.identity,dynamicRoot);
                 towerViews[pad]=view;
             }
+            view.GetComponent<TowerVisual>().Configure(Match.Towers[pad].Definition,combatEffects.shellMaterial);
             return view;
         }
         void OnShotFired(ShotState shot)
@@ -177,6 +185,7 @@ namespace TheLineHolds
             // Legacy journal cues remain available to core checks; weapon events carry exact shot context.
             if(cue=="fire" || cue=="impact")return;
             audioPlayer.Play(cue);
+            if(cue=="wave")Notice=$"Round held. +${MatchState.WaveReward(Match.Wave)} supplies. "+Match.NextWave.briefing;
             if(cue=="escape")combatEffects.Escape(position);
         }
         void Unsubscribe()

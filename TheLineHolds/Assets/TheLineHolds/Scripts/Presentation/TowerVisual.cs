@@ -6,6 +6,14 @@ namespace TheLineHolds
     public sealed class TowerVisual : MonoBehaviour
     {
         Transform traverse, slide, muzzle, barrel;
+        DefenseDefinition configured; GameObject markings;
+        public void Configure(DefenseDefinition definition,Material metal)
+        {
+            if(configured==definition)return;configured=definition;Style=WeaponStyles.For(definition);
+            if(markings)Destroy(markings);if(definition.tier<=1)return;
+            markings=new GameObject("Veteran markings");markings.transform.SetParent(transform,false);
+            for(int i=0;i<definition.tier;i++){var pip=GameObject.CreatePrimitive(PrimitiveType.Cube);Destroy(pip.GetComponent<Collider>());pip.transform.SetParent(markings.transform,false);pip.transform.localPosition=new Vector3(-.16f+i*.16f,.36f,-.62f);pip.transform.localScale=new Vector3(.1f,.12f,.035f);pip.GetComponent<Renderer>().sharedMaterial=metal;var tint=new MaterialPropertyBlock();tint.SetColor("_BaseColor",new Color(.78f,.67f,.36f));pip.GetComponent<Renderer>().SetPropertyBlock(tint);}
+        }
         Quaternion bindRotation;
         Vector3 bindPosition, bindForward, aimForward;
         float recoilAge = 10;

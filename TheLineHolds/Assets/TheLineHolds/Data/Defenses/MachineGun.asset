@@ -13,6 +13,13 @@ MonoBehaviour:
   m_Name: MachineGun
   m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.DefenseDefinition
   displayName: Machine-gun nest
+  role: 0
+  tier: 1
+  upgrades:
+  - defense: {fileID: 11400000, guid: 03bc72e0777c64a4b8a850f47c6f6059, type: 2}
+    price: 90
+  slowMultiplier: 1
+  slowDuration: 0
   description: Single infantry / weak vs armor
   cost: 75
   range: 3.3

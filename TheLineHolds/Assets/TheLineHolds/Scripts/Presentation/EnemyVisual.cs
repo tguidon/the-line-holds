@@ -6,7 +6,7 @@ namespace TheLineHolds
     public sealed class EnemyVisual : MonoBehaviour
     {
         Transform body; Vector3 position,scale; Quaternion rotation;
-        Transform[] wheels; Quaternion[] wheelBinds; Renderer[] surfaces; Color[] colors;
+        Transform[] wheels; Quaternion[] wheelBinds; Vector3[] wheelAxes; Renderer[] surfaces; Color[] colors;
         MaterialPropertyBlock block; InfantryVisual infantry;
         float hit,deathAge,smokeClock,tintHit=-1,tintHealth=-1; bool vehicle,dying; float health=1;
         public bool Dying => dying;
@@ -21,6 +21,7 @@ namespace TheLineHolds
                 infantry=GetComponent<InfantryVisual>();
                 wheels=GetComponentsInChildren<Transform>().Where(t=>t.name.StartsWith("RoadWheel") || t.name.StartsWith("Rolling wheel")).ToArray();
                 wheelBinds=wheels.Select(t=>t.localRotation).ToArray();
+                wheelAxes=wheels.Select(t=>{var size=t.GetComponent<MeshFilter>().sharedMesh.bounds.size;return size.x<size.y && size.x<size.z?Vector3.right:size.y<size.z?Vector3.up:Vector3.forward;}).ToArray();
                 surfaces=body.GetComponentsInChildren<Renderer>();colors=surfaces.Select(r=>r.sharedMaterial.color).ToArray();block=new MaterialPropertyBlock();
             }
             hit=deathAge=smokeClock=0;tintHit=-1;dying=false;health=1;body.localPosition=position;body.localRotation=rotation;body.localScale=scale;Tint();
@@ -42,7 +43,7 @@ namespace TheLineHolds
             body.localPosition=position+Vector3.up*(vehicle?Mathf.Sin(phase)*.012f:Mathf.Abs(Mathf.Sin(phase))*.025f);
             body.localRotation=rotation*Quaternion.Euler(vehicle?Mathf.Sin(phase*.6f)*1.1f:2,0,Mathf.Sin(phase)*(vehicle?1.1f:2.5f)+hit*22);
             infantry?.Pose(enemy.Distance,enemy.Id);
-            for(int i=0;i<wheels.Length;i++)wheels[i].localRotation=wheelBinds[i]*Quaternion.Euler(0,enemy.Distance*450,0);
+            for(int i=0;i<wheels.Length;i++)wheels[i].localRotation=wheelBinds[i]*Quaternion.AngleAxis(enemy.Distance*450,wheelAxes[i]);
             Tint();smokeClock-=dt;return false;
         }
         public bool SmokeDue => vehicle && health<.35f && smokeClock<=0;

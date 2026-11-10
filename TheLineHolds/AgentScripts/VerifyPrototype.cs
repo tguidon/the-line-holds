@@ -7,16 +7,16 @@ using TheLineHolds;
 // Run through Pipeline script run; assertions exercise actual authored data and simulation.
 public static class VerifyPrototype
 {
-    static WaveDefinition[] Waves => Enumerable.Range(1,5).Select(i=>AssetDatabase.LoadAssetAtPath<WaveDefinition>($"Assets/TheLineHolds/Data/Waves/Wave{i}.asset")).ToArray();
+    static WaveDefinition[] Waves => Enumerable.Range(1,10).Select(i=>AssetDatabase.LoadAssetAtPath<WaveDefinition>($"Assets/TheLineHolds/Data/Waves/Wave{i}.asset")).ToArray();
     static DefenseDefinition[] Defenses => new[]{"MachineGun","AntiTank","Mortar"}.Select(n=>AssetDatabase.LoadAssetAtPath<DefenseDefinition>($"Assets/TheLineHolds/Data/Defenses/{n}.asset")).ToArray();
     static MatchState New() => new MatchState(Waves,new BattleRoute(BattleRoute.DefaultPoints),BattleRoute.DefaultPads);
     static void Check(bool condition,string message) { if(!condition)throw new Exception("FAILED: "+message); }
     public static string All()
     {
         var report=new StringBuilder(); var d=Defenses;
-        Check(Waves.All(w=>w!=null),"all five waves exist");
-        Check(Waves.Select(w=>w.UnitCount).SequenceEqual(new[]{18,30,40,56,72}),"authored wave counts");
-        Check(Waves.Select(w=>w.spawns.Where(s=>s.enemy.armored).Sum(s=>s.UnitCount)).SequenceEqual(new[]{0,0,4,8,12}),"authored armor composition");
+        Check(Waves.All(w=>w!=null),"all ten waves exist");
+        Check(Waves.Select(w=>w.UnitCount).SequenceEqual(new[]{18,36,40,25,12,63,52,86,20,107}),"authored wave counts");
+        Check(Waves.Select(w=>w.spawns.Where(s=>s.enemy.armored).Sum(s=>s.UnitCount)).SequenceEqual(new[]{0,0,0,5,12,3,4,0,20,19}),"authored armor composition");
         Check(Enumerable.Range(1,5).Select(MatchState.WaveReward).SequenceEqual(new[]{70,80,90,100,110}),"modest increasing round rewards");
         var m=New(); Check(m.Funds==300 && m.Lives==20 && m.Wave==0 && m.Enemies.Count==0,"fresh state");
         Check(m.Build(0,d[0]),"purchase");Check(m.Funds==225,"cost exactly once");Check(!m.Build(0,d[1]) && m.Funds==225,"occupied pad rejects purchase");
@@ -51,7 +51,7 @@ public static class VerifyPrototype
     }
     static void CheckRoles(StringBuilder report)
     {
-        var d=Defenses;var infantry=Waves[0].spawns[0].enemy;var tank=Waves[2].spawns.First(s=>s.enemy.armored).enemy;
+        var d=Defenses;var infantry=Waves[0].spawns[0].enemy;var tank=AssetDatabase.LoadAssetAtPath<EnemyDefinition>("Assets/TheLineHolds/Data/Enemies/LightTank.asset");
         Check(CombatSystem.DamageFor(d[0],tank)<CombatSystem.DamageFor(d[0],infantry)*.2f,"armor resists machine guns");
         Check(CombatSystem.DamageFor(d[1],tank)>CombatSystem.DamageFor(d[1],infantry),"anti-tank damage profile");
         var squad=ScriptableObject.CreateInstance<WaveDefinition>();squad.spawns=new[]{new SpawnEntry(infantry,0,6,.2f)};

@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 769d371ce75084085a2455795b1eff98, type: 3}
   m_Name: Infantry
   m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.EnemyDefinition
-  displayName: Infantry
+  displayName: Riflemen
+  description: Regular infantry. Machine guns are efficient.
   armored: 0
   spawnSeparation: 0
-  health: 80
-  speed: 1.5
+  health: 68
+  speed: 1.2
   reward: 4
   prefab: {fileID: 7563923182228393798, guid: d79df0ed0b5294088bc6eb4ecad150a2, type: 3}

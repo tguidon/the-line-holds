@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 769d371ce75084085a2455795b1eff98, type: 3}
+  m_Name: ArmoredCar
+  m_EditorClassIdentifier: Assembly-CSharp::TheLineHolds.EnemyDefinition
+  displayName: Armored cars
+  description: Quick armor. Anti-tank coverage at several bends.
+  armored: 1
+  spawnSeparation: 4.4
+  health: 270
+  speed: 1.9
+  reward: 15
+  prefab: {fileID: 5152277154898092345, guid: 4582a398bef4145a9b236d3f0a079f22, type: 3}
