@@ -17,7 +17,7 @@ public static class ReviewPolish
  {
   var g=UnityEngine.Object.FindAnyObjectByType<BattleController>();g.NewMatch(42);g.Choose(0);g.ClickPad(0);g.Cancel();g.ClickPad(0);g.ClickPad(-1);if(g.SelectedPad!=-1)throw new Exception("Ground deselect");
   g.ClickPad(0);g.ClickPad(0);if(g.SelectedPad!=-1)throw new Exception("Toggle deselect");
-  g.ClickPad(0);g.Pause();if(g.SelectedPad!=-1 || g.Match.Paused)throw new Exception("Escape selection priority");
+  g.ClickPad(0);g.Escape();if(g.SelectedPad!=-1 || g.Match.Paused)throw new Exception("Escape selection priority");
   g.ClickPad(0);g.hud.Refresh();Canvas.ForceUpdateCanvases();var buttons=g.hud.GetComponentsInChildren<UnityEngine.UI.Button>();
   buttons.Single(b=>b.name=="Upgrade 0").onClick.Invoke();if(g.Match.Towers[0].Definition.tier!=2 || g.Match.Funds!=135)throw new Exception("Upgrade callback/cost");
   await Task.Delay(100);g.hud.Refresh();buttons=g.hud.GetComponentsInChildren<UnityEngine.UI.Button>();

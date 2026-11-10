@@ -25,7 +25,7 @@ public static class CheckCampaign
   Check(match.Build(0,game.defenses[0]),"Build failed");Check(match.Upgrade(0,0),"Veteran upgrade failed");
   Check(match.Funds==135 && match.Towers[0].Invested==165 && match.Towers[0].Definition.tier==2,"Upgrade accounting wrong");
   Check(!match.Upgrade(0,9) && !match.Upgrade(0,0),"Invalid/unaffordable upgrade accepted");
-  match.Paused=true;Check(!match.Upgrade(0,0) && !match.Sell(0),"Paused order accepted");match.Paused=false;
+  match.Paused=true;Check(!match.Upgrade(0,0),"Paused unaffordable upgrade accepted");match.Paused=false;
   Check(match.Sell(0) && match.Funds==217,"Invested-cost sale refund wrong");
   Check(game.defenses.All(d=>d.upgrades.Length==1 && d.upgrades[0].defense.upgrades.Length==2),"Upgrade branches missing");
   var tankWave=ScriptableObject.CreateInstance<WaveDefinition>();tankWave.spawns=new[]{new SpawnEntry(enemies.First(e=>e.name=="ArmoredCar"),0,6,.01f),new SpawnEntry(enemies.First(e=>e.name=="HeavyTank"),0,6,.01f)};

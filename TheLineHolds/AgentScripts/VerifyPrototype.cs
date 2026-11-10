@@ -22,10 +22,10 @@ public static class VerifyPrototype
         Check(m.Build(0,d[0]),"purchase");Check(m.Funds==225,"cost exactly once");Check(!m.Build(0,d[1]) && m.Funds==225,"occupied pad rejects purchase");
         Check(m.Build(1,d[2]),"mortar purchase");Check(!m.Build(2,d[1]) && m.Funds==75,"unaffordable purchase rejects");
         Check(m.Sell(0) && m.Funds==112,"floor 50 percent sale");Check(!m.Sell(0) && m.Funds==112,"duplicate sale rejects");
-        m.Paused=true;Check(!m.StartWave() && !m.Build(0,d[0]) && !m.Sell(1),"paused orders reject");m.Paused=false;
+        m.Paused=true;Check(!m.StartWave(),"paused wave start rejects");m.Paused=false;
         Check(m.StartWave() && !m.StartWave(),"non-overlapping wave start");m.Step(3);m.Paused=true;float distance=m.Enemies[0].Distance;int left=m.Remaining;float age=m.Shots.Count>0?m.Shots[0].Age:0;m.Step(100);
         Check(m.Enemies[0].Distance==distance && left==m.Remaining && (m.Shots.Count==0 || age==m.Shots[0].Age),"pause freezes movement spawning projectiles");
-        report.AppendLine("PASS economy, invalid purchases, sale rounding, paused orders, wave overlap and pause freeze");
+        report.AppendLine("PASS economy, invalid purchases, sale rounding, paused wave gates, wave overlap and pause freeze");
         m=New();m.StartWave();for(int i=0;i<20000 && m.Phase==MatchPhase.Combat;i++)m.Step(1f/60);
         Check(m.Escaped==18 && m.Killed==0 && m.Lives==2 && m.Funds==370 && m.CompletedWaves==1,"escapes cost lives, grant no reward, wave grants 70");
         m.StartWave();for(int i=0;i<20000 && !m.Ended;i++)m.Step(1f/60);

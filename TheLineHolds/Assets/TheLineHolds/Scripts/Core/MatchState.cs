@@ -64,7 +64,7 @@ namespace TheLineHolds
         }
         public bool Build(int pad, DefenseDefinition defense)
         {
-            if (Ended || Paused || defense == null || pad < 0 || pad >= Towers.Length || Towers[pad] != null) return false;
+            if (Ended || defense == null || pad < 0 || pad >= Towers.Length || Towers[pad] != null) return false;
             if (!economy.TrySpend(defense.cost)) return false;
             Towers[pad] = new TowerState { Pad = pad, Definition = defense, Invested=defense.cost };
             Emit("place", Pads[pad]);
@@ -72,7 +72,7 @@ namespace TheLineHolds
         }
         public bool Sell(int pad)
         {
-            if (Ended || Paused || pad < 0 || pad >= Towers.Length || Towers[pad] == null) return false;
+            if (Ended || pad < 0 || pad >= Towers.Length || Towers[pad] == null) return false;
             economy.Credit(Towers[pad].SellValue);
             Towers[pad] = null;
             Emit("place", Pads[pad]);
@@ -80,7 +80,7 @@ namespace TheLineHolds
         }
         public bool Upgrade(int pad,int option)
         {
-            if(Ended || Paused || pad<0 || pad>=Towers.Length || Towers[pad]==null)return false;
+            if(Ended || pad<0 || pad>=Towers.Length || Towers[pad]==null)return false;
             var tower=Towers[pad];var options=tower.Definition.upgrades;
             if(option<0 || option>=options.Length || options[option].defense==null || options[option].price<=0)return false;
             var upgrade=options[option];if(!economy.TrySpend(upgrade.price))return false;

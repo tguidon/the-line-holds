@@ -41,7 +41,7 @@ namespace TheLineHolds
         public void NewMatch(int seed=0)
         {
             Unsubscribe(); ClearViews(); audioPlayer.ResetAudio(); InMenu=false; Placement=SelectedPad=-1;
-            Match=new MatchState(waves,new BattleRoute(BattleRoute.DefaultPoints),BattleRoute.DefaultPads,seed==0?System.Environment.TickCount:seed);GameSpeed=1;
+            Match=new MatchState(waves,new BattleRoute(BattleRoute.DefaultPoints),BattleRoute.DefaultPads,seed==0?System.Environment.TickCount:seed);GameSpeed=1;hud.CloseOptions();
             Match.Cue += OnCue; Match.ShotFired += OnShotFired; Match.ShotImpacted += OnShotImpacted; Match.EnemyDamaged+=EnemyViews.Hit; Match.EnemyKilled+=OnEnemyKilled;
             CameraControls.ResetView(); Notice="Deploy your defenses. Wave 1 waits for your order.";
         }
@@ -61,15 +61,18 @@ namespace TheLineHolds
         }
         public void Choose(int type)
         {
-            if(Match==null || Match.Ended || Match.Paused) return;
+            if(Match==null || Match.Ended) return;
             Placement=type; SelectedPad=-1; Notice=defenses[type].description;
         }
         public void Cancel() { Placement=SelectedPad=-1; Notice="Choose a defense, then click an emplacement."; }
         public void Pause()
         {
             if(Match==null || Match.Ended) return;
-            if(Placement>=0 || SelectedPad>=0) { Cancel(); return; }
             Match.Paused=!Match.Paused; audioPlayer.SetPaused(Match.Paused);
+        }
+        public void Escape()
+        {
+            if(Placement>=0 || SelectedPad>=0)Cancel();else Pause();
         }
         public void StartNextWave()
         {
@@ -90,11 +93,11 @@ namespace TheLineHolds
         }
         void Update()
         {
-            if(Keyboard.current!=null && Keyboard.current.escapeKey.wasPressedThisFrame) Pause();
+            if(Keyboard.current!=null && Keyboard.current.escapeKey.wasPressedThisFrame) Escape();
             if(Mouse.current!=null)
             {
                 if(Mouse.current.rightButton.wasPressedThisFrame) Cancel();
-                if(!InMenu && Match!=null && !Match.Paused && !Match.Ended)
+                if(!InMenu && Match!=null && !Match.Ended)
                 {
                     var mouse=Mouse.current.position.ReadValue(); hover=FindPad(mouse);
                     if(Mouse.current.leftButton.wasPressedThisFrame && !CameraControls.IsRotatingPointer && !MapCameraControls.RotationModifier(Keyboard.current) && !(EventSystem.current && EventSystem.current.IsPointerOverGameObject())) ClickPad(hover);
@@ -108,7 +111,7 @@ namespace TheLineHolds
                     float remaining=Mathf.Min(Time.deltaTime*GameSpeed,.25f);
                     while(remaining>0) { float dt=Mathf.Min(remaining,1f/60); Match.Step(dt); remaining-=dt; }
                 }
-                if(!Match.Paused)combatEffects.Tick(Time.deltaTime*GameSpeed,Match.Shots);
+                if(!Match.Paused)combatEffects.Tick(Time.deltaTime*GameSpeed,Match.Shots);else combatEffects.TickPurchases(Time.unscaledDeltaTime);
                 SyncViews();
             }
             UpdatePreview(); hud.Refresh();
@@ -125,7 +128,7 @@ namespace TheLineHolds
         }
         public void ClickPad(int pad)
         {
-            if(Match==null || Match.Paused || Match.Ended) return;
+            if(Match==null || Match.Ended) return;
             if(pad<0 || pad>=Match.Pads.Length){if(SelectedPad>=0)Cancel();return;}
             if(Match.Towers[pad]!=null) { if(SelectedPad==pad){Cancel();return;} SelectedPad=pad; Placement=-1; Notice="Emplacement selected."; return; }
             if(Placement<0) { SelectedPad=-1; Notice="Select a defense from the supply bar first."; return; }
@@ -141,13 +144,13 @@ namespace TheLineHolds
                 if(t==null) { if(towerViews.TryGetValue(i,out var old)) { Destroy(old); towerViews.Remove(i); } continue; }
                 var view=EnsureTower(i);
                 var target=Match.Target(t);var visual=view.GetComponent<TowerVisual>();
-                if(visual)visual.Aim(target!=null?target.Position-view.transform.position:Vector3.zero,Match.Paused || Match.Ended?0:Time.deltaTime*GameSpeed);
+                if(visual)visual.Aim(target!=null?target.Position-view.transform.position:Vector3.zero,Match.Paused || Match.Ended?0:Time.deltaTime*GameSpeed,Match.Ended?0:Time.unscaledDeltaTime);
                 else if(target!=null) { var d=target.Position-view.transform.position; d.y=0; view.transform.rotation=Quaternion.LookRotation(d); }
             }
         }
         void UpdatePreview()
         {
-            bool allowed=Match!=null && !Match.Paused && !Match.Ended && !InMenu;
+            bool allowed=Match!=null && !Match.Ended && !InMenu;
             int pad=Placement>=0?hover:SelectedPad;
             var definition=allowed && pad>=0 ? (Placement>=0?defenses[Placement]:Match.Towers[pad]?.Definition):null;
             ring.enabled=definition!=null;

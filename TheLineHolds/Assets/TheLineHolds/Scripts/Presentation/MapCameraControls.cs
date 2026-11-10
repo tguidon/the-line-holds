@@ -84,7 +84,7 @@ namespace TheLineHolds
         void Update()
         {
             if(overview && (Screen.width!=fittedWidth || Screen.height!=fittedHeight || !Mathf.Approximately(view.aspect,fittedAspect)))ResetView();
-            if(game==null || game.InMenu || game.Match==null || game.Match.Paused || game.Match.Ended)
+            if(game==null || game.InMenu || game.Match==null || game.Match.Ended)
             { dragging=false; return; }
             var keyboard=Keyboard.current;
             if(keyboard!=null)

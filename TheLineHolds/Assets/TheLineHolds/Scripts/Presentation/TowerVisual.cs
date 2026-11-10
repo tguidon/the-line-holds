@@ -46,10 +46,10 @@ namespace TheLineHolds
             Turn(destination - transform.position, 0, true);
             Fire();
         }
-        public void Aim(Vector3 direction, float dt)
+        public void Aim(Vector3 direction, float dt,float purchaseDt=-1)
         {
             Turn(direction, dt, false);
-            celebration+=dt;
+            celebration+=purchaseDt>=0?purchaseDt:dt;
             transform.localScale=rootScale*(1+Mathf.Sin(Mathf.Clamp01(celebration/.42f)*Mathf.PI)*.13f);
             recoilAge += dt;
             ApplyRecoil();

@@ -1,7 +1,7 @@
 using UnityEngine;
 namespace TheLineHolds
 {
-    public enum HudSymbol { Heart, Supply, Wave, Infantry, Vehicle, Gun, Cannon, Mortar, Play, Pause, Close, Help, Sound, Reset, Left, Right, Plus, Minus, Upgrade }
+    public enum HudSymbol { Heart, Supply, Wave, Infantry, Vehicle, Gun, Cannon, Mortar, Play, Pause, Close, Help, Sound, Reset, Left, Right, Plus, Minus, Upgrade, Menu, Lock }
     // Small, consistent line icons; no font glyph dependencies or raster atlases.
     [RequireComponent(typeof(CanvasRenderer))]
     public sealed class HudIcon : UnityEngine.UI.MaskableGraphic
@@ -20,6 +20,8 @@ namespace TheLineHolds
             void Box(float x,float y,float w,float h)=>Path(x,y,x+w,y,x+w,y+h,x,y+h,x,y);
             switch(symbol)
             {
+                case HudSymbol.Menu:Path(.2f,.25f,.8f,.25f);Path(.2f,.5f,.8f,.5f);Path(.2f,.75f,.8f,.75f);break;
+                case HudSymbol.Lock:Box(.2f,.15f,.6f,.45f);Path(.32f,.6f,.32f,.8f,.68f,.8f,.68f,.6f);break;
                 case HudSymbol.Heart:Path(.5f,.15f,.13f,.53f,.13f,.73f,.28f,.84f,.5f,.67f,.72f,.84f,.87f,.73f,.87f,.53f,.5f,.15f);break;
                 case HudSymbol.Supply:Box(.18f,.2f,.64f,.55f);Path(.18f,.58f,.82f,.58f);Path(.38f,.76f,.38f,.88f,.62f,.88f,.62f,.76f);break;
                 case HudSymbol.Wave:Path(.28f,.12f,.28f,.87f,.83f,.78f,.66f,.59f,.28f,.62f);break;

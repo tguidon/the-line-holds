@@ -40,9 +40,10 @@ public static class CheckInput
         }
         async Task Button(string prefix)
         {
-            prefix=prefix switch {"DEPLOY"=>"Play","Shop Machine"=>"Shop MG","SELL"=>"Sell","RESET VIEW"=>"Reset view",">"=>"Rotate right","+"=>"Zoom in","-"=>"Zoom out","START WAVE"=>"Send wave","RESUME"=>"Resume","RETRY"=>"Play again","MAIN MENU"=>"Main menu",_=>prefix};
+            prefix=prefix switch {"DEPLOY"=>"Play","Shop Machine"=>"Shop MG","SELL"=>"Sell","RESET VIEW"=>"Reset view",">"=>"Rotate right","+"=>"Zoom in","-"=>"Zoom out","START WAVE"=>"Send wave","RESUME"=>"Pause","RETRY"=>"Restart","MAIN MENU"=>"Main menu",_=>prefix};
             bool camera=prefix=="Reset view" || prefix=="Rotate right" || prefix=="Zoom in" || prefix=="Zoom out";
             var all=UnityEngine.Object.FindObjectsByType<Button>(FindObjectsInactive.Include);
+            if((prefix=="Restart" || prefix=="Main menu") && !all.Any(b=>b.gameObject.activeInHierarchy && b.name.StartsWith(prefix,StringComparison.Ordinal)))await Button("Options");
             if(camera && !all.Single(b=>b.name==prefix).gameObject.activeInHierarchy)await Button("Help");
             if((prefix.StartsWith("Shop ") || prefix=="Send wave") && all.Single(b=>b.name=="Reset view").gameObject.activeInHierarchy)await Button("Help");
             var button = UnityEngine.Object.FindObjectsByType<Button>().Single(b => b.name.StartsWith(prefix, StringComparison.Ordinal));
@@ -78,7 +79,7 @@ public static class CheckInput
             float zoom = game.battleCamera.orthographicSize;
             MouseEvent(0, 120); await Frame(); Check(game.battleCamera.orthographicSize < zoom, "wheel zooms");
             MouseEvent(0, 4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, MapCameraControls.MinimumZoom), "close zoom minimum clamps");
-            MouseEvent(0, -4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, MapCameraControls.MaximumZoom), "zoom maximum clamps");
+            MouseEvent(0, -4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, Mathf.Max(MapCameraControls.MaximumZoom,game.CameraControls.OverviewSize)), "zoom maximum clamps");
             await Key(UnityEngine.InputSystem.Key.R);
             Check(Vector3.Distance(homePosition,game.battleCamera.transform.position)<.001f && Mathf.Approximately(game.battleCamera.orthographicSize,game.CameraControls.OverviewSize), "R resets overview");
             await Key(UnityEngine.InputSystem.Key.E); Check(Quaternion.Angle(homeRotation,game.battleCamera.transform.rotation)>1,"E rotates map");

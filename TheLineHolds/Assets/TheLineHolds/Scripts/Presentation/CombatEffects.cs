@@ -7,7 +7,7 @@ namespace TheLineHolds
     public sealed class CombatEffects : MonoBehaviour
     {
         public Material fireballMaterial,flashMaterial, smokeMaterial, dustMaterial, sparkMaterial, brassMaterial, shellMaterial;
-        ParticleSystem flash, smoke, dust, sparks, brass, fireball, fragments;
+        ParticleSystem flash, smoke, dust, sparks, brass, fireball, fragments, purchase;
         readonly List<ParticleSystem> emitters = new List<ParticleSystem>();
         readonly Dictionary<int, Flight> flights = new Dictionary<int, Flight>();
         readonly List<int> expired = new List<int>();
@@ -27,6 +27,7 @@ namespace TheLineHolds
         void Awake()
         {
             root = new GameObject("Pooled combat effects").transform; root.SetParent(transform, false);
+            purchase=Emitter("Upgrade celebration",sparkMaterial,128,false);
             flash = Emitter("Muzzle flash", flashMaterial, 128, false);
             smoke = Emitter("Weapon smoke", smokeMaterial, 256, false);
             dust = Emitter("Road dust", dustMaterial, 384, false);
@@ -140,9 +141,9 @@ namespace TheLineHolds
         }
         public void Upgrade(Vector3 p)
         {
-            for(int i=0;i<18;i++){float a=i*Mathf.PI*2/18;Puff(sparks,p+new Vector3(Mathf.Cos(a)*.7f,.1f,Mathf.Sin(a)*.7f),new Vector3(Mathf.Cos(a)*.3f,1.1f,Mathf.Sin(a)*.3f),.11f,.65f,new Color(1,.83f,.36f));}
-            GroundDust(p,8,.6f);
+            for(int i=0;i<18;i++){float a=i*Mathf.PI*2/18;Puff(purchase,p+new Vector3(Mathf.Cos(a)*.7f,.1f,Mathf.Sin(a)*.7f),new Vector3(Mathf.Cos(a)*.3f,1.1f,Mathf.Sin(a)*.3f),.11f,.65f,new Color(1,.83f,.36f));}
         }
+        public void TickPurchases(float dt)=>purchase.Simulate(dt,false,false);
         public void Escape(Vector3 p) => GroundDust(p, 4, .4f);
         public void Tick(float dt, IReadOnlyList<ShotState> shots)
         {

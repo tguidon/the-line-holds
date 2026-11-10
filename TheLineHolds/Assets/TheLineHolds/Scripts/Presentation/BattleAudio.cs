@@ -84,8 +84,8 @@ namespace TheLineHolds
         public void SetPaused(bool value)
         {
             paused = value;
-            if (paused) { ui.Pause(); foreach (var voice in voices) voice.Pause(); }
-            else { ui.UnPause(); foreach (var voice in voices) voice.UnPause(); }
+            if (paused) { foreach (var voice in voices) voice.Pause(); }
+            else { foreach (var voice in voices) voice.UnPause(); }
         }
         public void ResetAudio()
         {
