@@ -4,7 +4,7 @@ A single-map WWII tower defense prototype built with Unity **6000.6.7f1**, URP 1
 
 To play without the Unity Editor, unzip `TheLineHolds/Builds/Packages/The-Line-Holds-macOS.zip` and open **The Line Holds.app**. The unpackaged local app is also available at `TheLineHolds/Builds/macOS/The Line Holds.app`. Choose **Deploy** to begin. The diorama pass adds rolling terrain, a worn road, leafy vegetation, refined miniatures, independent gun traverse, and infantry strides. The default window is now 1920×1080; smaller displays use a fitting size, and an existing saved window size migrates once. This is the current macOS prototype; Windows testing will use a Windows VM when you are ready.
 
-Open `TheLineHolds/` in Unity. The playable scene is `Assets/TheLineHolds/Scenes/Countryside.unity`. Press Play, then **Deploy**. Buy a defense from the supply bar and click a cleared gun site. Start each wave when ready. Click an occupied emplacement to inspect its range or sell it for half its price. Right-click cancels placement; Escape cancels placement first, otherwise pauses; the mouse wheel zooms from a close view to the full map. Middle-drag, Command+left-drag on macOS, Ctrl+left-drag on Windows, or Q/E rotates through 360 degrees; Shift+middle-drag or WASD pans; R restores the overview. The view strip also has rotate, zoom, and reset buttons.
+Open `TheLineHolds/` in Unity. The playable scene is `Assets/TheLineHolds/Scenes/Countryside.unity`. Press Play, choose a defense from the build dock and click a cleared gun site. Click a tower to upgrade or sell it. Pausing freezes combat while you build, inspect, upgrade, sell or move the camera. The corner pause control resumes play; Options holds Restart and Main menu. Unaffordable upgrades show a lock and their shortfall. Escape cancels selection first, otherwise pauses. Middle-drag, Command+left-drag on macOS, Ctrl+left-drag on Windows, or Q/E rotates the map; Shift+middle-drag or WASD pans; the wheel zooms; R fits the complete route. Help contains camera buttons and shortcuts.
 
 Ten attacks mix irregular patrols, runner streams, infantry clusters, vehicle columns and combined assaults. Seven enemy types have distinct speeds and durability: riflemen, runners, assault troops, trucks, armored cars, light tanks and heavy tanks. The next attack's composition and tactical hint are shown before you call it. Formations and individual speeds vary within that announced plan. Vehicles retain safe spacing through bends.
 
@@ -64,3 +64,7 @@ unity command script eval --project-path "$PWD/TheLineHolds" 'TheLineHolds.Edito
 ```
 
 See `ART_DIRECTION.md` for palette, lighting, generator details, and the visual target. Steps 2a–2c are implemented; review their captures under `TheLineHolds/Screenshots/diorama-*.png` before the next composition pass.
+
+### Pending review build
+
+The latest tactical-pause/countryside build is staged at `TheLineHolds/Builds/macOS-Review/The Line Holds.app` (Windows cross-build: `Builds/Windows-Review/`). It has **not been launched**. The existing `Builds/macOS/` app and any current session were preserved while the user continued testing. On the next requested launch, use the review build and avoid opening a second copy. Validation: `Tools/Validation/tactical-pause-scenery.json`.

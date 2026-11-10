@@ -88,11 +88,11 @@ namespace TheLineHolds
         }
         public void Refresh()
         {
-            var m=game.Match;bool active=!game.InMenu && m!=null;bool playing=active && !m.Ended;
-            if(active && !m.Paused)showOptions=false;pauseStatus.SetActive(playing && m.Paused);options.SetActive(playing && showOptions);
+            var m=game.Match;bool active=!game.InMenu && m!=null;bool editable=active && !m.Ended;
+            if(active && !m.Paused)showOptions=false;pauseStatus.SetActive(editable && m.Paused);options.SetActive(editable && showOptions);
             var pauseIcon=pauseButton.GetComponentInChildren<HudIcon>();var symbol=active && m.Paused?HudSymbol.Play:HudSymbol.Pause;if(pauseIcon.symbol!=symbol){pauseIcon.symbol=symbol;pauseIcon.SetVerticesDirty();}pauseButton.GetComponent<HudHint>().hint=active && m.Paused?"Resume":"Pause";
-            top.SetActive(active);bottom.SetActive(playing);help.SetActive(playing && showHelp);intel.SetActive(playing && showIntel && !showHelp);
-            bool inspect=playing && game.SelectedPad>=0 && m.Towers[game.SelectedPad]!=null;sell.SetActive(inspect && !showHelp && !showOptions);
+            top.SetActive(active);bottom.SetActive(editable);help.SetActive(editable && showHelp);intel.SetActive(editable && showIntel && !showHelp);
+            bool inspect=editable && game.SelectedPad>=0 && m.Towers[game.SelectedPad]!=null;sell.SetActive(inspect && !showHelp && !showOptions);
             if(active)
             {
                 lives.text=m.Lives.ToString();funds.text=m.Funds.ToString();status.text=$"{m.Wave} / {m.TotalWaves}";
@@ -103,10 +103,10 @@ namespace TheLineHolds
                 var next=m.NextWave;string roster=string.Join("\n",System.Array.ConvertAll(next.spawns,e=>$"{e.UnitCount}  {e.enemy.displayName}"));
                 waveInfo.text=$"<b>{next.title}</b>\n<size=13>{next.formation}</size>\n{roster}";
                 bool prep=m.Phase==MatchPhase.Preparation;startWave.interactable=prep && !m.Paused;
-                startWave.GetComponentInChildren<TextMeshProUGUI>().text=m.Paused?"Resume to send":prep?$"Send wave {Mathf.Min(m.Wave+1,m.TotalWaves)}":"Wave underway";
+                startWave.GetComponentInChildren<TextMeshProUGUI>().text=m.Paused?(prep?"Resume to send":"Wave paused"):prep?$"Send wave {Mathf.Min(m.Wave+1,m.TotalWaves)}":"Wave underway";
                 for(int i=0;i<3;i++)
                 {
-                    var d=game.defenses[i];shops[i].interactable=playing;
+                    var d=game.defenses[i];shops[i].interactable=editable;
                     shops[i].GetComponentInChildren<TextMeshProUGUI>().text=$"{new[]{"MG nest","Anti-tank","Mortar"}[i]}  <color=#E8BF64>${d.cost}</color>";
                     shops[i].GetComponent<UnityEngine.UI.Image>().color=game.Placement==i?new Color(.35f,.41f,.27f):m.Funds<d.cost?new Color(.12f,.16f,.13f):new Color(.19f,.25f,.2f);
                 }
@@ -131,7 +131,6 @@ namespace TheLineHolds
             starRow.SetActive(end && m.Stars>0);for(int i=0;i<3;i++)ratingStars[i].color=end && i<m.Stars?accent:new Color(.27f,.33f,.28f);
             if(game.InMenu){modalTitle.text="The Line Holds";modalSubtitle.text="Normandy, 1944";modalStats.text="Hold the road through 10 attacks.\nBuild. Upgrade. Adapt.";}
             else if(end){modalTitle.text=m.Phase==MatchPhase.Victory?"The line held.":"Regroup.";modalSubtitle.text=m.Phase==MatchPhase.Victory?"Victory":"The defenses fell";modalStats.text=$"{m.Lives} lives saved     {m.CompletedWaves} / {m.TotalWaves} waves\n{m.Killed} defeated     {m.Escaped} escaped";}
-            else {modalTitle.text="Paused";modalSubtitle.text="Take your time.";modalStats.text="Resume the battle when ready.";}
         }
         static string ShortName(DefenseDefinition d)=>d.tier==1?(d.role==DefenseRole.MachineGun?"MG nest":d.role==DefenseRole.Cannon?"Anti-tank":"Mortar"):d.displayName.Replace("machine gun","MG").Replace("anti-tank","gun").Replace(" nest","");
         static string RoleHint(DefenseDefinition d)=>d.slowDuration>0?"Suppresses movement":d.role==DefenseRole.Mortar?"Area bombardment":d.splashRadius>0?"Explosive shells":d.role==DefenseRole.Cannon?"Armor specialist":d.armorDamageMultiplier>.5f?"Pierces light armor":"Infantry specialist";

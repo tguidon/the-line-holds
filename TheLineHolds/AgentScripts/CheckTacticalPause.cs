@@ -11,7 +11,7 @@ public static class CheckTacticalPause
   var g=UnityEngine.Object.FindAnyObjectByType<BattleController>();var m=new MatchState(g.waves,new BattleRoute(BattleRoute.DefaultPoints),BattleRoute.DefaultPads,42);m.Paused=true;
   Check(m.Build(0,g.defenses[0]),"Paused build rejected");Check(m.Upgrade(0,0),"Paused upgrade rejected");Check(m.Funds==135,"Upgrade accounting");
   Check(!m.Upgrade(0,0) && m.Funds==135,"Paused unaffordable upgrade spent funds");Check(m.Sell(0) && m.Funds==217,"Paused sale accounting");Check(!m.StartWave() && m.Wave==0,"Paused wave advanced");
-  m.Paused=false;m.Build(0,g.defenses[0]);m.StartWave();m.Step(3);m.Paused=true;
+  m.Paused=false;m.Build(0,g.defenses[0]);m.StartWave();for(int i=0;i<600 && m.Shots.Count==0;i++)m.Step(1f/60);Check(m.Enemies.Count>0 && m.Shots.Count>0,"Freeze fixture requires live enemies and an in-flight shot");m.Paused=true;
   var enemies=m.Enemies.Select(e=>(e.Id,e.Position,e.Health)).ToArray();var shots=m.Shots.Select(s=>(s.Id,s.Age)).ToArray();float cooldown=m.Towers[0].Cooldown;int remaining=m.Remaining;
   m.Step(100);Check(enemies.SequenceEqual(m.Enemies.Select(e=>(e.Id,e.Position,e.Health))) && shots.SequenceEqual(m.Shots.Select(s=>(s.Id,s.Age))) && remaining==m.Remaining && cooldown==m.Towers[0].Cooldown,"Combat advanced while paused");
   return "PASS paused build/upgrade/sale, prices and guard; spawning/movement/health/shots/reloads remain frozen";

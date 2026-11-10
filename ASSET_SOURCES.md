@@ -24,3 +24,5 @@ No historical faction insignia or third-party reference art is included.
 ## November 10 additions
 
 Nine tower tier/branch models and the barn are original procedural Blender assets in `Tools/Blender/generate_assets.py` and `miniatures.blend`. The countryside ambience is original generated PCM; its repeatable source is `Tools/Audio/generate_ambience.py`, with no third-party samples. See `Tools/Audio/AMBIENCE.md`. The app icon is generated with the built-in imagegen tool; the selected project PNG and complete prompt are recorded in `Tools/Blender/APP_ICON.md`. No new external game assets or packages were added.
+
+- Countryside refinement: original StoneCottage, VillageInn, Dairy, ToolShed and VillageWell geometry in `Tools/Blender/generate_assets.py`, with editable `miniatures.blend` and exported FBX/prefabs retained. Connected road pigment, yard clearings, grass tufts and scenery placement are original deterministic editor generation in `CountrysideLayout`, `PastureDetail` and `CountrysideSurroundings`. Existing barn/foliage/field-kit materials are reused. No external models, textures or packages were added.

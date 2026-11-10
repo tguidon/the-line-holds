@@ -13,7 +13,8 @@ namespace TheLineHolds.Editor
         public static void RegisterMacApplication(BuildTarget target,string appPath)
         {
 #if UNITY_EDITOR_OSX
-            if(target!=BuildTarget.StandaloneOSX)return;
+            // Staged review builds stay unregistered while the existing player is in use.
+            if(target!=BuildTarget.StandaloneOSX || Path.GetFileName(Path.GetDirectoryName(appPath))=="macOS-Review")return;
             // CLI launches execute the player directly. Register bundle metadata for the Dock first.
             const string registration="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister";
             if(!File.Exists(registration))throw new FileNotFoundException("macOS application registration tool missing",registration);

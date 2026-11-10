@@ -107,3 +107,20 @@ References used: game-craft audio, VFX and visual-scorecard; uGUI and Unity CLI/
 ## Startup-framing and icon follow-up
 
 The user reported clipped endpoints in a narrow window and a generic Dock icon. Adaptive overview fitting now includes road/site margins and endpoint headroom with clearance for the HUD. `overview-fit-1516x1324.png` captures the corrected reported aspect; wide and tall views are included separately. Both endpoints and the whole road are visible. Manual camera operations remain available. `running-app-icon.png` is extracted from the live macOS NSApplication icon, not just the source artwork. Bundle identity, explicit icon sizes and repeatable LaunchServices registration are configured through editor APIs and a build callback. Scoped palette/style/light/feedback scores are unchanged; this is a framing and identity correction. API pages checked: Unity 6.6 Camera.orthographicSize and PlayerSettings.SetApplicationIdentifier. No new artwork, packages, gameplay rules or computer-use tools were added.
+
+## November 10 tactical pause and countryside review
+
+The final Editor Play Mode overview is `countryside-panorama.png`; `countryside-village.png` and `countryside-farm.png` use temporary close cameras for asset review. `tactical-pause.png` is a temporary funded inspection fixture showing the small pause indicator, accessible map and locked upgrade choices. These are presentation evidence, not a native campaign run. The user's current player was left running and unchanged.
+
+The first review exposed blank rear building walls and smooth roofs. The final pass adds rear/gable windows, doors, framing and varied roof-tile courses. Continuous small grass tufts, related leaf materials, connected roads/driveways, hedges, gardens and an orchard tie the extension to the core. All 22 road chains have meaningful destinations. Core route and tower anchors are unchanged.
+
+| Axis | Internal score | Evidence |
+| --- | --- | --- |
+| Palette discipline | 3/5 | Existing moss, grass, earth and olive palette; restrained clay roofs. |
+| Style uniformity | 3/5 | Shared grass/leaf scale and architectural roof/window detail across the extension. |
+| Lighting depth | 3/5 | Existing warm sunlight, cool fill and grade retained. |
+| Silhouette | 3/5 | Distinct inn, dairy, cottage, shed and well forms around the battle zone. |
+| UI intentionality | 4/5 | Non-blocking pause indicator; locked upgrades state missing funds directly. |
+| Feedback visibility | 4/5 | Purchase feedback continues during pause while combat effects remain frozen. |
+
+Scores are internal assessments, not user approval. New native acceptance awaits the user's next launch; no frame-rate claim is made for the additional scenery yet.

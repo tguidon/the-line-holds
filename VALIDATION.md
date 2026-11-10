@@ -2,7 +2,15 @@
 
 Checked on Apple silicon macOS, November 7, 9 and 10, 2026, with Unity 6000.6.7f1, URP 17.6.0, Unity CLI 1.0.0-beta.17, and Pipeline 0.10.0-exp.1. All authoring, play checks, captures, and builds used Blender scripts and Unity CLI. No computer-use automation was used.
 
-## Current: November 10 startup camera and Dock icon corrections
+## Current: November 10 tactical pause and countryside refinement
+
+Pause now freezes spawning, movement, health, projectiles and reload time while allowing building, inspection, upgrades, sales and camera movement. The blocking modal is replaced by a small corner indicator; restart/main-menu actions live in the optional Options menu. Unaffordable upgrades are non-interactable with a lock, muted text/price and an exact funds shortfall. Focused simulation checks require live enemies and an in-flight shot before testing freeze. Play Mode pointer/keyboard checks exercise paused sale, rebuilding, a rejected locked upgrade, camera orbit and resume. Core rules, ten-wave rules and all 18 strategy/seed scenarios pass.
+
+The extended scenery now has 16 structures across six types, including original cottages, an inn, dairy, tool sheds and wells. All 22 decorative road chains end at a junction, building yard, battlefield endpoint or outer map edge. Eighty spatial grass batches contain 275,160 vertices; hedges, crop plots, fences and an orchard connect the surrounding landscape visually. Core gameplay data, route and placement anchors are unchanged. Saved pasture seam colors still pass. First visual review identified blank rear facades and smooth new roofs; the final assets have windows on all facades and tiled roof courses. Editor captures are `tactical-pause.png`, `countryside-panorama.png`, `countryside-village.png` and `countryside-farm.png`.
+
+Separate **macOS-Review** and **Windows-Review** release builds pass with zero build warnings/errors. The editor console has zero errors; its history includes deprecated icon-API compiler warnings. No new native player was launched: the user was still playing, so the existing release was neither replaced nor relaunched. Its executable SHA-256 remains unchanged. New native-player acceptance and Windows execution remain pending. Details and repeatable commands are in `Tools/Validation/tactical-pause-scenery.json` and the validation README. Step 7 remains in progress.
+
+## Historical: November 10 startup camera and Dock icon corrections
 
 The previous native overview used one fixed orthographic size, which clipped the entry at 4:3 and narrower window shapes. `CheckOverview.All` failed before the fix with viewport X=0.02 for the entry margin. Startup/Reset now project the route, sites and landmark headroom into the original camera axes and fit both dimensions within HUD-safe margins. Resizing the untouched overview refits it; a manually panned, rotated or zoomed view stays under player control until Reset.
 

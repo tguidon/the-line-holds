@@ -118,7 +118,14 @@ public static class CheckInput
             Check(game.Match.Wave==0 && game.Match.Killed==0 && game.Match.Enemies.Count==0,"camera controls do not advance combat or alter the match");
             await Click(new Vector2(Screen.width*.5f,Screen.height*.5f),2);
             await Button("START WAVE"); Check(game.Match.Phase == MatchPhase.Combat, "mouse starts wave");
-            await Key(UnityEngine.InputSystem.Key.Escape); Check(game.Match.Paused, "Escape pauses combat");
+            await Task.Delay(1500);await Key(UnityEngine.InputSystem.Key.Escape); Check(game.Match.Paused, "Escape pauses combat");
+            var frozen=game.Match.Enemies.Select(e=>(e.Id,e.Distance,e.Health)).ToArray();var frozenShots=game.Match.Shots.Select(s=>(s.Id,s.Age)).ToArray();
+            await Click(Pad(6));await Button("SELL");Check(game.Match.Towers[6]==null && game.Match.Funds==112,"Paused pointer sale");
+            await Button("Shop Machine");await Click(Pad(6));Check(game.Match.Towers[6]!=null && game.Match.Funds==37,"Paused pointer build");
+            await Click(Pad(6));await Button("Upgrade 0");Check(game.Match.Funds==37 && game.Match.Towers[6].Definition.tier==1,"Disabled upgrade consumed funds");
+            rotation=game.battleCamera.transform.rotation;await Key(UnityEngine.InputSystem.Key.E);Check(Quaternion.Angle(rotation,game.battleCamera.transform.rotation)>1,"Camera blocked during pause");
+            Check(frozen.SequenceEqual(game.Match.Enemies.Select(e=>(e.Id,e.Distance,e.Health))) && frozenShots.SequenceEqual(game.Match.Shots.Select(s=>(s.Id,s.Age))),"Combat advanced during paused pointer management");
+            await Click(new Vector2(Screen.width*.5f,Screen.height*.5f),2);
             await Button("RESUME"); Check(!game.Match.Paused, "mouse resumes combat");
             await Key(UnityEngine.InputSystem.Key.Escape); await Button("RETRY");
             Check(game.Match.Wave == 0 && game.Match.Funds == 300 && game.Match.Lives == 20, "pause Restart resets match");

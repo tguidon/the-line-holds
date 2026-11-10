@@ -2,7 +2,7 @@
 
 November 9, 2026. This expands the initial prototype into a ten-wave battlefield. Final player playtesting is roadmap step 7; this is the baseline to evaluate, not a claim of finished balance.
 
-Start with 300 funds and 20 lives. Build on the ten clearings, click a deployed tower to upgrade it, and call the next wave when ready. Orders work during combat. Each escape costs one life. Wave completion pays 70, 80, …, 160 funds exactly once. A victory scores three stars at 18–20 lives, two at 10–17, and one at 1–9. The 1x/2x control changes game pace; pause stops combat and orders.
+Start with 300 funds and 20 lives. Build on the ten clearings, click a deployed tower to upgrade it, and call the next wave when ready. Orders work during combat. Each escape costs one life. Wave completion pays 70, 80, …, 160 funds exactly once. A victory scores three stars at 18–20 lives, two at 10–17, and one at 1–9. The 1x/2x control changes game pace; pause freezes combat while tower management and camera controls remain available.
 
 ## Enemies
 
@@ -55,4 +55,4 @@ The Kingdom Rush reference informed upgrade specializations, complementary count
 
 ## Playtest interface
 
-The top left shows lives, supplies and the current wave. The top right holds speed, pause, ambience mute and help. Build from the small bottom dock; click a deployed tower to inspect upgrades. Click ground, click the tower again, use the close button, right-click or press Escape to deselect. Escape cancels selection before pausing. Wave intel is available beside Send wave; it is not a persistent briefing. Camera buttons and shortcuts are in Help. All upgrade tiers and specializations now have distinct authored models.
+The top left shows lives, supplies and the current wave. The top right holds speed, pause/resume, ambience mute, help and a small Options panel for restarting or returning to the menu. Build from the small bottom dock; click a deployed tower to inspect upgrades. Click ground, click the tower again, use the close button, right-click or press Escape to deselect. Escape cancels selection before pausing. Wave intel is available beside Send wave; it is not a persistent briefing. Camera buttons and shortcuts are in Help. All upgrade tiers and specializations now have distinct authored models. Unaffordable upgrades show muted styling, a lock and the missing funds; they cannot be purchased. Starting another wave stays disabled during pause.

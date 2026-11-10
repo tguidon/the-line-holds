@@ -196,5 +196,10 @@
     },
     "startup_log_note": "Unused stripped URP DOF/Panini pass notices remain; authored grade does not use them."
   },
-  "startup_corrections": "startup-fixes.json"
+  "startup_corrections": "startup-fixes.json",
+  "latest_pending_native_review": {
+    "record": "tactical-pause-scenery.json",
+    "runtime_source_sha256": "60a42fb50dd61273a943e9fc38db380ee12369718e1cde8aadc694b5f7f6128d",
+    "status": "Editor checks and separate review builds passed; native launch deferred while user playtests existing release."
+  }
 }

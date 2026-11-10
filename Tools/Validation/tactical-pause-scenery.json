@@ -1,0 +1,112 @@
+{
+  "date": "2026-11-10",
+  "unity": "6000.6.7f1",
+  "runtime_source_sha256": "60a42fb50dd61273a943e9fc38db380ee12369718e1cde8aadc694b5f7f6128d",
+  "source_hash_method": "Sorted UTF-8 paths relative to Assets/TheLineHolds/Scripts, each followed by file bytes",
+  "checkpoints": {
+    "pause_and_locked_upgrades": "8c8bb07",
+    "countryside": "3c63c1e"
+  },
+  "checks": {
+    "tactical-orders-final": {
+      "passed": true,
+      "result": "PASS paused build/upgrade/sale, prices and guard; spawning/movement/health/shots/reloads remain frozen"
+    },
+    "tactical-core": {
+      "passed": true,
+      "result": "PASS economy, invalid purchases, sale rounding, paused wave gates, wave overlap and pause freeze\nPASS unguarded defeat, kill/escape accounting, terminal freeze, all rating boundaries\nPASS final-escape defeat priority\nPASS stable targeting, splash damage, simultaneous lethal shots, exactly-once kill and wave rewards\nPASS squad totals/formation, armor resistance/priority, cluster targeting, actual single-target and multi-target projectile damage\n"
+    },
+    "tactical-campaign": {
+      "passed": true,
+      "result": "PASS ten waves/seven archetypes, announced composition, seeded variety, upgrade branches/accounting/guards, mixed-speed vehicle spacing 2.76m"
+    },
+    "tactical-disabled": {
+      "passed": true,
+      "result": "PASS unaffordable upgrade visibly locked with shortfall"
+    },
+    "tactical-play-final": {
+      "passed": true,
+      "result": "PASS live pause without modal; inspect/build/upgrade/sell and camera; disabled upgrade rejects click; world frozen then resumes"
+    },
+    "tactical-input-final": {
+      "passed": true,
+      "result": "PASS frame-driven mouse placement/inspection/selling, rejected purchases, right-click, Escape priority, close zoom limits, orbit/modifier-drag/pan/reset buttons and keys, rotated placement, UI scroll isolation, wave start, pause/resume/restart/menu"
+    },
+    "tactical-landscape-check": {
+      "passed": true,
+      "result": "PASS core sites unchanged; 16 varied structures / 6 types; all 22 road chains connected; 80 grass tiles / 275160 vertices; styled materials"
+    },
+    "tactical-seam": {
+      "passed": true,
+      "result": "PASS core/outer pasture pigment seam: RGBA(0.506, 0.545, 0.353, 1.000) versus RGBA(0.489, 0.531, 0.340, 1.000)"
+    },
+    "tactical-balance": {
+      "passed": true,
+      "result": "strategy=0 seed=1944: Victory wave=10 lives=20 kills=459 escapes=0 funds=232 upgrades=20 seconds=823 finalDepth=79 % rear=181\nstrategy=0 seed=42: Victory wave=10 lives=18 kills=457 escapes=2 funds=190 upgrades=20 seconds=828 finalDepth=100 % rear=205\nstrategy=0 seed=2026: Victory wave=10 lives=19 kills=458 escapes=1 funds=228 upgrades=20 seconds=829 finalDepth=95 % rear=203\nstrategy=1 seed=1944: Defeat wave=10 lives=0 kills=342 escapes=20 funds=2191 upgrades=0 seconds=655 finalDepth=100 % rear=20\nstrategy=1 seed=42: Defeat wave=9 lives=0 kills=331 escapes=20 funds=1987 upgrades=0 seconds=668 finalDepth=0 % rear=0\nstrategy=1 seed=2026: Defeat wave=9 lives=0 kills=331 escapes=20 funds=1972 upgrades=0 seconds=664 finalDepth=0 % rear=0\nstrategy=2 seed=1944: Defeat wave=6 lives=0 kills=174 escapes=20 funds=84 upgrades=8 seconds=360 finalDepth=0 % rear=0\nstrategy=2 seed=42: Defeat wave=6 lives=0 kills=174 escapes=20 funds=84 upgrades=8 seconds=365 finalDepth=0 % rear=0\nstrategy=2 seed=2026: Defeat wave=6 lives=0 kills=174 escapes=20 funds=84 upgrades=8 seconds=349 finalDepth=0 % rear=0\nstrategy=3 seed=1944: Defeat wave=2 lives=0 kills=26 escapes=20 funds=324 upgrades=0 seconds=97 finalDepth=0 % rear=0\nstrategy=3 seed=42: Defeat wave=2 lives=0 kills=25 escapes=20 funds=320 upgrades=0 seconds=95 finalDepth=0 % rear=0\nstrategy=3 seed=2026: Defeat wave=2 lives=0 kills=33 escapes=20 funds=352 upgrades=0 seconds=108 finalDepth=0 % rear=0\nstrategy=4 seed=1944: Victory wave=10 lives=20 kills=459 escapes=0 funds=382 upgrades=19 seconds=731 finalDepth=95 % rear=150\nstrategy=4 seed=42: Victory wave=10 lives=15 kills=454 escapes=5 funds=317 upgrades=19 seconds=734 finalDepth=100 % rear=157\nstrategy=4 seed=2026: Victory wave=10 lives=18 kills=457 escapes=2 funds=340 upgrades=19 seconds=741 finalDepth=100 % rear=172\nstrategy=5 seed=1944: Victory wave=10 lives=20 kills=459 escapes=0 funds=232 upgrades=20 seconds=717 finalDepth=81 % rear=85\nstrategy=5 seed=42: Victory wave=10 lives=18 kills=457 escapes=2 funds=190 upgrades=20 seconds=769 finalDepth=100 % rear=197\nstrategy=5 seed=2026: Victory wave=10 lives=20 kills=459 escapes=0 funds=232 upgrades=20 seconds=747 finalDepth=81 % rear=101\n"
+    }
+  },
+  "builds": [
+    {
+      "buildId": "build_2fcc8652a449",
+      "result": "Succeeded",
+      "platform": "StandaloneOSX",
+      "outputPath": "/Users/tguidon/Developer/the-line-holds/TheLineHolds/Builds/macOS-Review/The Line Holds.app",
+      "totalSizeBytes": 381609065,
+      "buildTimeMs": 16215,
+      "totalWarnings": 0,
+      "totalErrors": 0
+    },
+    {
+      "buildId": "build_3a2108e8268d",
+      "result": "Succeeded",
+      "platform": "StandaloneWindows64",
+      "outputPath": "/Users/tguidon/Developer/the-line-holds/TheLineHolds/Builds/Windows-Review/The Line Holds.exe",
+      "totalSizeBytes": 406885950,
+      "buildTimeMs": 12922,
+      "totalWarnings": 0,
+      "totalErrors": 0
+    }
+  ],
+  "console": {
+    "captured_counts": {
+      "error": 0,
+      "warn": 19,
+      "log": 9
+    },
+    "final_ground_truth": {
+      "sampledUtc": "2026-11-10T23:56:45.637532Z",
+      "ageMs": 137,
+      "compilationFailed": false,
+      "compiling": false,
+      "consoleErrors": 0,
+      "consoleWarnings": 0,
+      "consoleLogs": 2,
+      "seeded": true
+    },
+    "warnings": "Historical compiler warnings for deprecated PlayerSettings icon APIs; no console errors."
+  },
+  "native_review": {
+    "new_player_launched": false,
+    "reason": "User is still playtesting; do not relaunch or replace the active app.",
+    "existing_release_pid_verified": 75590,
+    "existing_executable_sha256_unchanged": "0afd5c5214e970f72ff0dd6b3589d37cef4cc0d202dbd7a80889de0efa25597a",
+    "next_mac_launch": "TheLineHolds/Builds/macOS-Review/The Line Holds.app",
+    "windows_execution": "Deferred to future VM"
+  },
+  "scenery": {
+    "structures": 16,
+    "types": 6,
+    "road_chains": 22,
+    "grass_tiles": 80,
+    "grass_vertices": 275160,
+    "core_route_and_sites": "Unchanged"
+  },
+  "captures": [
+    "tactical-pause.png",
+    "countryside-panorama.png",
+    "countryside-village.png",
+    "countryside-farm.png"
+  ],
+  "capture_scope": "Editor Play Mode; pause is a funded inspection fixture; village/farm are temporary close cameras, not native campaign evidence.",
+  "roadmap_step_7": "In progress"
+}
