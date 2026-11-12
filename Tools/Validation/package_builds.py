@@ -14,7 +14,11 @@ if args.version:
     for binary in (builds/'Windows'/'The Line Holds.exe', builds/'macOS'/'The Line Holds.app'/'Contents'/'MacOS'/'The Line Holds'):
         if not binary.is_file():
             parser.error(f'Missing release player: {binary}')
-    subprocess.run(['codesign','--verify','--deep','--strict',str(builds/'macOS'/'The Line Holds.app')],check=True)
+    app=builds/'macOS'/'The Line Holds.app'
+    developer_id='anchor apple generic and certificate leaf[field.1.2.840.113635.100.6.1.13] exists'
+    subprocess.run(['codesign','--verify','--deep','--strict','-R='+developer_id,str(app)],check=True)
+    subprocess.run(['xcrun','stapler','validate',str(app)],check=True)
+    subprocess.run(['syspolicy_check','distribution',str(app)],check=True)
 packages.mkdir(exist_ok=True)
 prefix=f'The-Line-Holds-{args.version}' if args.version else 'The-Line-Holds'
 win_zip=packages/(f'{prefix}-Windows-x64.zip' if args.version else f'{prefix}-Windows.zip')

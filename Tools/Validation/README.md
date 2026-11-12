@@ -67,15 +67,12 @@ Build separate review outputs with `unity command build run --target StandaloneO
 
 Set the game version in Unity Player Settings and increment the macOS build number. The scene and identity generators preserve these values. Build both players with development options off into a fresh directory, for example `Builds/Release-0.0.1/macOS/The Line Holds.app` and `Builds/Release-0.0.1/Windows/The Line Holds.exe`.
 
-The Apple silicon 0.0.1 build uses an ad-hoc signature. Unity's architecture processing invalidated four bundled framework signatures. For this ad-hoc build, the repair before packaging was:
+For a public GitHub release, use a Developer ID Application identity with its private key in the login keychain. Save notarization credentials once in Terminal with `xcrun notarytool store-credentials TheLineHolds-notary`. The signing tool reads that named profile from Keychain.
 
 ```sh
 app='TheLineHolds/Builds/Release-0.0.1/macOS/The Line Holds.app'
-for framework in "$app"/Contents/Frameworks/*.dylib; do
-  codesign --verify --strict "$framework" 2>/dev/null || codesign --force --sign - --preserve-metadata=identifier,entitlements,flags "$framework" || exit 1
-done
-codesign --force --sign - --preserve-metadata=identifier,entitlements,flags "$app"
+Tools/Validation/notarize_mac.sh "$app" 'Developer ID Application: YOUR NAME (TEAMID)' TheLineHolds-notary
 python3 Tools/Validation/package_builds.py --builds TheLineHolds/Builds/Release-0.0.1 --version 0.0.1
 ```
 
-Release packaging checks the app signature and requires both binaries. Extract the macOS ZIP and launch its app to check the version and graphics backend in the player log. The Windows ZIP includes the executable, its data folder and the runtime libraries.
+If a submission is interrupted after upload, use the printed submission ID with `xcrun notarytool info` or `log` and the same keychain profile. After acceptance, staple the ticket to the submitted app and validate it before packaging. Extract the final ZIP in a fresh directory, run `syspolicy_check distribution` on the extracted app, and launch it to check the player log for the main menu on Metal. For a signing-only replacement, use the original version tag and the original Windows ZIP.
