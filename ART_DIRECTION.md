@@ -51,3 +51,11 @@ Startup and Reset now fit the playable route, sites and endpoint landmarks to th
 ## Connected countryside refinement
 
 Surrounding pasture shares the core's grass-tuft scale, pigment and leaf materials. Roads form a connected village network and terminate at yards, junctions or the map boundary. Original stone cottages, an inn, dairy, open tool sheds and wells vary the skyline; all building facades have window detail and roofs have visible courses. Hedges, fenced crop plots and an orchard give the land a purpose. Retain the core battle route and placement anchors. `RefineCountryside.All` replaces only the surrounding scenery through the Editor, using `CountrysideLayout` and `PastureDetail`. Grass and static scenery are spatially batched for culling.
+
+## Normandy miniatures at gameplay zoom
+
+The battle road runs from a brick-pier farm gate and parked cart to a slate-roofed sentry box with a recognition flag and raised barrier. Wheel wear fades over harder ground. Limestone chips collect at the shoulders. White survey stakes and a broken timber rim mark the ten tamped gun sites. Keep the wildflowers, walling and supplies near field boundaries so the centre of a fight has a quiet background.
+
+Machine guns sit on open tripods, anti-tank guns carry a shield and long barrel, and mortars show an elevated open bore above a braced bed. Specialist tubes recoil with their mechanisms. The twin suppressor and barrage mounts alternate muzzle sockets on successive shots. Straight tracers, heavier shell streaks and a short smoke tail on the mortar arc use the simulation’s existing flight times. Ground-level dust spreads with the actual blast radius.
+
+Regenerate models with the Blender generator, then use **The Line Holds → Visuals → Refresh Historic Miniatures** in the Countryside scene. This rebuilds the actor prefabs, field dressing, ground pigment, material finishes and lighting. The farm cart and sentry box are authored within the FieldGate and Checkpoint Blender scenes.

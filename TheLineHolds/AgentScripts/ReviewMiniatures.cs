@@ -92,14 +92,6 @@ public static class ReviewMiniatures
             if (g.Match.Towers[3].Definition.tier != 2) throw new Exception("Veteran purchase failed");
             g.Cancel();
             g.StartNextWave();
-            if (pass == "after")
-            {
-                await Wait.Until(() => g.Match.Enemies.Count >= 8 && g.combatEffects.ActiveProjectiles > 0, timeoutMs: 50000, because: "cluster under fire");
-                Time.timeScale = 1;
-                CaptureFrame("wave");
-                await Task.Delay(250);
-            }
-            Time.timeScale = 3;
             await FinishWave();
             return $"{pass}, {Screen.width}x{Screen.height}, zoom {g.battleCamera.orthographicSize:F3}, wave 2 sample {fps:F1} fps, {g.Match.CompletedWaves} waves, {g.Match.Lives} lives, {g.Match.Killed} kills, {g.Match.Escaped} escapes; MG, AT, mortar placed, veteran MG purchased";
         }

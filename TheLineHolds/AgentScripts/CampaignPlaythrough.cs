@@ -10,7 +10,7 @@ void Check(bool v,string m){if(!v)throw new Exception(m);}
 var seen=new HashSet<string>();int upgrades=0,peakEnemies=0,peakCorpses=0,peakVoices=0;float depth=0,audioPeak=0;int rear=0;var samples=new float[1024];
 int[] pads={3,4,6,7,5,1,8,2,9,0},types={0,0,2,1,2,0,1,2,1,0};
 int startedFrame=Time.frameCount;float started=Time.realtimeSinceStartup;int projectileObjects=g.combatEffects.ProjectileObjectsCreated;
-bool captured=false,inspection=false,normalSample=false;float normalUntil=0,sampleStarted=0,sampleFPS=0;int sampleFrame=0;
+bool capturedFinal=false,captured=false,inspection=false,normalSample=false;float normalUntil=0,sampleStarted=0,sampleFPS=0;int sampleFrame=0;
 g.Match.Journal+=m=>Debug.Log("[Campaign playthrough] "+m);
 g.Match.Cue+=(cue,p)=>{if(cue=="fire" && g.Match.Wave==10 && p.x>4)rear++;};
 Time.timeScale=4;
@@ -39,6 +39,11 @@ try
    if(!normalSample && g.Match.Wave>=8 && g.Match.Enemies.Count>=12){normalSample=true;Time.timeScale=1;sampleStarted=Time.realtimeSinceStartup;sampleFrame=Time.frameCount;normalUntil=sampleStarted+3;}
    if(normalUntil>0 && Time.realtimeSinceStartup>=normalUntil){sampleFPS=(Time.frameCount-sampleFrame)/(Time.realtimeSinceStartup-sampleStarted);Time.timeScale=4;normalUntil=0;}
    if(!captured && g.Match.Wave>=8 && g.Match.Enemies.Count>=12 && g.EnemyViews.RetiringCount>0){ScreenCapture.CaptureScreenshot(System.IO.Path.Combine(System.IO.Path.GetTempPath(),"campaign-native-combat.png"));captured=true;}
+   if(!capturedFinal && g.Match.Wave==10 && g.Match.Enemies.Count>=18 && g.combatEffects.ActiveProjectiles>=3)
+   {
+    ScreenCapture.CaptureScreenshot(System.IO.Path.Combine(System.IO.Path.GetTempPath(),"campaign-final-crossfire.png"));
+    capturedFinal=true;
+   }
    bool money=g.Match.Towers.Where(t=>t!=null).Any(t=>{int option=t.Definition.role==DefenseRole.Mortar?1:0;if(t.Definition.upgrades.Length==1)option=0;return option<t.Definition.upgrades.Length && t.Definition.upgrades[option].price<=g.Match.Funds;});
    int next=Array.FindIndex(pads,p=>g.Match.Towers[p]==null);if(next>=0 && g.Match.Funds>=g.defenses[types[next]].cost)money=true;
    return g.Match.Ended || g.Match.Phase==MatchPhase.Preparation || money;

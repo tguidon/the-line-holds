@@ -124,3 +124,25 @@ The first review exposed blank rear building walls and smooth roofs. The final p
 | Feedback visibility | 4/5 | Purchase feedback continues during pause while combat effects remain frozen. |
 
 Scores are internal assessments, not user approval. New native acceptance awaits the user's next launch; no frame-rate claim is made for the additional scenery yet.
+
+## Historical miniature pass, November 12
+
+The matched 1600×900 Play Mode views use the reset gameplay camera at orthographic size 8.839, seed 42, and the same three purchases after wave one. The west entrance has paired brick piers, paving and a parked cart. The defended east checkpoint has a painted sentry box, flag and striped boom. The winding road, all ten staked sites, and the gaps between them are visible in the frame.
+
+| Check | Result |
+| --- | --- |
+| Matched wave-two performance | 60.0 fps before and 60.0 fps after over eight wall-clock seconds at 1×, starting with four enemies active. This measures delivered Editor frames at its 60 Hz cadence. |
+| Three-wave comparison | Both runs finished with 16 lives, 90 kills and four escapes. Placement used starting supplies and wave income. Both purchased a veteran MG during preparation. |
+| Weapons and units | All twelve tower prefabs traverse and fire along the tested headings. Both twin mounts alternate sockets. The seven enemy classes have supported materials. Infantry stride, hit, fall and pooled reuse pass. |
+| Map and input | Ten original anchors, both endpoint markers and a three-lane vehicle corridor sweep pass. Frame-driven mouse placement, rejected purchases, inspection, selling, camera controls, tactical pause and upgrading pass. |
+| Combat feedback | Thirty repeated shots use the original 32 pooled projectiles and eight emitters. Shot events match each impact; pause, recoil recovery and cleanup pass. |
+
+At overview scale the MG reads as a drum-fed tripod, the anti-tank gun as a shield and long barrel, and the mortar as an open tube on a wide bed. Runners carry a dispatch satchel and take longer strides. Riflemen carry packs and rifles, while assault troops carry a bedroll and compact weapon. The canvas truck, wheeled scout car, tracked light tank and skirted heavy tank retain their distinct running gear.
+
+The camera review prompted a second pass on sign occlusion, uninterrupted wheel grooves and the sentry box’s blank side. Internal ratings on a five-point scale moved from 3 to 4 for lighting depth, silhouette and feedback visibility. Palette and style moved from 3 to 4. The existing HUD remains at 3.
+
+The capture driver is `ReviewMiniatures.Capture`. The display check is `ReviewMiniatures.InspectModels`. Authoring followed the project’s Blender generator, the craft references for art direction, scene lighting, VFX and visual scoring, and Pipeline’s scripts, capture, build/compilation and editor lifecycle references.
+
+The full Play Mode campaign reached victory with 18 lives, 457 kills, two escapes and 20 earned upgrades across all seven enemy classes. Peak live enemy count was 39. The three-second normal-speed wave-eight sample also recorded 60.0 fps. The rest of this campaign ran at 4× for verification. The selected final-wave frame was requested with 18 enemies, three live projectiles and 85 particles. The before, after and busy-wave PNGs are in `TheLineHolds/Screenshots/miniatures-*.png`.
+
+The macOS and Windows review players both built with zero warnings and zero errors. Gameplay and frame measurements above are from the macOS Unity Editor. Windows runtime verification remains outstanding.
