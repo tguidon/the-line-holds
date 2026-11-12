@@ -82,19 +82,19 @@ namespace TheLineHolds.Editor
             foreach(var guid in AssetDatabase.FindAssets("t:Mesh",new[]{DioramaSurface.Root}))
             {var path=AssetDatabase.GUIDToAssetPath(guid);string name=Path.GetFileNameWithoutExtension(path);if(name.StartsWith("Scenery ") && !used.Contains(name))AssetDatabase.DeleteAsset(path);}
         }
-        static Texture2D Paint()
+        internal static Texture2D Paint()
         {
-            const int n=2048;var pixels=new Color32[n*n];Color moss=DioramaSurface.Hex("607044"),grass=DioramaSurface.Hex("85905B"),straw=DioramaSurface.Hex("A4A273"),road=DioramaSurface.Hex("AF9D76");
+            const int n=2048;var pixels=new Color32[n*n];Color straw=DioramaSurface.Hex("ADAB75"), yard=DioramaSurface.Hex("A29370");
             var fields=new[]{new Vector2(-27,3),new Vector2(-20,-21),new Vector2(24,8)};
             var roadDistance=CountrysideLayout.RasterRoads(n,Extent);
             for(int z=0;z<n;z++)for(int x=0;x<n;x++)
             {
-                float px=x*180f/(n-1)-90,pz=z*180f/(n-1)-90;float noise=Mathf.PerlinNoise(px*.28f+43,pz*.28f+17),fine=Mathf.PerlinNoise(px*8+17,pz*8+9);
-                var c=Color.Lerp(moss,grass,Mathf.SmoothStep(.1f,.9f,noise));c=Color.Lerp(c,straw,Mathf.SmoothStep(.54f,.83f,Mathf.PerlinNoise(px*.8f+5,pz*.8f+32))*.35f);
+                float px=x*180f/(n-1)-90,pz=z*180f/(n-1)-90;float fine=Mathf.PerlinNoise(px*8+17,pz*8+9);
+                var c=FieldPigment.Grass(px,pz);
                 float distance=roadDistance[z*n+x];float edge=.9f+(Mathf.PerlinNoise(px*3+80,pz*3+80)-.5f)*.12f;
                 float lane=1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(edge-.08f,edge+.18f,distance));
-                var track=Color.Lerp(road,DioramaSurface.Hex("8F805F"),Mathf.Exp(-Mathf.Pow((distance-.37f)/.12f,2))*.22f);c=Color.Lerp(c,track,lane);
-                if(Mathf.Abs(px)<35 && Mathf.Abs(pz)<30)c=Color.Lerp(c,DioramaSurface.Hex("A29370"),CountrysideLayout.YardWeight(new Vector2(px,pz))*.72f);
+                if(lane>0)c=Color.Lerp(c,FieldPigment.Road(px,pz,distance,px),lane);
+                if(Mathf.Abs(px)<35 && Mathf.Abs(pz)<30)c=Color.Lerp(c,yard,CountrysideLayout.YardWeight(new Vector2(px,pz))*.72f);
                 float field=0;foreach(var center in fields){float dx=Mathf.Abs(px-center.x),fieldZ=Mathf.Abs(pz-center.y);field=Mathf.Max(field,(1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(4,5,dx)))*(1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(2.5f,3.5f,fieldZ))));}c=Color.Lerp(c,straw,field*.18f);c*=.965f+fine*.07f;pixels[z*n+x]=c;
             }
             var texture=new Texture2D(n,n,TextureFormat.RGB24,true);texture.SetPixels32(pixels);texture.Apply();string path=DioramaSurface.Root+"/SurroundingPasture.png";File.WriteAllBytes(path,texture.EncodeToPNG());UnityEngine.Object.DestroyImmediate(texture);AssetDatabase.ImportAsset(path);

@@ -35,6 +35,11 @@ def part(name,loc,scale,mat='Olive',shape='cube',rot=None,edge=None):
 def barrel(loc,length=.8,r=.045,angle=0):
  return part('Barrel',loc,(r,r,length/2),'Steel','cylinder',(math.pi/2+angle,0,0))
 
+def beam(name,a,b,width,depth,material):
+ delta=Vector(b)-Vector(a)
+ return part(name,(Vector(a)+Vector(b))/2,(width,depth,delta.length/2),material,
+             rot=delta.to_track_quat('Z','Y').to_euler(),edge=.005)
+
 def tank():
  for x in [-.45,.45]:
   part('Track',(x,0,.24),(.15,.7,.19),'Dark')
@@ -56,6 +61,10 @@ def tank():
  for x in [-.24,.24]:
   part('Exhaust',(x,-.63,.54),(.045,.045,.12),'Steel','cylinder',(math.pi/2,0,0))
   part('Headlight',(x,.635,.52),(.052,.025,.052),'Sand','sphere')
+ for x in [-.41,.41]:
+  part('Mudguard',(x,0,.46),(.19,.71,.025),'Edge',edge=.012)
+ part('Rolled tarpaulin',(-.18,-.45,.74),(.09,.09,.20),'Sand','cylinder',(0,math.pi/2,0))
+ for x in [-.28,-.08]:part('Lashing',(x,-.45,.74),(.096,.096,.016),'Leather','cylinder',(0,math.pi/2,0))
  part('Stowage roll',(.28,-.4,.74),(.12,.17,.075),'Cloth','sphere')
  for y in [-.49,-.32]:part('Stowage strap',(.28,y,.74),(.125,.015,.08),'Leather')
 
@@ -83,6 +92,8 @@ def infantry():
  part('Pack',(0,-.155,.6),(.135,.07,.14),'Sand')
  for x in [-.115,.115]:part('Pack strap',(x,.134,.6),(.018,.014,.14),'Leather',rot=(0,x,0))
  for x in [-.12,.12]:part('Belt pouch',(x,.15,.46),(.05,.033,.05),'Sand')
+ part('Canteen',(-.16,-.12,.46),(.068,.045,.08),'Steel','sphere')
+ part('Pack flap',(0,-.20,.69),(.143,.04,.045),'Leather')
  part('Rifle stock',(.18,.16,.49),(.03,.16,.035),'Wood');barrel((.18,.32,.57),.48,.023)
  limb('Carry',[o for o in bpy.context.scene.objects if o.type=='MESH' and o.name.startswith(('Sleeve','Hand','Rifle stock','Barrel'))],(0,0,.6))
 
@@ -91,11 +102,15 @@ def scout():
  for o in list(bpy.context.scene.objects):
   if o.type=='MESH' and (o.name.startswith('Pack') or o.name.startswith('Helmet')):bpy.data.objects.remove(o,do_unlink=True)
   elif o.type=='MESH' and o.name.startswith(('Coat','Sleeve','Trouser')):o.data.materials[0]=materials['Sand']
+ part('Dispatch satchel',(-.18,-.07,.49),(.08,.085,.11),'Leather',rot=(.12,0,.2))
+ part('Dispatch strap',(0,.133,.59),(.028,.015,.18),'Leather',rot=(0,.62,0))
  part('Field cap',(0,0,.95),(.125,.13,.055),'Cloth','sphere')
  part('Cap peak',(0,.12,.93),(.11,.075,.015),'Cloth')
 
 def assault():
  infantry()
+ part('Blanket roll',(0,-.215,.75),(.09,.09,.21),'Cloth','cylinder',(0,math.pi/2,0))
+ for x in [-.13,.13]:part('Bedroll webbing',(x,-.215,.75),(.098,.098,.018),'Leather','cylinder',(0,math.pi/2,0))
  part('Armored vest',(0,.13,.57),(.16,.045,.14),'Steel',edge=.012)
  for x in [-.2,.2]:part('Shoulder pad',(x,.02,.76),(.09,.11,.05),'Olive','sphere')
 
@@ -113,12 +128,18 @@ def vehicle(kind):
   part('Windshield',(0,.745,.71),(.27,.012,.1),'WindowGlass',edge=.003)
   part('Bonnet',(0,.8,.49),(.34,.15,.12),'Olive',edge=.018)
   part('Canvas bed',(0,-.32,.65),(.37,.48,.28),'Sand',edge=.07)
-  for y in [-.7,-.35,0]:part('Canvas rib',(0,y,.91),(.375,.014,.024),'Leather')
+  for y in [-.70,-.32,.06]:
+   part('Canvas hoop',(0,y,.925),(.35,.018,.012),'Cloth')
+   for x in [-.37,.37]:beam('Canvas tie',(x,y-.035,.44),(x,y,.85),.013,.012,'Leather')
+  part('Cab visor',(0,.72,.89),(.365,.09,.022),'Edge',rot=(.12,0,0))
+  for x in [-.345,.345]:part('Side glass',(x,.46,.73),(.012,.16,.09),'WindowGlass')
   part('Tailgate',(0,-.825,.48),(.38,.03,.14),'Wood')
  else:
   part('Angled hull',(0,0,.53),(.38,.69,.22),'Edge',edge=.04)
   part('Scout turret',(0,-.1,.8),(.22,.22,.13),'Olive','cylinder')
   barrel((0,.3,.83),.65,.035)
+  part('Spare tyre',(0,-.46,.785),(.155,.155,.052),'Dark','cylinder')
+  part('Spare rim',(0,-.46,.839),(.09,.09,.014),'Edge','cylinder')
   part('Aerial',(-.24,-.42,.98),(.012,.012,.3),'Steel','cylinder')
   part('Hatch',(0,-.1,.94),(.12,.12,.02),'Steel','cylinder')
  for x in [-.25,.25]:part('Headlight',(x,.9,.5),(.045,.025,.045),'Sand','sphere')
@@ -128,6 +149,10 @@ def heavy_tank():
  part('Turret cheek L',(-.28,.11,.78),(.09,.3,.14),'Steel',edge=.018)
  part('Turret cheek R',(.28,.11,.78),(.09,.3,.14),'Steel',edge=.018)
  part('Heavy muzzle',(0,1.28,.82),(.08,.11,.08),'Steel')
+ for x in [-.56,.56]:
+  for y in [-.46,0,.46]:
+   part('Skirt plate',(x,y,.43),(.043,.218,.18),'Steel',rot=(0,x*.13,0),edge=.012)
+ part('Commander cupola',(-.09,-.02,1.025),(.135,.135,.072),'Edge','cylinder')
  root=bpy.data.objects.new('Heavy chassis',None);bpy.context.collection.objects.link(root)
  for o in list(bpy.context.scene.objects):
   if o!=root and o.parent is None:o.parent=root
@@ -140,12 +165,29 @@ def bags(radius=.68,count=14):
   for i in range(count):
    angle=(i+row*.5)*math.tau/count
    r=radius+rng.uniform(-.008,.008)
-   part('Sandbag',(math.cos(angle)*r,math.sin(angle)*r,.10+row*.155),(.163,.115,.09),'BagCloth','sphere',(.025*math.sin(i),.02*math.cos(i),angle+math.pi/2))
+   bag=part('Sandbag',(math.cos(angle)*r,math.sin(angle)*r,.082+row*.128),
+            (.172,.118,.084),'BagCloth','sphere',(.035*math.sin(i),.045*math.cos(i),angle+math.pi/2))
+   for vertex in bag.data.vertices:
+    # Flatten the bearing faces and gather the cloth at each stitched end.
+    u=abs(vertex.co.x)/.172
+    vertex.co.y*=1.22-.45*u**3
+    vertex.co.z=max(-.065,min(.065,vertex.co.z*(1.32-.5*u*u)))+.012*u**4
 
 def gun(kind):
  bags(.79,16) if kind=='AntiTank' else bags()
+ # Sleepers and spent packing sit beneath each moving carriage.
+ for x in [-.31,.31]:part('Oak sleeper',(x,0,.044),(.085,.45,.045),'Wood',edge=.009)
+ if kind=='MachineGun':
+  part('Ready belt chest',(-.40,-.22,.17),(.12,.22,.10),'ShedPaint')
+  part('Chest lid',(-.40,-.22,.28),(.14,.23,.021),'Edge')
+ elif kind=='Mortar':
+  for i in range(3):
+   part('Shell in ready rack',(.30+i*.063,-.18,.17),(.035,.035,.145),'Badge','sphere',(.36,0,0))
  before=set(bpy.context.scene.objects)
  if kind=='MachineGun':
+  for x,y in [(-.26,-.21),(.26,-.21),(0,.34)]:
+   beam('Tripod leg',(x,y,.095),(0,0,.46),.027,.031,'Edge')
+  part('Drum magazine',(-.155,.085,.56),(.14,.14,.074),'ShedPaint','cylinder',(0,math.pi/2,0))
   part('Mount',(0,0,.29),(.045,.045,.26),'Steel','cylinder')
   part('Receiver',(0,.13,.55),(.095,.24,.08),'Steel');barrel((0,.56,.56),.48,.035)
   part('Heat sleeve',(0,.49,.56),(.052,.052,.16),'Dark','cylinder',(math.pi/2,0,0))
@@ -166,8 +208,12 @@ def gun(kind):
   for x in [-.32,.32]:
    for z in [.4,.68]:part('Shield rivet',(x,.108,z),(.018,.014,.018),'Edge','sphere')
   for x in [-.2,.2]:part('Trail',(x,-.32,.18),(.045,.24,.045),'Steel',rot=(0,0,x))
+  part('Panoramic sight',(-.31,-.07,.79),(.040,.07,.12),'Steel')
+  part('Sight eyepiece',(-.31,-.1,.90),(.05,.08,.035),'Badge')
   part('Elevation handwheel',(.19,-.2,.52),(.09,.09,.02),'Steel','cylinder',(0,math.pi/2,0))
  else:
+  for x in [-.24,.24]:
+   beam('Mortar bed brace',(x,-.26,.10),(x,.29,.22),.06,.05,'ShedPaint')
   part('Base plate',(0,0,.07),(.3,.3,.045),'Steel','cylinder');barrel((0,.1,.4),.7,.09,.65)
   part('Tube collar',(0,.28,.54),(.105,.105,.04),'Edge','cylinder',(math.pi/2+.65,0,0))
   for x in [-.2,.2]:part('Bipod',(x,.3,.25),(.025,.025,.28),'Steel','cylinder',(0,x,0))
@@ -197,12 +243,15 @@ def upgraded_gun(kind,branch=''):
   part('Armored receiver shield',(0,.35,.59),(.24,.035,.23),'Olive',edge=.015)
   part('Shield brass strip',(0,.31,.8),(.24,.025,.025),'Sand',edge=.004)
   if branch=='A':
+   for x in [-.28,.28]:part('High capacity feed drum',(x,-.06,.57),(.19,.19,.08),'ShedPaint','cylinder',(0,math.pi/2,0))
    for x in [-.13,.13]:barrel((x,.62,.6),.65,.045)
    part('Linked ammo box',(-.3,0,.45),(.12,.22,.15),'Olive')
   elif branch=='B':
+   part('Optic housing',(.14,.13,.86),(.055,.18,.055),'Edge')
    barrel((0,.8,.65),.98,.065);part('AP sight',(.12,.18,.88),(.025,.13,.025),'Steel')
  elif kind=='AntiTank':
   part('Reinforced gun shield',(0,.02,.66),(.49,.04,.36),'Steel',edge=.02)
+  for x in [-.45,.45]:part('Folding shield wing',(x,-.09,.64),(.13,.035,.26),'Olive',rot=(.16,0,-x*.8))
   for x in [-.4,.4]:part('Identification band',(x,-.026,.65),(.025,.018,.23),'Sand')
   if branch=='A':
    barrel((0,.97,.68),1.9,.085);part('Long range optics',(.28,-.1,.94),(.035,.17,.035),'Dark')
@@ -210,14 +259,16 @@ def upgraded_gun(kind,branch=''):
    barrel((0,.61,.7),1,.14);part('Heavy muzzle collar',(0,1.07,.7),(.19,.1,.18),'Dark')
  else:
   part('Elevated base',(0,0,.18),(.36,.36,.12),'Olive','cylinder')
+  for x in [-.3,.3]:beam('Platform outrigger',(x,-.23,.12),(x*.6,.21,.49),.045,.045,'Edge')
   if branch=='B':
    for x in [-.17,.17]:
     part('Twin mortar tube',(x,.16,.61),(.105,.105,.44),'Steel','cylinder',(math.pi/2+.65,0,0))
   elif branch=='A':part('Siege tube',(0,.18,.65),(.17,.17,.53),'Steel','cylinder',(math.pi/2+.65,0,0))
   else:part('Mortar armored collar',(0,.18,.5),(.15,.15,.11),'Olive','cylinder',(math.pi/2+.65,0,0))
+ slide=next(o for o in pivot.children if o.name.startswith('Recoil'))
  for obj in set(bpy.context.scene.objects)-before:
   # Kit uses the same authored coordinates as the mechanism, and traverses with it.
-  obj.parent=pivot
+  obj.parent=slide if obj.name.startswith(('Barrel','Twin mortar tube','Siege tube','Heavy muzzle collar')) else pivot
  muzzle=next(o for o in bpy.context.scene.objects if o.name.startswith('Muzzle socket'))
  if branch:
   muzzle.location=({'MachineGun':(0,.98,.6),'AntiTank':(0,1.94,.68),'Mortar':(0,.52,.94)} if branch=='A' else {'MachineGun':(0,1.31,.65),'AntiTank':(0,1.19,.7),'Mortar':(0,.43,.86)})[kind]
@@ -355,12 +406,22 @@ def combine_static(prefix):
 def gate():
  # Open farm entrance. The 1.8 m corridor accommodates armor without decorative intersections.
  for x in [-1,1]:
-  for row in range(3):part('Gate pier',(x*.99,0,.09+row*.17),(.14,.15,.08),'Masonry',edge=.009)
-  part('Pier coping',(x*.99,0,.55),(.18,.18,.04),'Masonry',edge=.009)
+  for row in range(6):
+   for col in [-1,1]:
+    centre=(x*1.17+col*.106,0,.10+row*.169) if row%2 else (x*1.17,col*.107,.10+row*.169)
+    size=(.103,.21,.079) if row%2 else (.21,.104,.079)
+    part('Brick pier',centre,size,'RoofClayLight' if (row+col)%3==0 else 'RoofClay',edge=.009)
+  part('Limestone plinth',(x*1.17,0,.075),(.25,.25,.075),'Masonry')
+  part('Pier lantern',(x*1.17,0,1.19),(.102,.10,.115),'Badge')
+  for dx in [-.095,.095]:
+   for dy in [-.095,.095]:part('Lamp iron',(x*1.17+dx,dy,1.20),(.012,.012,.12),'RoofTrim')
+  part('Lantern hood',(x*1.17,0,1.36),(.15,.15,.064),'RoofTrim','cone')
+  part('Pier coping',(x*1.17,0,1.055),(.245,.245,.045),'Masonry',edge=.009)
   part('Gate hinge',(x*.99,0,.77),(.055,.055,.2),'Wood',edge=.006)
   # Gate leaves lie open along the verge, rather than crossing the lane.
   for y in [-.26,-.75]:part('Open gate upright',(x*1.10,y,.39),(.04,.04,.36),'Wood',edge=.005)
   for z in [.22,.62]:part('Open gate rail',(x*1.10,-.5,z),(.035,.38,.035),'Wood',edge=.004)
+  beam('Gate diagonal',(x*1.10,-.86,.20),(x*1.10,-.14,.62),.026,.026,'Wood')
  combine_static('Farm gate')
 
 def checkpoint():
@@ -371,6 +432,29 @@ def checkpoint():
  # Raised boom stays above the road, with its support on the verge.
  part('Raised boom',(-1.04,0,1.10),(.035,.035,.55),'Sand',rot=(0,-.6,0),edge=.004)
  part('Boom hinge',(-1.04,0,.7),(.1,.09,.08),'Steel',edge=.008)
+ # Slatted sentry box on a battered stone sill, behind the crossing.
+ cx,cy=1.68,-.34
+ part('Sentry footing',(cx,cy,.08),(.46,.41,.08),'Masonry')
+ part('Sentry box',(cx,cy,.70),(.38,.34,.56),'ShedPaint')
+ for side in [-1,1]:
+  for j in range(7):part('Painted boards',(cx,cy+side*.342,.23+j*.155),(.38,.016,.013),'Shutter')
+  part('Observation window',(cx,cy+side*.362,.92),(.24,.012,.17),'WindowGlass')
+  part('Stone sill',(cx,cy+side*.38,.735),(.28,.047,.023),'Badge')
+  part('Corner board',(cx+side*.362,cy,.72),(.025,.365,.56),'StuccoCream')
+  part('Slate pent',(cx+side*.22,cy,1.35),(.252,.43,.038),'RoofSlate',rot=(0,side*.40,0))
+ part('Ridge flashing',(cx,cy,1.45),(.045,.44,.038),'RoofTrim')
+ part('Flagstaff',(cx+.42,cy+.24,1.26),(.023,.023,1.26),'Wood','cylinder')
+ # Two-sided folded cloth, striped along the fly so it reads when viewed from above.
+ pole=Vector((cx+.42,cy+.24,2.42))
+ for i,mat in enumerate(['WindowGlass','StuccoCream','RoofClay']):
+  a=i/3;b=(i+1)/3
+  def cloth(t,h):return pole+Vector((t*.20+math.sin(t*6)*.08,t*.82,-t*.13+h))
+  verts=[cloth(a,0),cloth(b,0),cloth(b,-.32),cloth(a,-.32)]
+  mesh=bpy.data.meshes.new('Flag fold');mesh.from_pydata(verts,[],[(0,1,2,3),(3,2,1,0)])
+  flag=bpy.data.objects.new('Recognition flag',mesh);bpy.context.collection.objects.link(flag);mesh.materials.append(materials[mat])
+ for i in range(4):
+  d=-.36+i*.22
+  part('Barrier paint',(-1.04-math.sin(.6)*d,0,1.10+math.cos(.6)*d),(.037,.037,.052),'RoofClay',rot=(0,-.6,0))
  combine_static('Road checkpoint')
 
 def signpost():
@@ -394,8 +478,8 @@ def fence():
  combine_static('Farm fence')
 
 def stake():
- part('Survey stake',(0,0,.065),(.035,.035,.095),'Wood',edge=.003)
- part('Pale stake cap',(0,0,.146),(.036,.036,.015),'Sand',edge=.002)
+ part('Survey stake',(0,0,.065),(.045,.045,.12),'Wood',edge=.003)
+ part('Survey paint',(0,0,.161),(.047,.047,.043),'StuccoCream',edge=.002)
 
 def revetment():
  for i in range(12):

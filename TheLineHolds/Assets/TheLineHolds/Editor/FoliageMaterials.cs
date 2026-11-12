@@ -15,6 +15,43 @@ namespace TheLineHolds.Editor
             var importer=(TextureImporter)AssetImporter.GetAtPath(path);importer.mipmapEnabled=true;importer.anisoLevel=4;importer.maxTextureSize=512;importer.textureCompression=TextureImporterCompression.CompressedHQ;importer.SaveAndReimport();
             return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
         }
+        // Shared, mipmapped finishes. The large-scale tonal variation survives the overview camera.
+        internal static void FinishSurfaces()
+        {
+            var oak=Bake("Seasoned oak",256,(u,v)=>
+            {
+                float knot=Mathf.PerlinNoise(u*4+3,v*3+7);
+                float grain=Mathf.PerlinNoise(u*7+19,v*52+knot*4);
+                float ring=Mathf.Sin((v*19+knot*.8f)*Mathf.PI*2);
+                return Color.white*(.69f+grain*.24f+ring*.045f);
+            });
+            var distemper=Bake("Lime and patina",256,(u,v)=>
+            {
+                float mottling=Mathf.PerlinNoise(u*7+21,v*6+16);
+                float chips=FieldPigment.Ramp(.63f,.82f,Mathf.PerlinNoise(u*43+6,v*38+11));
+                return Color.white*(.81f+mottling*.17f-chips*.16f);
+            });
+            void Coat(string name,string color,float smoothness,Texture2D map)
+            {
+                var mat=AssetDatabase.LoadAssetAtPath<Material>("Assets/TheLineHolds/Art/Materials/"+name+".mat");
+                if(!mat)mat=AssetDatabase.LoadAssetAtPath<Material>(DioramaSurface.Root+"/"+name+".mat");
+                mat.color=DioramaSurface.Hex(color);mat.mainTexture=map;
+                mat.SetFloat("_Smoothness",smoothness);EditorUtility.SetDirty(mat);
+            }
+            Coat("Wood","927456",.15f,oak);
+            Coat("ShedPaint","607E80",.19f,oak);
+            Coat("RoofClay","A45741",.13f,distemper);
+            Coat("RoofClayLight","BD7654",.14f,distemper);
+            Coat("RoofSlate","526775",.22f,distemper);
+            Coat("RoofSlateLight","728493",.22f,distemper);
+            Coat("Masonry","B0AA94",.13f,distemper);
+            Coat("Plaster","CCBD97",.10f,distemper);
+            Coat("Steel","59656B",.38f,distemper);
+            Coat("Olive","5D6953",.24f,distemper);
+            Coat("Cloth","747C70",.08f,distemper);
+            Coat("BagCloth","9D9279",.07f,AssetDatabase.LoadAssetAtPath<Texture2D>(DioramaSurface.Root+"/Sandbag weave.png"));
+        }
+
         public static void Configure()
         {
             var leaf=Bake("Broadleaf veins",256,(u,v)=>
@@ -33,7 +70,7 @@ namespace TheLineHolds.Editor
             {
                 string path=name=="Leaf"?"Assets/TheLineHolds/Art/Materials/Leaf.mat":DioramaSurface.Root+"/"+name+".mat";
                 var mat=AssetDatabase.LoadAssetAtPath<Material>(path);
-                mat.color=DioramaSurface.Hex(name=="Leaf"?"637B40":name=="LeafLight"?"7F914C":"4F673A");
+                mat.color=DioramaSurface.Hex(name=="Leaf"?"5E784D":name=="LeafLight"?"849A5E":"4B6646");
                 mat.mainTexture=leaf;mat.SetFloat("_Cull",0);mat.SetFloat("_Smoothness",.18f);EditorUtility.SetDirty(mat);
             }
             var bags=DioramaBuilder.Material("BagCloth","A18C60");
@@ -44,6 +81,7 @@ namespace TheLineHolds.Editor
                 return Color.white*(.91f+thread+grain);
             });
             bags.SetFloat("_Smoothness",.05f);EditorUtility.SetDirty(bags);
+            FinishSurfaces();
             AssetDatabase.SaveAssets();
         }
     }

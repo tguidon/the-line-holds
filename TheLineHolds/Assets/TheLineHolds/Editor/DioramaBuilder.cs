@@ -91,6 +91,26 @@ namespace TheLineHolds.Editor
             EditorUtility.SetDirty(game);EditorSceneManager.MarkSceneDirty(scene);EditorSceneManager.SaveScene(scene);AssetDatabase.SaveAssets();
             string result=$"[Diorama] Smooth terrain, painted road, clustered foliage; {environment.GetComponentsInChildren<Renderer>().Length} landscape renderers; default window 1920x1080.";Debug.Log(result);return result;
         }
+        [MenuItem("The Line Holds/Visuals/Refresh Historic Miniatures")]
+        public static void RefreshMiniatures()
+        {
+            var scene=EditorSceneManager.GetActiveScene();
+            if(EditorApplication.isPlaying || scene.path!=Root+"/Scenes/Countryside.unity")
+                throw new InvalidOperationException("Open Countryside in Edit Mode.");
+            var landscape=GameObject.Find("Diorama landscape").transform;
+            RefreshModels(new[]{"FieldGate","Checkpoint","BuildStake","Sandbags","Infantry","Scout","AssaultInfantry",
+                "Truck","ArmoredCar","LightTank","HeavyTank","MachineGun","AntiTank","Mortar"}
+                .Concat(PlaytestPolishBuilder.Upgrades).ToArray());
+            DioramaSurface.Paint();
+            CountrysideSurroundings.Paint();
+            UnityEngine.Object.DestroyImmediate(landscape.Find("Authored battlefield details").gameObject);
+            BattlefieldDetails.Build(landscape);
+            FoliageMaterials.Configure();
+            Lighting(UnityEngine.Object.FindAnyObjectByType<BattleController>().battleCamera);
+            AssetDatabase.SaveAssets();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+        }
         public static string RefreshModels(string[] names)
         {
             if(EditorApplication.isPlaying)throw new InvalidOperationException("Stop Play Mode before authoring prefabs.");
@@ -116,18 +136,23 @@ namespace TheLineHolds.Editor
                     var authored=AssetDatabase.LoadAssetAtPath<Material>(Root+"/Art/Materials/"+m.name.Replace(" (Instance)","")+".mat");
                     return authored?authored:Material(m.name,ExtraColor(m.name));
                 }).ToArray();
-                if(name=="Infantry" || name=="Scout" || name=="AssaultInfantry")go.AddComponent<InfantryVisual>();
+                if(name=="Infantry" || name=="Scout" || name=="AssaultInfantry")
+                {
+                    var gait=go.AddComponent<InfantryVisual>();
+                    if(name=="Scout")gait.SetGait(34,8.5f);
+                    if(name=="AssaultInfantry")gait.SetGait(16,11);
+                }
                 if(new[]{"MachineGun","AntiTank","Mortar","MachineGunII","MachineGunRapid","MachineGunAP","AntiTankII","TankHunter","FieldHowitzer","MortarII","SiegeMortar","BarrageMortar"}.Contains(name))go.AddComponent<TowerVisual>();
                 PrefabUtility.SaveAsPrefabAsset(go,Root+"/Prefabs/"+name+".prefab");UnityEngine.Object.DestroyImmediate(go);
             }
             AssetDatabase.SaveAssets();return "Updated "+string.Join(", ",names);
         }
         static string ExtraColor(string name)=>name=="RoofClay"?"8A6652":name=="RoofClayLight"?"9B7858":name=="StuccoCream"?"B9AE8B":name=="ShedPaint"?"697F70":name=="Masonry"?"A39D88":name=="RoofSlate"?"56635F":name=="RoofSlateLight"?"6B7770":name=="RoofTrim"?"394641":name=="WindowGlass"?"344E55":name=="Shutter"?"526D4C":name.Contains("BagCloth")?"A18C60":name.Contains("LeafLight")?"738451":name.Contains("LeafDark")?"4C633E":name.Contains("Bark")?"71604A":name.Contains("Leather")?"604B36":name.Contains("Edge")?"6F7859":name.Contains("Badge")?"D0C4A0":"747C60";
-        static void Lighting(Camera camera)
+        internal static void Lighting(Camera camera)
         {
             var light=UnityEngine.Object.FindObjectsByType<Light>().First(l=>l.type==LightType.Directional);
-            light.color=DioramaSurface.Hex("FFF0D9");light.intensity=2f;light.transform.rotation=Quaternion.Euler(48,-38,0);light.shadows=LightShadows.Soft;light.shadowBias=.035f;light.shadowNormalBias=.12f;
-            RenderSettings.skybox=null;RenderSettings.ambientMode=AmbientMode.Trilight;RenderSettings.ambientSkyColor=DioramaSurface.Hex("73868D");RenderSettings.ambientEquatorColor=DioramaSurface.Hex("68725F");RenderSettings.ambientGroundColor=DioramaSurface.Hex("4D4030");RenderSettings.ambientIntensity=1;
+            light.color=DioramaSurface.Hex("FFF1DA");light.intensity=2.2f;light.transform.rotation=Quaternion.Euler(38,38,0);light.shadows=LightShadows.Soft;light.shadowBias=.035f;light.shadowNormalBias=.12f;
+            RenderSettings.skybox=null;RenderSettings.ambientMode=AmbientMode.Trilight;RenderSettings.ambientSkyColor=DioramaSurface.Hex("849BA8");RenderSettings.ambientEquatorColor=DioramaSurface.Hex("778376");RenderSettings.ambientGroundColor=DioramaSurface.Hex("4D4030");RenderSettings.ambientIntensity=1;
             camera.backgroundColor=DioramaSurface.Hex("61736D");camera.allowHDR=true;
             var data=camera.GetComponent<UniversalAdditionalCameraData>();data.renderPostProcessing=true;data.antialiasing=AntialiasingMode.SubpixelMorphologicalAntiAliasing;
             var profile=UnityEngine.Object.FindAnyObjectByType<Volume>().sharedProfile;
@@ -137,7 +162,7 @@ namespace TheLineHolds.Editor
             if(!profile.TryGet<Bloom>(out var existingBloom))profile.Add<Bloom>(true);
             if(!profile.TryGet<Vignette>(out var existingVignette))profile.Add<Vignette>(true);
             if(!profile.TryGet<ColorAdjustments>(out var grade))grade=profile.Add<ColorAdjustments>(true);
-            grade.saturation.Override(4);grade.contrast.Override(4);grade.postExposure.Override(.1f);
+            grade.saturation.Override(1);grade.contrast.Override(7);grade.postExposure.Override(0f);
             if(profile.TryGet<Bloom>(out var bloom)){bloom.threshold.Override(1.15f);bloom.intensity.Override(.12f);}
             if(profile.TryGet<Vignette>(out var vignette))vignette.intensity.Override(.15f);
             var urp=(UniversalRenderPipelineAsset)GraphicsSettings.currentRenderPipeline;urp.shadowDistance=100;urp.shadowCascadeCount=2;urp.mainLightShadowmapResolution=4096;urp.msaaSampleCount=4;urp.supportsHDR=true;

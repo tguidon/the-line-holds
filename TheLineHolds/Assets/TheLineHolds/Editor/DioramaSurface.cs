@@ -26,11 +26,12 @@ namespace TheLineHolds.Editor
         public static Texture2D Paint()
         {
             const int width=1536,height=896;
-            float[] distance=new float[width*height], side=new float[distance.Length];
+            float[] distance=new float[width*height], along=new float[distance.Length];
             Array.Fill(distance,100f);
             var points=new List<Vector3>(BattleRoute.DefaultPoints);
             points.Insert(0,BattleRoute.OnGround(-12.15f,-5));points.Add(BattleRoute.OnGround(12.15f,5));
             // Rasterize only a narrow band around each segment; deterministic and fast to regenerate.
+            float travelled=0;
             for(int k=1;k<points.Count;k++)
             {
                 var a=new Vector2(points[k-1].x,points[k-1].z);var b=new Vector2(points[k].x,points[k].z);var ab=b-a;
@@ -42,25 +43,28 @@ namespace TheLineHolds.Editor
                 {
                     var p=new Vector2(x*24f/(width-1)-12,z*14f/(height-1)-7);
                     var delta=p-a-ab*Mathf.Clamp01(Vector2.Dot(p-a,ab)/ab.sqrMagnitude);float d=delta.magnitude;int i=z*width+x;
-                    if(d>=distance[i])continue;distance[i]=d;side[i]=(ab.x*delta.y-ab.y*delta.x)/ab.magnitude;
+                    if(d>=distance[i])continue;distance[i]=d;along[i]=travelled+Mathf.Clamp(Vector2.Dot(p-a,ab)/ab.magnitude,0,ab.magnitude);
                 }
+                travelled+=ab.magnitude;
             }
             var pads=BattleRoute.DefaultPads;
             var approaches=Array.ConvertAll(pads,p=>BattlefieldDetails.NearestRoad(new Vector2(p.x,p.z)));
             var colors=new Color32[width*height];var rng=new System.Random(1944);
-            Color moss=Hex("607044"), grass=Hex("85905B"), straw=Hex("A4A273"), dirt=Hex("AF9D76"), rut=Hex("8F805F");
+            var pathSoil=Hex("9E9475");var gardenEarth=Hex("796448");var scrapeEarth=Hex("4F4938");
             for(int z=0;z<height;z++)for(int x=0;x<width;x++)
             {
                 int i=z*width+x;float px=x*24f/(width-1)-12,pz=z*14f/(height-1)-7;
-                float n=Mathf.PerlinNoise(px*.28f+43,pz*.28f+17), fine=Mathf.PerlinNoise(px*8+17,pz*8+9);
-                Color c=Color.Lerp(moss,grass,Mathf.SmoothStep(.1f,.9f,n));
-                c=Color.Lerp(c,straw,Mathf.SmoothStep(.54f,.83f,Mathf.PerlinNoise(px*.8f+5,pz*.8f+32))*.35f);
-                float edge=.94f+(Mathf.PerlinNoise(px*3+80,pz*3+80)-.5f)*.17f;
-                float blend=1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(edge-.09f,edge+.16f,distance[i]));
-                Color road=Color.Lerp(dirt,rut,Mathf.Exp(-Mathf.Pow((Mathf.Abs(side[i])-.32f)/.10f,2))*.35f);
-                road*=.95f+fine*.09f;
-                c=Color.Lerp(c,road,blend);
+                float fine=Mathf.PerlinNoise(px*8+17,pz*8+9);
+                Color c=FieldPigment.Grass(px,pz);
+                float edge=.91f+(Mathf.PerlinNoise(px*3+80,pz*3+80)-.5f)*.32f;
+                float blend=1-FieldPigment.Ramp(edge-.09f,edge+.16f,distance[i]);
+                if(blend>0)
+                {
+                    var road=FieldPigment.Road(px,pz,distance[i],along[i]);
+                    c=Color.Lerp(c,FieldPigment.GateSetts(px,pz,road),blend);
+                }
                 float clearing=0,approach=0;
+                var siteOffset=Vector2.zero;
                 for(int site=0;site<pads.Length;site++)
                 {
                     var pad=pads[site];var a=new Vector2(pad.x,pad.z);var ab=approaches[site]-a;var q=new Vector2(px,pz)-a;
@@ -68,15 +72,16 @@ namespace TheLineHolds.Editor
                     approach=Mathf.Max(approach,1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.08f,.22f,trail)));
                     float d=new Vector2(px-pad.x,pz-pad.z).magnitude;
                     float radius=.88f+(Mathf.PerlinNoise(px*5+20,pz*5+31)-.5f)*.16f;
-                    clearing=Mathf.Max(clearing,1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(radius-.09f,radius+.15f,d)));
+                    float weight=1-FieldPigment.Ramp(radius-.09f,radius+.15f,d);
+                    if(weight>clearing){clearing=weight;siteOffset=q;}
                 }
-                c=Color.Lerp(c,Hex("9B8D6A"),approach*.57f);
-                c=Color.Lerp(c,Hex("A29370")*(.94f+fine*.09f),clearing*.94f);
+                c=Color.Lerp(c,pathSoil,approach*.48f*(1-blend));
+                if(clearing>0)c=Color.Lerp(c,FieldPigment.GunSite(px,pz,siteOffset,fine),clearing);
                 // Authored garden beds and communication scrape sit clear of the road and gun sites.
                 float garden=BattlefieldDetails.GardenWeight(px,pz);
-                c=Color.Lerp(c,Hex("796448")*(.94f+fine*.12f),garden);
+                c=Color.Lerp(c,gardenEarth*(.94f+fine*.12f),garden);
                 float scrape=BattlefieldDetails.ScrapeWeight(px,pz);
-                c=Color.Lerp(c,Hex("4F4938"),scrape*.88f);
+                c=Color.Lerp(c,scrapeEarth,scrape*.88f);
                 // Fine pigment grain avoids uniform plastic surfaces; it is filtered by mipmaps.
                 c*=.965f+(float)rng.NextDouble()*.07f+(fine-.5f)*.08f;
                 colors[i]=c;

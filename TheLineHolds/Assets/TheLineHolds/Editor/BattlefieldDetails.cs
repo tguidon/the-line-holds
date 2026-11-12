@@ -85,9 +85,40 @@ namespace TheLineHolds.Editor
                 Model("Duckboard",BattleRoute.OnGround(x,-6.08f)+Vector3.up*.035f,Vector3.one);
             }
             OnGround("Crate",2.35f,-6.05f,.65f,30);
+            BoundaryWall(-11.48f,-2.75f,1.65f);
+            BoundaryWall(10.96f,-.98f,2.00f);
+            // Boots and tyres have swept the heavy grit off the crown of the road.
+            var gravel=new System.Random(173);
+            for(float d=.30f;d<route.Length;d+=.53f)
+            {
+                float verge=gravel.Next(2)==0?-.95f:.95f;
+                var p=route.Position(d,verge);
+                if(BattleRoute.DefaultPads.Any(site=>Vector3.Distance(site,p)<1.05f))continue;
+                for(int i=0;i<3;i++)
+                {
+                    float x=p.x+(float)gravel.NextDouble()*.13f,z=p.z+(float)gravel.NextDouble()*.10f;
+                    float size=.029f+(float)gravel.NextDouble()*.040f;
+                    var stone=BattleRoute.OnGround(x,z);stone.y-=.023f;
+                    Model("FieldStone",stone,new Vector3(size*1.25f,size*.43f,size),gravel.Next(360));
+                }
+            }
             EarthDetail();
             Combine();
             Debug.Log("[Map composition] Ten cleared gun sites; entry gate, exit checkpoint, farm plots, boundaries, timber field position, and detailed earth cut.");
+        }
+        static void BoundaryWall(float x,float z,float length)
+        {
+            var random=new System.Random(87);
+            for(int course=0;course<3;course++)
+            {
+                int count=Mathf.CeilToInt(length/.32f)-course%2;
+                for(int i=0;i<count;i++)
+                {
+                    float at=z+(i+course%2*.5f)*.32f;
+                    var p=BattleRoute.OnGround(x,at)+Vector3.up*(.05f+course*.128f);
+                    Model("FieldStone",p,new Vector3(.15f,.105f,.24f),random.Next(-16,17));
+                }
+            }
         }
         static void EarthDetail()
         {

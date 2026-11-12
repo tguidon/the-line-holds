@@ -1,14 +1,34 @@
-using UnityEngine;
-using UnityEditor;
+using System;
 using System.IO;
+using UnityEditor;
+using UnityEngine;
+
 public static class ProbePasture
 {
- public static string All()
- {
-  var a=GameObject.Find("Continuous rolling meadow and road").GetComponent<Renderer>().sharedMaterial;var b=GameObject.Find("North pasture").GetComponent<Renderer>().sharedMaterial;
-  var ta=new Texture2D(2,2);ta.LoadImage(File.ReadAllBytes(AssetDatabase.GetAssetPath(a.mainTexture)));var tb=new Texture2D(2,2);tb.LoadImage(File.ReadAllBytes(AssetDatabase.GetAssetPath(b.mainTexture)));
-  var core=ta.GetPixelBilinear(.5f,1);var outer=tb.GetPixelBilinear(.5f,97f/180);
-  if(Vector3.Distance(new Vector3(core.r,core.g,core.b),new Vector3(outer.r,outer.g,outer.b))>.09f)throw new System.Exception($"Pasture seam: {core} versus {outer}");
-  return $"PASS core/outer pasture pigment seam: {core} versus {outer}";
- }
+    static Texture2D ReadPigment(string surface)
+    {
+        var source=GameObject.Find(surface).GetComponent<Renderer>().sharedMaterial.mainTexture;
+        var copy=new Texture2D(2,2);
+        copy.LoadImage(File.ReadAllBytes(AssetDatabase.GetAssetPath(source)));
+        copy.wrapMode=source.wrapMode;
+        return copy;
+    }
+
+    public static string All()
+    {
+        var core=ReadPigment("Continuous rolling meadow and road");
+        var apron=ReadPigment("North pasture");
+        try
+        {
+            foreach(float z in new[]{-7f,7f})
+            {
+                var a=core.GetPixelBilinear(.5f,(z+7)/14);
+                var b=apron.GetPixelBilinear(.5f,(z+90)/180);
+                if(Vector3.Distance(new Vector3(a.r,a.g,a.b),new Vector3(b.r,b.g,b.b))>.09f)
+                    throw new Exception($"Pasture seam at z={z}: {a} versus {b}");
+            }
+            return "PASS north and south pasture pigments meet at the core boundary";
+        }
+        finally { UnityEngine.Object.DestroyImmediate(core); UnityEngine.Object.DestroyImmediate(apron); }
+    }
 }
