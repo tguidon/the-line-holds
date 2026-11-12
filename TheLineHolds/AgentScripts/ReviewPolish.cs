@@ -25,7 +25,13 @@ public static class ReviewPolish
   buttons.Single(b=>b.name=="Close inspection").onClick.Invoke();if(g.SelectedPad!=-1)throw new Exception("Close inspection");
   var ambient=g.audioPlayer.GetComponents<AudioSource>().Single(a=>a.loop);await Task.Delay(150);
   if(!ambient.isPlaying || !ambient.clip || ambient.clip.length<40)throw new Exception("Ambient loop missing");
-  g.audioPlayer.ToggleAmbience();await Task.Delay(1800);if(ambient.volume>.01f)throw new Exception("Ambient mute");g.audioPlayer.ToggleAmbience();
+  var muteButton=g.hud.GetComponentsInChildren<UnityEngine.UI.Button>().Single(b=>b.name=="Mute sound");
+  muteButton.onClick.Invoke();
+  g.audioPlayer.Play("place");g.audioPlayer.Fire(g.defenses[0],Vector3.zero);
+  var sources=g.audioPlayer.GetComponentsInChildren<AudioSource>();
+  if(sources.Any(source=>!source.mute))throw new Exception("Game audio still enabled");
+  muteButton.onClick.Invoke();
+  if(sources.Any(source=>source.mute))throw new Exception("Game audio still muted");
   if(GameObject.Find("Exposed earth layers") || GameObject.Find("Miniature display plinth"))throw new Exception("Floating land remains");
   if(!GameObject.Find("Surrounding countryside"))throw new Exception("Surroundings missing");
   g.MainMenu();return "PASS deselection routes, actual upgrade/branch callbacks and costs, original ambience/mute, continuous countryside";

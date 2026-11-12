@@ -8,7 +8,13 @@ void Check(bool v,string m){if(!v)throw new Exception(m);}
 var defs=g.defenses.SelectMany(d=>d.upgrades.SelectMany(u=>u.defense.upgrades.Select(v=>v.defense)).Concat(d.upgrades.Select(u=>u.defense))).ToArray();
 Check(defs.Length==9 && defs.Select(d=>d.prefab).Distinct().Count()==9,"Upgrade models are not distinct");
 Check(!GameObject.Find("Exposed earth layers") && !GameObject.Find("Miniature display plinth") && GameObject.Find("Surrounding countryside"),"Floating map remains");
-var ambient=g.audioPlayer.GetComponents<AudioSource>().Single(a=>a.loop);await Task.Delay(200);Check(ambient.isPlaying && ambient.clip.length>40,"Ambient loop not playing");g.audioPlayer.ToggleAmbience();await Task.Delay(1800);Check(ambient.volume<.01f,"Ambient mute failed");g.audioPlayer.ToggleAmbience();
+var ambient=g.audioPlayer.GetComponents<AudioSource>().Single(a=>a.loop);await Task.Delay(200);Check(ambient.isPlaying && ambient.clip.length>40,"Ambient loop not playing");var muteButton=g.hud.GetComponentsInChildren<UnityEngine.UI.Button>().Single(b=>b.name=="Mute sound");
+  muteButton.onClick.Invoke();
+  g.audioPlayer.Play("place");g.audioPlayer.Fire(g.defenses[0],Vector3.zero);
+  var sources=g.audioPlayer.GetComponentsInChildren<AudioSource>();
+  if(sources.Any(source=>!source.mute))throw new Exception("Game audio still enabled");
+  muteButton.onClick.Invoke();
+  if(sources.Any(source=>source.mute))throw new Exception("Game audio still muted");
 // Temporary funded tier showcase; full campaign purchases are verified separately.
 ((Economy)typeof(MatchState).GetField("economy",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance).GetValue(g.Match)).Credit(10000);
 for(int i=0;i<9;i++){g.Match.Build(i,g.defenses[i/3]);if(i%3>0)g.Match.Upgrade(i,0);if(i%3==2)g.Match.Upgrade(i,0);}

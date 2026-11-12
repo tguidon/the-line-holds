@@ -1,7 +1,7 @@
 using UnityEngine;
 namespace TheLineHolds
 {
-    public enum HudSymbol { Heart, Supply, Wave, Infantry, Vehicle, Gun, Cannon, Mortar, Play, Pause, Close, Help, Sound, Reset, Left, Right, Plus, Minus, Upgrade, Menu, Lock }
+    public enum HudSymbol { Heart, Supply, Wave, Infantry, Vehicle, Gun, Cannon, Mortar, Play, Pause, Close, Help, Sound, Reset, Left, Right, Plus, Minus, Upgrade, Menu, Lock, Muted }
     // Small, consistent line icons; no font glyph dependencies or raster atlases.
     [RequireComponent(typeof(CanvasRenderer))]
     public sealed class HudIcon : UnityEngine.UI.MaskableGraphic
@@ -34,7 +34,11 @@ namespace TheLineHolds
                 case HudSymbol.Pause:Path(.34f,.18f,.34f,.82f);Path(.66f,.18f,.66f,.82f);break;
                 case HudSymbol.Close:Path(.25f,.25f,.75f,.75f);Path(.25f,.75f,.75f,.25f);break;
                 case HudSymbol.Help:Path(.28f,.75f,.4f,.87f,.67f,.87f,.77f,.68f,.52f,.46f,.52f,.35f);Path(.52f,.19f,.52f,.13f);break;
-                case HudSymbol.Sound:Path(.15f,.38f,.32f,.38f,.56f,.18f,.56f,.82f,.32f,.62f,.15f,.62f,.15f,.38f);Path(.71f,.3f,.83f,.5f,.71f,.7f);break;
+                case HudSymbol.Sound:
+                case HudSymbol.Muted:Path(.15f,.38f,.32f,.38f,.56f,.18f,.56f,.82f,.32f,.62f,.15f,.62f,.15f,.38f);
+                    if(symbol==HudSymbol.Sound)Path(.71f,.3f,.83f,.5f,.71f,.7f);
+                    else {Path(.68f,.38f,.88f,.62f);Path(.68f,.62f,.88f,.38f);}
+                    break;
                 case HudSymbol.Reset:Path(.24f,.65f,.38f,.83f,.72f,.8f,.86f,.52f,.74f,.22f,.42f,.16f,.2f,.32f);Path(.24f,.88f,.24f,.65f,.47f,.65f);break;
                 case HudSymbol.Left:Path(.68f,.2f,.32f,.5f,.68f,.8f);break;
                 case HudSymbol.Right:Path(.32f,.2f,.68f,.5f,.32f,.8f);break;

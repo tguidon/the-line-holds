@@ -12,7 +12,7 @@ namespace TheLineHolds
         GameObject top,bottom,modal,sell,help,intel,starRow,pauseStatus,options;
         RectTransform dock,dispatch,card;
         TextMeshProUGUI lives,funds,status,notice,waveInfo,selection,selectionStats,modalTitle,modalSubtitle,modalStats;
-        UnityEngine.UI.Button sellButton,speedButton,startWave,retry,menu,play,quit,pauseButton,ambientButton;
+        UnityEngine.UI.Button sellButton,speedButton,startWave,retry,menu,play,quit,pauseButton,soundButton;
         readonly UnityEngine.UI.Button[] shops=new UnityEngine.UI.Button[3],upgradeButtons=new UnityEngine.UI.Button[2];
         readonly StarGraphic[] ratingStars=new StarGraphic[3];
         readonly Color ink=new Color(.075f,.105f,.09f,.96f),paper=new Color(.94f,.92f,.83f),muted=new Color(.71f,.76f,.66f),accent=new Color(.91f,.75f,.39f);
@@ -29,14 +29,15 @@ namespace TheLineHolds
             gameObject.AddComponent<UnityEngine.UI.GraphicRaycaster>();
             if(!EventSystem.current)new GameObject("EventSystem",typeof(EventSystem),typeof(InputSystemUIInputModule));
             top=Group("HUD",transform);
-            var resources=Panel("Resources",top.transform,new Vector2(16,-16),new Vector2(416,54));
+            var resources=Panel("Resources",top.transform,new Vector2(16,-16),new Vector2(355,54));
             Icon(resources.transform,HudSymbol.Heart,new Vector2(16,-15),24,new Color(.9f,.55f,.45f));lives=Label(resources.transform,"20",new Vector2(50,-12),new Vector2(42,30),23,paper);
-            Icon(resources.transform,HudSymbol.Supply,new Vector2(112,-15),24,accent);funds=Label(resources.transform,"300",new Vector2(148,-12),new Vector2(83,30),23,paper);
-            Icon(resources.transform,HudSymbol.Wave,new Vector2(245,-15),24,muted);status=Label(resources.transform,"0 / 10",new Vector2(280,-13),new Vector2(121,30),21,paper);
+            funds=Label(resources.transform,"$300",new Vector2(109,-12),new Vector2(105,30),23,paper);
+            Icon(resources.transform,HudSymbol.Wave,new Vector2(220,-15),24,muted);status=Label(resources.transform,"0 / 10",new Vector2(254,-12),new Vector2(92,30),21,paper);
+            lives.alignment=funds.alignment=status.alignment=TextAlignmentOptions.MidlineLeft;
             var controls=Panel("Quick controls",top.transform,new Vector2(-294,-16),new Vector2(278,54),true);
             speedButton=Button(controls.transform,"1x",new Vector2(4,-4),new Vector2(52,46),()=>game.ToggleSpeed());
             pauseButton=IconButton(controls.transform,"Pause",HudSymbol.Pause,new Vector2(58,-4),()=>game.Pause());
-            ambientButton=IconButton(controls.transform,"Ambience",HudSymbol.Sound,new Vector2(112,-4),()=>game.audioPlayer.ToggleAmbience());
+            soundButton=IconButton(controls.transform,"Mute sound",HudSymbol.Sound,new Vector2(112,-4),()=>game.audioPlayer.ToggleMute());
             IconButton(controls.transform,"Help",HudSymbol.Help,new Vector2(166,-4),()=>{showHelp=!showHelp;showOptions=false;});
             IconButton(controls.transform,"Options",HudSymbol.Menu,new Vector2(220,-4),()=>{showOptions=!showOptions;showHelp=false;if(showOptions && !game.Match.Paused)game.Pause();});
             pauseStatus=Panel("Pause status",top.transform,new Vector2(-478,-16),new Vector2(172,54),true);
@@ -95,9 +96,12 @@ namespace TheLineHolds
             bool inspect=editable && game.SelectedPad>=0 && m.Towers[game.SelectedPad]!=null;sell.SetActive(inspect && !showHelp && !showOptions);
             if(active)
             {
-                lives.text=m.Lives.ToString();funds.text=m.Funds.ToString();status.text=$"{m.Wave} / {m.TotalWaves}";
+                lives.text=m.Lives.ToString();funds.text=$"<color=#E8BF64>$</color>{m.Funds}";status.text=$"{m.Wave} / {m.TotalWaves}";
                 speedButton.GetComponentInChildren<TextMeshProUGUI>().text=game.GameSpeed+"x";
-                ambientButton.GetComponentInChildren<HudIcon>().color=game.audioPlayer.AmbienceEnabled?paper:muted*.6f;
+                var soundIcon=soundButton.GetComponentInChildren<HudIcon>();
+                var soundSymbol=game.audioPlayer.Muted?HudSymbol.Muted:HudSymbol.Sound;
+                if(soundIcon.symbol!=soundSymbol){soundIcon.symbol=soundSymbol;soundIcon.SetVerticesDirty();}
+                soundButton.GetComponent<HudHint>().hint=game.audioPlayer.Muted?"Unmute sound":"Mute sound";
                 if(lastNotice!=game.Notice){lastNotice=game.Notice;noticeUntil=Time.unscaledTime+3.2f;}
                 notice.text=hint??(Time.unscaledTime<noticeUntil?ShortNotice(game.Notice):"");
                 var next=m.NextWave;string roster=string.Join("\n",System.Array.ConvertAll(next.spawns,e=>$"{e.UnitCount}  {e.enemy.displayName}"));
