@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using TheLineHolds;
 using UnityEngine;
@@ -8,6 +9,45 @@ using Unity.Pipeline.Scripting;
 
 public static class ReviewMiniatures
 {
+    public static string InspectModels()
+    {
+        var game=UnityEngine.Object.FindAnyObjectByType<BattleController>();
+        var veterans=game.defenses.SelectMany(d=>d.upgrades).Select(u=>u.defense).ToArray();
+        var weapons=game.defenses.Concat(veterans).Concat(veterans.SelectMany(d=>d.upgrades).Select(u=>u.defense)).ToArray();
+        if(weapons.Length!=12 || weapons.Select(d=>d.prefab).Distinct().Count()!=12)
+            throw new Exception("Expected twelve distinct weapon models");
+        foreach(var definition in weapons)
+        {
+            var instance=UnityEngine.Object.Instantiate(definition.prefab);
+            try
+            {
+                var gun=instance.GetComponent<TowerVisual>();
+                gun.Configure(definition,game.combatEffects.shellMaterial);
+                foreach(var target in new[]{Vector3.forward,Vector3.left})
+                {
+                    gun.FireAt(target*5);
+                    var heading=Vector3.ProjectOnPlane(gun.MuzzleForward,Vector3.up);
+                    if(Vector3.Angle(heading,target)>3 || gun.MuzzlePosition.y<.3f)
+                        throw new Exception("Incorrect firing axis on "+definition.name);
+                    if(definition.role==DefenseRole.Mortar && gun.MuzzleForward.y<.45f)
+                        throw new Exception("Mortar firing below its elevated tube: "+definition.name);
+                }
+                if(definition.name=="MachineGunRapid" || definition.name=="BarrageMortar")
+                {
+                    var first=gun.MuzzlePosition;gun.Fire();
+                    if(Vector3.Distance(first,gun.MuzzlePosition)<.20f)
+                        throw new Exception("Twin mount failed to alternate barrels: "+definition.name);
+                }
+            }
+            finally { UnityEngine.Object.DestroyImmediate(instance); }
+        }
+        var actors=game.waves.SelectMany(w=>w.spawns).Select(s=>s.enemy.prefab).Distinct().ToArray();
+        if(actors.Length!=7 || actors.SelectMany(a=>a.GetComponentsInChildren<Renderer>())
+            .Any(r=>r.sharedMaterials.Any(m=>!m || !m.shader.isSupported)))
+            throw new Exception("Enemy roster or material binding incomplete");
+        return "PASS 12 distinct base, veteran and branch prefabs, aimed muzzles, both alternating mounts, seven rendered enemy classes";
+    }
+
     public static async Task<string> Capture(string pass)
     {
         if (pass != "before" && pass != "after") throw new ArgumentException(nameof(pass));

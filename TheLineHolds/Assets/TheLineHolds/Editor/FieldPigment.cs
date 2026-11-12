@@ -18,9 +18,10 @@ namespace TheLineHolds.Editor
         {
             float growth = Mathf.PerlinNoise(x*.31f+43, z*.31f+17);
             float rough = Mathf.PerlinNoise(x*1.8f+23, z*1.8f+8);
-            var baseColor = Color.Lerp(Hollow, Meadow, Ramp(.18f,.80f,growth*.78f+rough*.22f));
+            var baseColor = Color.Lerp(Hollow, Meadow, Mathf.Lerp(.19f,.89f,Ramp(.15f,.83f,growth*.78f+rough*.22f)));
             float dry = Mathf.PerlinNoise(x*.74f+15, z*.61f+32);
-            return Color.Lerp(baseColor, Hay, .55f*Ramp(.50f,.86f,dry));
+            float stems = Mathf.PerlinNoise(x*13+z*4+19,z*26+64);
+            return Color.Lerp(baseColor, Hay, .36f*Ramp(.50f,.86f,dry)+.14f*Ramp(.59f,.78f,stems));
         }
 
         public static Color Road(float x, float z, float distance, float along)
@@ -29,12 +30,13 @@ namespace TheLineHolds.Editor
             float fine = Mathf.PerlinNoise(x*13+19,z*13+13);
             float verge = Ramp(.59f,1.05f,distance);
             float wheel = distance - .42f - .085f*(patches-.5f);
-            float rut = Mathf.Exp(-wheel*wheel/.007f);
+            float wear = Mathf.PerlinNoise(along*.58f+24, x*.8f+z*.7f+8);
+            float rut = Mathf.Exp(-wheel*wheel/(.007f+.011f*wear))*(.10f+.9f*Ramp(.23f,.76f,wear));
             float lip = Mathf.Exp(-Mathf.Pow((wheel-.108f)/.042f,2));
             var road = Color.Lerp(Clay, Chalk, .41f+patches*.53f-verge*.37f);
             float tread = Ramp(.68f,.97f,Mathf.Sin(along*44+wheel*16));
             road = Color.Lerp(road,Track,rut*(.36f+patches*.30f+tread*.18f));
-            road = Color.Lerp(road,Chalk,lip*.35f);
+            road = Color.Lerp(road,Chalk,lip*(.09f+.25f*wear));
             float gravel = Ramp(.64f,.84f,fine)*(.23f+verge*.74f);
             return Color.Lerp(road,Grit,gravel)*(.96f+.08f*fine);
         }

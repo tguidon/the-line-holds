@@ -151,7 +151,7 @@ namespace TheLineHolds.Editor
         internal static void Lighting(Camera camera)
         {
             var light=UnityEngine.Object.FindObjectsByType<Light>().First(l=>l.type==LightType.Directional);
-            light.color=DioramaSurface.Hex("FFF1DA");light.intensity=2.2f;light.transform.rotation=Quaternion.Euler(38,38,0);light.shadows=LightShadows.Soft;light.shadowBias=.035f;light.shadowNormalBias=.12f;
+            light.color=DioramaSurface.Hex("FFF1DA");light.intensity=2.2f;light.transform.rotation=Quaternion.Euler(38,38,0);light.shadows=LightShadows.Soft;light.shadowStrength=.82f;light.shadowBias=.035f;light.shadowNormalBias=.12f;
             RenderSettings.skybox=null;RenderSettings.ambientMode=AmbientMode.Trilight;RenderSettings.ambientSkyColor=DioramaSurface.Hex("849BA8");RenderSettings.ambientEquatorColor=DioramaSurface.Hex("778376");RenderSettings.ambientGroundColor=DioramaSurface.Hex("4D4030");RenderSettings.ambientIntensity=1;
             camera.backgroundColor=DioramaSurface.Hex("61736D");camera.allowHDR=true;
             var data=camera.GetComponent<UniversalAdditionalCameraData>();data.renderPostProcessing=true;data.antialiasing=AntialiasingMode.SubpixelMorphologicalAntiAliasing;

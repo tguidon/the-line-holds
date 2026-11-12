@@ -63,7 +63,7 @@ namespace TheLineHolds.Editor
             Landmark("Enemy entry gateway",route.Points[0]);Landmark("Defended exit checkpoint",route.Points[route.Points.Length-1]);
             OnGround("FieldGate",-11.15f,-5,1,-90);
             OnGround("Checkpoint",11.1f,5,1,-90);
-            Sign(-11.0f,-6.15f,"ENEMY","A96544");Sign(11.15f,3.9f,"EXIT","7D936D");
+            Sign(-11.89f,-6.48f,"ENEMY","A96544");Sign(11.89f,3.42f,"EXIT","7D936D");
             // Gate approaches and supplies tell apart the exposed enemy lane and the defended rear.
             OnGround("Crate",10.0f,6.15f,.65f,8);OnGround("Crate",10.65f,6.25f,.52f,-12);
             OnGround("FieldFence",-11.35f,-3.15f,.8f,90);
@@ -89,12 +89,12 @@ namespace TheLineHolds.Editor
             BoundaryWall(10.96f,-.98f,2.00f);
             // Boots and tyres have swept the heavy grit off the crown of the road.
             var gravel=new System.Random(173);
-            for(float d=.30f;d<route.Length;d+=.53f)
+            for(float d=.30f;d<route.Length;d+=.19f+(float)gravel.NextDouble()*1.24f)
             {
                 float verge=gravel.Next(2)==0?-.95f:.95f;
                 var p=route.Position(d,verge);
                 if(BattleRoute.DefaultPads.Any(site=>Vector3.Distance(site,p)<1.05f))continue;
-                for(int i=0;i<3;i++)
+                for(int i=0;i<4;i++)
                 {
                     float x=p.x+(float)gravel.NextDouble()*.13f,z=p.z+(float)gravel.NextDouble()*.10f;
                     float size=.029f+(float)gravel.NextDouble()*.040f;
@@ -104,6 +104,7 @@ namespace TheLineHolds.Editor
             }
             EarthDetail();
             Combine();
+            VergeFlowers.Build(parent);
             Debug.Log("[Map composition] Ten cleared gun sites; entry gate, exit checkpoint, farm plots, boundaries, timber field position, and detailed earth cut.");
         }
         static void BoundaryWall(float x,float z,float length)

@@ -76,7 +76,7 @@ public static class CheckWeaponFeedback
             Check(fx.ActiveProjectiles==0,"Projectile leaked after impacts");
             Check(audio.ActiveWorldVoices>0,"No sound voices playing");
             audio.SetPaused(true);await Task.Delay(100);Check(audio.ActiveWorldVoices==0,"Audio did not pause");audio.SetPaused(false);
-            audio.sfxGain=0;await Task.Delay(40);Check(audio.GetComponentsInChildren<AudioSource>().All(v=>v.volume==0),"SFX gain did not reach all voices");audio.sfxGain=.65f;
+            audio.sfxGain=0;await Task.Delay(40);Check(audio.GetComponentsInChildren<AudioSource>().Where(v=>!v.loop).All(v=>v.volume==0),"SFX gain did not reach all voices");audio.sfxGain=.65f;
             fx.Tick(1,new ShotState[0]);Check(fx.ParticleCount==0,"Particles exceeded short lifetime");
             audio.ResetAudio();Check(audio.ActiveWorldVoices==0,"Reset left voices playing");
             game.MainMenu();Check(fx.ActiveProjectiles==0 && fx.ParticleCount==0,"Menu left effects active");

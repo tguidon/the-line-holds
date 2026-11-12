@@ -94,7 +94,8 @@ def infantry():
  for x in [-.12,.12]:part('Belt pouch',(x,.15,.46),(.05,.033,.05),'Sand')
  part('Canteen',(-.16,-.12,.46),(.068,.045,.08),'Steel','sphere')
  part('Pack flap',(0,-.20,.69),(.143,.04,.045),'Leather')
- part('Rifle stock',(.18,.16,.49),(.03,.16,.035),'Wood');barrel((.18,.32,.57),.48,.023)
+ part('Rifle stock',(.18,.14,.515),(.035,.18,.042),'Wood',rot=(.12,0,0))
+ barrel((.18,.42,.55),.48,.023)
  limb('Carry',[o for o in bpy.context.scene.objects if o.type=='MESH' and o.name.startswith(('Sleeve','Hand','Rifle stock','Barrel'))],(0,0,.6))
 
 def scout():
@@ -111,6 +112,11 @@ def assault():
  infantry()
  part('Blanket roll',(0,-.215,.75),(.09,.09,.21),'Cloth','cylinder',(0,math.pi/2,0))
  for x in [-.13,.13]:part('Bedroll webbing',(x,-.215,.75),(.098,.098,.018),'Leather','cylinder',(0,math.pi/2,0))
+ carry=next(o for o in bpy.context.scene.objects if o.name.startswith('Carry'))
+ rifle=next(o for o in carry.children if o.name.startswith('Barrel'))
+ rifle.scale.z=.62
+ mag=part('Box magazine',(.18,.24,.47),(.036,.042,.084),'Steel',rot=(-.19,0,0))
+ matrix=mag.matrix_world.copy();mag.parent=carry;mag.matrix_world=matrix
  part('Armored vest',(0,.13,.57),(.16,.045,.14),'Steel',edge=.012)
  for x in [-.2,.2]:part('Shoulder pad',(x,.02,.76),(.09,.11,.05),'Olive','sphere')
 
@@ -214,7 +220,9 @@ def gun(kind):
  else:
   for x in [-.24,.24]:
    beam('Mortar bed brace',(x,-.26,.10),(x,.29,.22),.06,.05,'ShedPaint')
-  part('Base plate',(0,0,.07),(.3,.3,.045),'Steel','cylinder');barrel((0,.1,.4),.7,.09,.65)
+  part('Base plate',(0,0,.07),(.32,.32,.055),'Steel','cylinder');barrel((0,.10,.49),.91,.108,.82)
+  for title,y,z,r,h,mat in [('Tube lip',.406,.818,.123,.043,'Edge'),('Tube bore',.438,.851,.087,.009,'Dark')]:
+   part(title,(0,y,z),(r,r,h),mat,'cylinder',(math.pi/2+.82,0,0))
   part('Tube collar',(0,.28,.54),(.105,.105,.04),'Edge','cylinder',(math.pi/2+.65,0,0))
   for x in [-.2,.2]:part('Bipod',(x,.3,.25),(.025,.025,.28),'Steel','cylinder',(0,x,0))
   part('Sight',(-.13,.14,.5),(.028,.065,.035),'Dark')
@@ -228,11 +236,11 @@ def gun(kind):
  slide=bpy.data.objects.new('Recoil',None);bpy.context.collection.objects.link(slide);slide.parent=pivot
  prefixes={'MachineGun':('Receiver','Barrel','Heat sleeve','Cooling ring','Stock','Rear sight'),
            'AntiTank':('Barrel','Breech','Recoil sleeve','Muzzle brake'),
-           'Mortar':('Barrel','Tube collar')}[kind]
+           'Mortar':('Barrel','Tube collar','Tube lip','Tube bore')}[kind]
  for obj in list(pivot.children):
   if obj.name.startswith(prefixes):obj.parent=slide
  muzzle=bpy.data.objects.new('Muzzle socket',None);bpy.context.collection.objects.link(muzzle);muzzle.parent=slide
- muzzle.location={'MachineGun':(0,.82,.56),'AntiTank':(0,1.36,.6),'Mortar':(0,.38,.612)}[kind]
+ muzzle.location={'MachineGun':(0,.82,.56),'AntiTank':(0,1.36,.6),'Mortar':(0,.44,.86)}[kind]
 
 def upgraded_gun(kind,branch=''):
  gun(kind)
@@ -262,16 +270,22 @@ def upgraded_gun(kind,branch=''):
   for x in [-.3,.3]:beam('Platform outrigger',(x,-.23,.12),(x*.6,.21,.49),.045,.045,'Edge')
   if branch=='B':
    for x in [-.17,.17]:
-    part('Twin mortar tube',(x,.16,.61),(.105,.105,.44),'Steel','cylinder',(math.pi/2+.65,0,0))
-  elif branch=='A':part('Siege tube',(0,.18,.65),(.17,.17,.53),'Steel','cylinder',(math.pi/2+.65,0,0))
+    part('Twin mortar tube',(x,.16,.61),(.115,.115,.47),'Steel','cylinder',(math.pi/2+.82,0,0))
+    part('Twin bore',(x,.487,.957),(.09,.09,.010),'Dark','cylinder',(math.pi/2+.82,0,0))
+  elif branch=='A':
+   part('Siege tube',(0,.18,.65),(.17,.17,.53),'Steel','cylinder',(math.pi/2+.82,0,0))
+   part('Heavy bore',(0,.545,1.04),(.135,.135,.008),'Dark','cylinder',(math.pi/2+.82,0,0))
   else:part('Mortar armored collar',(0,.18,.5),(.15,.15,.11),'Olive','cylinder',(math.pi/2+.65,0,0))
  slide=next(o for o in pivot.children if o.name.startswith('Recoil'))
  for obj in set(bpy.context.scene.objects)-before:
   # Kit uses the same authored coordinates as the mechanism, and traverses with it.
-  obj.parent=slide if obj.name.startswith(('Barrel','Twin mortar tube','Siege tube','Heavy muzzle collar')) else pivot
+  obj.parent=slide if obj.name.startswith(('Barrel','Twin mortar tube','Twin bore','Siege tube','Heavy bore','Heavy muzzle collar')) else pivot
  muzzle=next(o for o in bpy.context.scene.objects if o.name.startswith('Muzzle socket'))
  if branch:
-  muzzle.location=({'MachineGun':(0,.98,.6),'AntiTank':(0,1.94,.68),'Mortar':(0,.52,.94)} if branch=='A' else {'MachineGun':(0,1.31,.65),'AntiTank':(0,1.19,.7),'Mortar':(0,.43,.86)})[kind]
+  # The socket follows the operative barrel even when a specialist adds two tubes.
+  muzzle.location=({'MachineGun':(-.13,.955,.6),'AntiTank':(0,1.94,.68),'Mortar':(0,.55,1.045)} if branch=='A' else {'MachineGun':(0,1.31,.65),'AntiTank':(0,1.19,.7),'Mortar':(-.17,.49,.963)})[kind]
+  if (kind,branch) in [('MachineGun','A'),('Mortar','B')]:
+   other=muzzle.copy();other.name='Second muzzle';bpy.context.collection.objects.link(other);other.location.x*=-1
  for x in [-.5,.5]:part('Additional supply crate',(x,-.4,.2),(.12,.16,.17),'Olive')
 
 def branch(a,b,radius=.04):
@@ -422,6 +436,25 @@ def gate():
   for y in [-.26,-.75]:part('Open gate upright',(x*1.10,y,.39),(.04,.04,.36),'Wood',edge=.005)
   for z in [.22,.62]:part('Open gate rail',(x*1.10,-.5,z),(.035,.38,.035),'Wood',edge=.004)
   beam('Gate diagonal',(x*1.10,-.86,.20),(x*1.10,-.14,.62),.026,.026,'Wood')
+ # Two-wheeled farm cart pulled onto the headland, with its shafts down.
+ cx,cy=-1.85,1.12
+ for side in [-1,1]:
+  x=cx+side*.34
+  bpy.ops.mesh.primitive_torus_add(major_segments=24,minor_segments=6,location=(x,cy,.295),
+                                  rotation=(0,math.pi/2,0),major_radius=.275,minor_radius=.024)
+  tyre=bpy.context.object;tyre.name='Iron tyre';tyre.data.materials.append(materials['RoofTrim'])
+  for i in range(5):
+   angle=i*math.pi/5
+   beam('Wheel spoke',(x,cy-.27*math.sin(angle),.295-.27*math.cos(angle)),
+        (x,cy+.27*math.sin(angle),.295+.27*math.cos(angle)),.014,.017,'Wood')
+  part('Wheel hub',(x,cy,.295),(.055,.055,.055),'Steel','cylinder',(0,math.pi/2,0))
+  beam('Cart shaft',(cx+side*.24,cy+.30,.37),(cx+side*.24,cy+1.21,.09),.022,.025,'Wood')
+  for row in range(3):part('Side slat',(cx+side*.28,cy,.43+row*.10),(.018,.45,.043),'ShedPaint')
+ for y in [-.40,.40]:
+  part('Cart end',(cx,cy+y,.51),(.275,.022,.12),'Wood')
+  for x in [-.27,.27]:part('Cart stanchion',(cx+x,cy+y,.51),(.021,.023,.19),'Wood')
+ part('Cart floor',(cx,cy,.365),(.29,.43,.037),'Wood')
+ part('Covered load',(cx,cy-.08,.56),(.23,.28,.15),'Sand',edge=.075)
  combine_static('Farm gate')
 
 def checkpoint():
@@ -440,7 +473,13 @@ def checkpoint():
   for j in range(7):part('Painted boards',(cx,cy+side*.342,.23+j*.155),(.38,.016,.013),'Shutter')
   part('Observation window',(cx,cy+side*.362,.92),(.24,.012,.17),'WindowGlass')
   part('Stone sill',(cx,cy+side*.38,.735),(.28,.047,.023),'Badge')
-  part('Corner board',(cx+side*.362,cy,.72),(.025,.365,.56),'StuccoCream')
+  for end in [-1,1]:part('Corner board',(cx+side*.368,cy+end*.32,.72),(.022,.025,.56),'StuccoCream')
+  xx=cx+side*.385
+  part('Side casement',(xx,cy,.94),(.013,.232,.20),'StuccoCream')
+  part('Side panes',(xx+side*.015,cy,.94),(.009,.207,.172),'WindowGlass')
+  part('Side mullion',(xx+side*.025,cy,.94),(.009,.013,.173),'StuccoCream')
+  for j in range(3):part('Wainscot',(xx,cy,.23+j*.14),(.012,.31,.010),'Shutter')
+  part('Window ledge',(xx,cy,.73),(.052,.252,.021),'Masonry')
   part('Slate pent',(cx+side*.22,cy,1.35),(.252,.43,.038),'RoofSlate',rot=(0,side*.40,0))
  part('Ridge flashing',(cx,cy,1.45),(.045,.44,.038),'RoofTrim')
  part('Flagstaff',(cx+.42,cy+.24,1.26),(.023,.023,1.26),'Wood','cylinder')

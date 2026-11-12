@@ -72,9 +72,9 @@ namespace TheLineHolds
             var forward = tower ? tower.MuzzleForward : (shot.Destination - origin).normalized;
             bool mg = style == WeaponStyle.MachineGun;
             Puff(flash, origin + forward * .04f, forward * .2f, mg ? .36f : style == WeaponStyle.Cannon ? .78f : .42f, mg ? .085f : .12f, new Color(1, .86f, .42f));
-            int count = mg ? 2 : style == WeaponStyle.Cannon ? 7 : 5;
+            int count = mg ? 1 : style == WeaponStyle.Cannon ? 4 : 3;
             for (int i = 0; i < count; i++)
-                Puff(smoke, origin + forward * V(0, .14f), forward * V(.25f, .7f) + Vector3.up * V(.25f, .6f), V(.22f, mg ? .34f : .58f), V(.25f, .65f), new Color(.68f, .66f, .55f, .6f));
+                Puff(smoke, origin + forward * V(0, .14f), forward * V(.25f, .7f) + Vector3.up * V(.25f, .6f), V(.22f, mg ? .34f : .58f), V(.18f, .40f), new Color(.71f, .73f, .70f, .48f));
             if (mg)
             {
                 var side = Vector3.Cross(Vector3.up, forward).normalized;
@@ -85,8 +85,15 @@ namespace TheLineHolds
             flight.View.transform.position = origin;
             flight.Body.localScale = mg ? new Vector3(.045f, .045f, .15f) : new Vector3(.11f, .11f, style == WeaponStyle.Mortar ? .25f : .32f);
             flight.BodyRenderer.sharedMaterial = mg ? sparkMaterial : shellMaterial;
-            flight.Trail.sharedMaterial = flashMaterial; flight.Trail.widthMultiplier = mg ? .035f : .045f;
-            flight.Trail.enabled = style != WeaponStyle.Mortar;
+            bool arcing = style == WeaponStyle.Mortar;
+            flight.Trail.sharedMaterial = arcing ? smokeMaterial : flashMaterial;
+            flight.Trail.startColor = arcing ? new Color(.82f,.81f,.70f,.65f) :
+                mg ? new Color(1f,.85f,.44f) : new Color(1f,.66f,.32f);
+            var tail = flight.Trail.startColor;
+            tail.a = 0;
+            flight.Trail.endColor = tail;
+            flight.Trail.startWidth = mg ? .048f : arcing ? .095f : .080f;
+            flight.Trail.endWidth = arcing ? .12f : .014f;
             flight.Trail.SetPosition(0, origin); flight.Trail.SetPosition(1, origin);
             flights.Add(shot.Id, flight);
         }
@@ -97,12 +104,14 @@ namespace TheLineHolds
             // Simulation hits the unit centre. Draw ricochets at the exposed hull edge.
             if (armor && style != WeaponStyle.Mortar)
                 p += Vector3.ProjectOnPlane(shot.Origin - p, Vector3.up).normalized * .62f + Vector3.up * .22f;
+            if (shot.Definition.splashRadius > 0)
+                BlastSkirt(shot.Destination, shot.Definition.splashRadius);
             if (style == WeaponStyle.Mortar)
             {
                 p.y = BattleRoute.Ground(p.x, p.z) + .05f;
                 Puff(flash, p + Vector3.up * .12f, Vector3.up * .4f, .65f, .12f, new Color(1.3f, .74f, .26f));
-                GroundDust(p, 18, 1.25f);
-                for (int i = 0; i < 7; i++) Puff(smoke, p + Vector3.up * V(.2f, .4f), new Vector3(V(-.45f, .45f), V(.6f, 1.3f), V(-.45f, .45f)), V(.5f, .8f), V(.45f, .8f), new Color(.35f, .32f, .25f, .75f));
+                GroundDust(p, 6, .78f);
+                for (int i = 0; i < 4; i++) Puff(smoke, p + Vector3.up * V(.2f, .4f), new Vector3(V(-.45f, .45f), V(.6f, 1.3f), V(-.45f, .45f)), V(.38f, .63f), V(.28f, .52f), new Color(.35f, .32f, .25f, .75f));
             }
             else if (armor)
             {
@@ -113,6 +122,19 @@ namespace TheLineHolds
             }
             else GroundDust(p, style == WeaponStyle.Cannon ? 9 : 3, style == WeaponStyle.Cannon ? .7f : .27f);
             if (flights.Remove(shot.Id, out var flight)) pool.Release(flight);
+        }
+        void BlastSkirt(Vector3 centre, float radius)
+        {
+            // Low, discontinuous dust follows the real blast footprint, leaving the target visible.
+            centre.y=BattleRoute.Ground(centre.x,centre.z)+.07f;
+            float start=V(0,2*Mathf.PI);
+            for(int i=0;i<9;i++)
+            {
+                float angle=start+i*(2*Mathf.PI/9)+V(-.1f,.1f);
+                var outward=new Vector3(Mathf.Cos(angle),0,Mathf.Sin(angle));
+                Puff(dust,centre+outward*(radius*.17f),outward*radius*1.9f+Vector3.up*.23f,
+                    V(.23f,.39f),V(.27f,.42f),new Color(.68f,.59f,.45f,.70f));
+            }
         }
         void GroundDust(Vector3 p, int count, float spread)
         {
@@ -159,7 +181,7 @@ namespace TheLineHolds
                 if (f.Style == WeaponStyle.Mortar) p += Vector3.up * (4 * t * (1 - t) * 3);
                 var d = p - f.Previous; f.View.transform.position = p;
                 if (d.sqrMagnitude > .000001f) f.Body.rotation = Quaternion.LookRotation(d);
-                f.Trail.SetPosition(0, p); f.Trail.SetPosition(1, p - d.normalized * Mathf.Min((p - f.Origin).magnitude, f.Style == WeaponStyle.MachineGun ? .5f : .7f));
+                f.Trail.SetPosition(0, p); f.Trail.SetPosition(1, p - d.normalized * Mathf.Min((p - f.Origin).magnitude, f.Style == WeaponStyle.MachineGun ? .70f : f.Style == WeaponStyle.Cannon ? .96f : .40f));
                 f.Previous = p;
             }
             foreach (int id in expired) { pool.Release(flights[id]); flights.Remove(id); }

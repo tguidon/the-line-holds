@@ -6,6 +6,9 @@ namespace TheLineHolds
     public sealed class TowerVisual : MonoBehaviour
     {
         Transform traverse, slide, muzzle, barrel;
+        Transform secondMuzzle;
+        bool useSecondMuzzle;
+        Transform ActiveMuzzle => useSecondMuzzle ? secondMuzzle : muzzle;
         Vector3 rootScale;
         public DefenseDefinition Definition=>configured;
         DefenseDefinition configured; GameObject markings;
@@ -21,8 +24,17 @@ namespace TheLineHolds
         float recoilAge = 10, celebration=10;
         public void Celebrate(){celebration=0;}
         public WeaponStyle Style { get; private set; }
-        public Vector3 MuzzlePosition => muzzle ? muzzle.position : transform.position + Vector3.up * .65f;
-        public Vector3 MuzzleForward => muzzle && barrel ? (muzzle.position - barrel.position).normalized : aimForward;
+        public Vector3 MuzzlePosition => ActiveMuzzle ? ActiveMuzzle.position : transform.position + Vector3.up * .65f;
+        public Vector3 MuzzleForward
+        {
+            get
+            {
+                if(!muzzle || !barrel)return aimForward;
+                var direction=muzzle.position-barrel.position;
+                if(secondMuzzle)direction=Vector3.ProjectOnPlane(direction,secondMuzzle.position-muzzle.position);
+                return direction.normalized;
+            }
+        }
         public float RecoilDistance { get; private set; }
         public float RecoveryDuration => Style == WeaponStyle.Cannon ? .48f : Style == WeaponStyle.Mortar ? .26f : .12f;
         void Awake()
@@ -32,15 +44,17 @@ namespace TheLineHolds
             var parts = GetComponentsInChildren<Transform>();
             traverse = parts.FirstOrDefault(t => t.name.StartsWith("Traverse"));
             slide = parts.FirstOrDefault(t => t.name.StartsWith("Recoil"));
+            secondMuzzle = parts.FirstOrDefault(t => t.name.StartsWith("Second muzzle"));
             muzzle = parts.FirstOrDefault(t => t.name.StartsWith("Muzzle socket"));
             barrel = parts.FirstOrDefault(t => t.name.StartsWith("Barrel"));
             if (!traverse || !barrel) return;
             bindRotation = traverse.rotation;
-            bindForward = Vector3.ProjectOnPlane(barrel.position - traverse.position, Vector3.up).normalized;
+            var centreline = secondMuzzle ? (secondMuzzle.position+muzzle.position)*.5f : muzzle ? muzzle.position : barrel.position;
+            bindForward = Vector3.ProjectOnPlane(centreline - traverse.position, Vector3.up).normalized;
             aimForward = bindForward;
             if (slide) bindPosition = slide.localPosition;
         }
-        public void Fire() { recoilAge = 0; ApplyRecoil(); }
+        public void Fire() { useSecondMuzzle = secondMuzzle && !useSecondMuzzle; recoilAge = 0; ApplyRecoil(); }
         public void FireAt(Vector3 destination)
         {
             Turn(destination - transform.position, 0, true);
