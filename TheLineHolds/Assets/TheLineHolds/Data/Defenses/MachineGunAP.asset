@@ -20,7 +20,7 @@ MonoBehaviour:
   slowDuration: 0
   description: Longer reach / strong against light armor
   cost: 355
-  range: 4.4
+  range: 4.5
   interval: 0.25
   damage: 21
   splashRadius: 0

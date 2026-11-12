@@ -42,7 +42,7 @@ namespace TheLineHolds
         public void NewMatch(int seed=0)
         {
             Unsubscribe(); ClearViews(); audioPlayer.ResetAudio(); InMenu=false; Placement=SelectedPad=-1;
-            Match=new MatchState(waves,new BattleRoute(BattleRoute.DefaultPoints),BattleRoute.DefaultPads,seed==0?System.Environment.TickCount:seed);GameSpeed=1;hud.CloseOptions();
+            Match=new MatchState(waves,BattleRoute.Countryside(),BattleRoute.DefaultPads,seed==0?System.Environment.TickCount:seed);GameSpeed=1;hud.CloseOptions();
             Match.Cue += OnCue; Match.ShotFired += OnShotFired; Match.ShotImpacted += OnShotImpacted; Match.EnemyDamaged+=EnemyViews.Hit; Match.EnemyKilled+=OnEnemyKilled;
             CameraControls.ResetView(); Notice="Deploy your defenses. Wave 1 waits for your order.";
         }
@@ -77,7 +77,21 @@ namespace TheLineHolds
         }
         public void StartNextWave()
         {
-            if(Match!=null && Match.StartWave()) { Cancel(); Notice=waves[Match.Wave-1].briefing; }
+            if(Match!=null && Match.StartWave(FindOffscreenEntry)) { Cancel(); Notice=waves[Match.Wave-1].briefing; }
+        }
+        readonly Plane[] entryPlanes=new Plane[6];
+        float FindOffscreenEntry()
+        {
+            GeometryUtility.CalculateFrustumPlanes(battleCamera,entryPlanes);
+            // Allow for the longest vehicle, the health bar and the outer infantry lane.
+            var bounds=new Bounds(Vector3.zero,new Vector3(5.5f,3,5.5f));
+            float distance=0;
+            do
+            {
+                distance-=1;
+                bounds.center=Match.Route.Position(distance)+Vector3.up;
+            } while(GeometryUtility.TestPlanesAABB(entryPlanes,bounds));
+            return distance;
         }
         public void SellSelected()
         {

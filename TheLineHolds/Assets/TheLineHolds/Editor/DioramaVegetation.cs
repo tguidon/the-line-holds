@@ -42,7 +42,7 @@ namespace TheLineHolds.Editor
                     grassT.AddRange(new[]{index,index+2,index+1});
                     var color=Color.Lerp(DioramaSurface.Hex("61754A"),DioramaSurface.Hex("B4B47C"),R());grassColors.Add(color);grassColors.Add(color);grassColors.Add(color);
                 }
-                if(i%15==0 && RoadDistance(p)>1.55f && !BattleRoute.DefaultPads.Any(pad=>new Vector2(pad.x-x,pad.z-z).magnitude<1.55f))
+                if(i%15==0 && RoadDistance(p)>1.55f && !BattleRoute.DefaultPads.Any(pad=>new Vector2(pad.x-x,pad.z-z).magnitude<2.1f))
                 {
                     float s=.22f+R()*.3f;
                     var placement=Matrix4x4.TRS(p,Quaternion.Euler(0,R()*360,0),Vector3.one*(.75f+s));

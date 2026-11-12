@@ -24,7 +24,7 @@ MonoBehaviour:
   slowDuration: 0
   description: Faster fire and better reach
   cost: 165
-  range: 3.7
+  range: 4
   interval: 0.26
   damage: 12
   splashRadius: 0

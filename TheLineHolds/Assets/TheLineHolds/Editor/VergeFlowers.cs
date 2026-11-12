@@ -7,7 +7,7 @@ namespace TheLineHolds.Editor
     {
         public static void Build(Transform parent)
         {
-            // Loose groups against the garden walls, gate and revetment. The road crown stays clear.
+            // Loose groups against the garden walls, gate and field edges. The road crown stays clear.
             var centres=new[]{new Vector2(-11.55f,-3.43f),new Vector2(-10.2f,.96f),
                 new Vector2(-9.65f,2.67f),new Vector2(-2.15f,-6.54f),new Vector2(3.2f,-6.16f),
                 new Vector2(10.54f,-2.63f),new Vector2(10.72f,6.56f)};

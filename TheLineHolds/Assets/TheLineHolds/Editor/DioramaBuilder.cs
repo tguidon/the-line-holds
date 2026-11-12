@@ -76,10 +76,10 @@ namespace TheLineHolds.Editor
             AssetDatabase.DeleteAsset(DioramaSurface.Root+"/RoadDiagnostic.asset");
             AssetDatabase.DeleteAsset(DioramaSurface.Root+"/Earth strata.mat");
             RefreshModels(new[]{"Pine","Bush","Farmhouse","Crate","Sandbags","FieldGate","Checkpoint","RoadSign","FieldFence","BuildStake","Revetment","Duckboard","FieldStone"});
-            var trees=new[]{new Vector2(-10.8f,5.6f),new Vector2(-11,2.5f),new Vector2(-10.9f,-.5f),new Vector2(-8.6f,6),new Vector2(-1.2f,6.2f),new Vector2(2.8f,6.1f),new Vector2(10.5f,-5.7f),new Vector2(11,-3),new Vector2(9.3f,6.4f)};
+            var trees=new[]{new Vector2(-10.8f,5.6f),new Vector2(-11,2.5f),new Vector2(-10.9f,-.5f),new Vector2(-8.6f,6.8f),new Vector2(-1.2f,6.85f),new Vector2(2.8f,6.8f),new Vector2(10.5f,-5.7f),new Vector2(11,-3),new Vector2(9.3f,6.4f)};
             for(int i=0;i<trees.Length;i++)Model("Pine",BattleRoute.OnGround(trees[i].x,trees[i].y),.8f+(i%3)*.13f,i*57);
             Model("Farmhouse",BattleRoute.OnGround(-10.4f,.1f),.65f,15);Model("Farmhouse",BattleRoute.OnGround(10.4f,-.4f),.65f,-20);
-            Model("Crate",BattleRoute.OnGround(-3,6),.7f,20);Model("Crate",BattleRoute.OnGround(9.8f,4),.7f,-15);
+            Model("Crate",BattleRoute.OnGround(-3,6.9f),.7f,20);Model("Crate",BattleRoute.OnGround(9.8f,4),.7f,-15);
             FoliageMaterials.Configure();
             DioramaVegetation.Build(environment);
             BattlefieldDetails.Build(environment);
@@ -141,6 +141,13 @@ namespace TheLineHolds.Editor
                     var gait=go.AddComponent<InfantryVisual>();
                     if(name=="Scout")gait.SetGait(34,8.5f);
                     if(name=="AssaultInfantry")gait.SetGait(16,11);
+                }
+                if(name=="TankHunter")
+                {
+                    // The FBX recoil assembly points along its local Y axis. Keep the socket
+                    // and moving barrel together and leave the carriage and shield full size.
+                    var slide=go.GetComponentsInChildren<Transform>().Single(t=>t.name.Split('.')[0]=="Recoil");
+                    slide.localScale=Vector3.Scale(slide.localScale,new Vector3(1,.64f,1));
                 }
                 if(new[]{"MachineGun","AntiTank","Mortar","MachineGunII","MachineGunRapid","MachineGunAP","AntiTankII","TankHunter","FieldHowitzer","MortarII","SiegeMortar","BarrageMortar"}.Contains(name))go.AddComponent<TowerVisual>();
                 PrefabUtility.SaveAsPrefabAsset(go,Root+"/Prefabs/"+name+".prefab");UnityEngine.Object.DestroyImmediate(go);

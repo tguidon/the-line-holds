@@ -19,12 +19,6 @@ namespace TheLineHolds.Editor
             float Box(float cx,float cz,float hx,float hz)=>1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.8f,1.05f,Mathf.Max(Mathf.Abs(x-cx)/hx,Mathf.Abs(z-cz)/hz)));
             return Mathf.Max(Box(-10.4f,1.8f,.75f,.55f),Box(10.3f,-1.8f,.75f,.5f));
         }
-        public static float ScrapeWeight(float x,float z)
-        {
-            float along=1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(2.0f,2.35f,Mathf.Abs(x+.4f)));
-            float across=1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.20f,.36f,Mathf.Abs(z+6.08f)));
-            return along*across;
-        }
         public static Vector2 NearestRoad(Vector2 p)
         {
             var points=BattleRoute.DefaultPoints;float best=float.MaxValue;Vector2 nearest=p;
@@ -36,7 +30,7 @@ namespace TheLineHolds.Editor
             }
             return nearest;
         }
-        public static bool Reserved(Vector3 p)=>GardenWeight(p.x,p.z)>.05f || (Mathf.Abs(p.x+.4f)<2.9f && Mathf.Abs(p.z+6.08f)<.9f)
+        public static bool Reserved(Vector3 p)=>GardenWeight(p.x,p.z)>.05f
             || (p.x<-10.6f && p.z<-3.7f) || (p.x>10.2f && p.z>3.8f);
         static GameObject Model(string name,Vector3 position,Vector3 scale,float yaw=0)
         {
@@ -67,7 +61,7 @@ namespace TheLineHolds.Editor
             // Gate approaches and supplies tell apart the exposed enemy lane and the defended rear.
             OnGround("Crate",10.0f,6.15f,.65f,8);OnGround("Crate",10.65f,6.25f,.52f,-12);
             OnGround("FieldFence",-11.35f,-3.15f,.8f,90);
-            OnGround("FieldFence",11.35f,2.85f,.8f,90);
+            OnGround("FieldFence",11.8f,3.1f,.8f,90);
             // Small cultivated plots and boundaries give the two farms a place in the landscape.
             foreach(var centre in new[]{new Vector2(-10.4f,1.8f),new Vector2(10.3f,-1.8f)})
             {
@@ -77,14 +71,6 @@ namespace TheLineHolds.Editor
                     OnGround("Bush",centre.x-.55f+plant*.27f,centre.y-.35f+row*.34f,.16f,plant*73+row*31);
             }
             OnGround("Crate",-9.7f,-.9f,.5f,15);
-            // A shallow timber-lined communication scrape, kept out of every combat corridor.
-            for(int section=0;section<3;section++)
-            {
-                float x=-1.95f+section*1.55f;
-                OnGround("Revetment",x,-6.37f,.95f);OnGround("Revetment",x,-5.79f,.95f,180);
-                Model("Duckboard",BattleRoute.OnGround(x,-6.08f)+Vector3.up*.035f,Vector3.one);
-            }
-            OnGround("Crate",2.35f,-6.05f,.65f,30);
             BoundaryWall(-11.48f,-2.75f,1.65f);
             BoundaryWall(10.96f,-.98f,2.00f);
             // Boots and tyres have swept the heavy grit off the crown of the road.
@@ -105,7 +91,7 @@ namespace TheLineHolds.Editor
             EarthDetail();
             Combine();
             VergeFlowers.Build(parent);
-            Debug.Log("[Map composition] Ten cleared gun sites; entry gate, exit checkpoint, farm plots, boundaries, timber field position, and detailed earth cut.");
+            Debug.Log("[Map composition] Ten cleared gun sites; entry gate, exit checkpoint, farm plots, boundaries and detailed earth cut.");
         }
         static void BoundaryWall(float x,float z,float length)
         {

@@ -89,11 +89,11 @@ namespace TheLineHolds
             tower.Cooldown=Mathf.Min(tower.Cooldown,tower.Definition.interval);
             Emit("place",Pads[pad]);return true;
         }
-        public bool StartWave()
+        public bool StartWave(Func<float> entryDistance=null)
         {
             if (Paused || Phase != MatchPhase.Preparation) return false;
             Wave++;
-            spawner.Begin(waves[Wave - 1],Seed+Wave*7919);
+            spawner.Begin(waves[Wave - 1],Seed+Wave*7919,entryDistance);
             Phase = MatchPhase.Combat;
             Journal?.Invoke($"Wave {Wave} started; funds={Funds}, lives={Lives}");
             return true;

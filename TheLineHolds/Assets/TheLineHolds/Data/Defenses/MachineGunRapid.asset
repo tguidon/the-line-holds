@@ -20,7 +20,7 @@ MonoBehaviour:
   slowDuration: 0.6
   description: Rapid fire / briefly slows single targets
   cost: 345
-  range: 3.9
+  range: 4.1
   interval: 0.16
   damage: 14
   splashRadius: 0

@@ -18,7 +18,7 @@ namespace TheLineHolds.Editor
             new Building("StoneCottage",-6,24,.8f,-40,1.6f),new Building("ToolShed",28,-23,1,-15,1.5f)
         };
         public static readonly Vector2[][] Roads={
-            Path(-12,-5,-16,-5,-21,-9,-31,-15,-55,-17,-90,-18),
+            BattleRoute.WesternLane,
             Path(-16,-5,-18,3,-20,10,-16,15,-3,16,10,16,18,12,17,6,12,5),
             Path(12,5,16,5,21,1,23,-6,19,-14,5,-17,-10,-18,-21,-9),
             Path(-3,16,-4,30,3,60,10,90),Path(23,-6,40,-4,60,0,90,0),Path(5,-17,8,-32,4,-65,0,-90),

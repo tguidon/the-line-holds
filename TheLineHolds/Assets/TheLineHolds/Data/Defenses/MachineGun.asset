@@ -22,7 +22,7 @@ MonoBehaviour:
   slowDuration: 0
   description: Single infantry / weak vs armor
   cost: 75
-  range: 3.3
+  range: 3.7
   interval: 0.32
   damage: 8
   splashRadius: 0

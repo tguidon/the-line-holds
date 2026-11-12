@@ -20,7 +20,7 @@ MonoBehaviour:
   slowDuration: 0
   description: Long-range heavy armor specialist
   cost: 515
-  range: 6.6
+  range: 6.8
   interval: 1.65
   damage: 255
   splashRadius: 0

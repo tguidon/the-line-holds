@@ -16,14 +16,14 @@ namespace TheLineHolds
             for(int index=0;index<match.Enemies.Count;index++)
             {
                 var enemy=match.Enemies[index];
-                if (enemy.Resolved || FlatDistance(enemy.Position, match.Pads[tower.Pad]) > tower.Definition.range) continue;
+                if (enemy.Resolved || enemy.Distance<0 || FlatDistance(enemy.Position, match.Pads[tower.Pad]) > tower.Definition.range) continue;
                 int score = 0;
                 if (tower.Definition.priority == TargetPriority.Armor) score = enemy.Definition.armored ? 1 : 0;
                 if (tower.Definition.priority == TargetPriority.Cluster)
                 {
                     var impact = predicted[index];
                     for(int j=0;j<match.Enemies.Count;j++)
-                        if (!match.Enemies[j].Resolved && FlatDistance(predicted[j], impact) <= tower.Definition.splashRadius)
+                        if (match.Enemies[j].Distance>=0 && !match.Enemies[j].Resolved && FlatDistance(predicted[j], impact) <= tower.Definition.splashRadius)
                             score++;
                 }
                 if (best == null || score > bestScore || (score == bestScore &&
@@ -73,7 +73,7 @@ namespace TheLineHolds
                 if (shot.Definition.splashRadius > 0)
                 {
                     for (int j = match.Enemies.Count - 1; j >= 0; j--)
-                        if (FlatDistance(match.Enemies[j].Position, shot.Destination) <= shot.Definition.splashRadius)
+                        if (match.Enemies[j].Distance>=0 && FlatDistance(match.Enemies[j].Position, shot.Destination) <= shot.Definition.splashRadius)
                             Damage(match, match.Enemies[j], DamageFor(shot.Definition, match.Enemies[j].Definition),shot.Definition);
                 }
                 else Damage(match, shot.Target, DamageFor(shot.Definition, shot.Target.Definition),shot.Definition);

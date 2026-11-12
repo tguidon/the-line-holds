@@ -50,7 +50,7 @@ namespace TheLineHolds.Editor
             var pads=BattleRoute.DefaultPads;
             var approaches=Array.ConvertAll(pads,p=>BattlefieldDetails.NearestRoad(new Vector2(p.x,p.z)));
             var colors=new Color32[width*height];var rng=new System.Random(1944);
-            var pathSoil=Hex("9E9475");var gardenEarth=Hex("796448");var scrapeEarth=Hex("4F4938");
+            var pathSoil=Hex("9E9475");var gardenEarth=Hex("796448");
             for(int z=0;z<height;z++)for(int x=0;x<width;x++)
             {
                 int i=z*width+x;float px=x*24f/(width-1)-12,pz=z*14f/(height-1)-7;
@@ -77,11 +77,9 @@ namespace TheLineHolds.Editor
                 }
                 c=Color.Lerp(c,pathSoil,approach*.48f*(1-blend));
                 if(clearing>0)c=Color.Lerp(c,FieldPigment.GunSite(px,pz,siteOffset,fine),clearing);
-                // Authored garden beds and communication scrape sit clear of the road and gun sites.
+                // Authored garden beds sit clear of the road and gun sites.
                 float garden=BattlefieldDetails.GardenWeight(px,pz);
                 c=Color.Lerp(c,gardenEarth*(.94f+fine*.12f),garden);
-                float scrape=BattlefieldDetails.ScrapeWeight(px,pz);
-                c=Color.Lerp(c,scrapeEarth,scrape*.88f);
                 // Fine pigment grain avoids uniform plastic surfaces; it is filtered by mipmaps.
                 c*=.965f+(float)rng.NextDouble()*.07f+(fine-.5f)*.08f;
                 colors[i]=c;
