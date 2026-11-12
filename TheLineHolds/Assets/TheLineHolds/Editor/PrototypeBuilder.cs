@@ -50,9 +50,9 @@ namespace TheLineHolds.Editor
             controller.tracerMaterial=materials["Flash"]; controller.rangeMaterial=materials["Range"]; controller.healthMaterial=materials["Health"]; controller.damageMaterial=materials["Damage"]; controller.smokeMaterial=materials["Smoke"];
             controller.audioPlayer=controller.gameObject.AddComponent<BattleAudio>(); BuildAudio(controller.audioPlayer);
             var font=BuildFont(); var hud=new GameObject("Command UI").AddComponent<GameHud>(); hud.font=font; controller.hud=hud;
-            PlayerSettings.companyName="The Line Holds"; PlayerSettings.productName="The Line Holds"; PlayerSettings.bundleVersion="0.1.0";
+            PlayerSettings.companyName="The Line Holds"; PlayerSettings.productName="The Line Holds";
             PlayerSettings.defaultScreenWidth=1920; PlayerSettings.defaultScreenHeight=1080; PlayerSettings.fullScreenMode=FullScreenMode.Windowed; PlayerSettings.resizableWindow=true;
-            PlayerSettings.runInBackground=true; PlayerSettings.macOS.buildNumber="1";
+            PlayerSettings.runInBackground=true;
             EditorUtility.SetDirty(profile); EditorUtility.SetDirty(urp);
             EditorSceneManager.SaveScene(scene,Root+"/Scenes/Countryside.unity");
             EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene(Root+"/Scenes/Countryside.unity",true)};

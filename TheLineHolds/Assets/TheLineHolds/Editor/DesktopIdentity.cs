@@ -27,7 +27,6 @@ namespace TheLineHolds.Editor
             var icon=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/TheLineHolds/Art/Identity/AppIcon.png");
             if(!icon)throw new Exception("Application icon missing");
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Standalone,Identifier);
-            PlayerSettings.bundleVersion="0.1.1";PlayerSettings.macOS.buildNumber="2";
             PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Unknown,new[]{icon});
             var sizes=PlayerSettings.GetIconSizesForTargetGroup(BuildTargetGroup.Standalone,IconKind.Application);
             var icons=new Texture2D[sizes.Length];Array.Fill(icons,icon);

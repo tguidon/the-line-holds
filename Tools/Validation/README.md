@@ -62,3 +62,20 @@ Use `CheckTacticalPause.Orders` and `.Disabled` in Edit Mode, and `.Play` plus `
 To rebuild scenery with Countryside open and Play Mode stopped, run `AgentScripts/RefineCountryside.cs --entry RefineCountryside.All` through Pipeline `script run`. The five new Blender types are generated with `--only StoneCottage,VillageInn,Dairy,ToolShed,VillageWell`. `ShowCountryside` provides Panorama/Village/Farm temporary cameras and Reset. `PrepareSilentReview.All` silences only the isolated editor's audio for concurrent player testing.
 
 Build separate review outputs with `unity command build run --target StandaloneOSX --output-path "$PWD/TheLineHolds/Builds/macOS-Review/The Line Holds.app" --options '[]' --confirm true --project-path "$PWD/TheLineHolds"`, and similarly `StandaloneWindows64` to `Builds/Windows-Review/The Line Holds.exe`. Do not overwrite/register/relaunch the active release while the user is testing. The macOS callback deliberately leaves `macOS-Review` unregistered. Current review builds pass but have not been run natively; the historical full native campaign remains separately recorded.
+
+### Desktop releases
+
+Set the game version in Unity Player Settings and increment the macOS build number. The scene and identity generators preserve these values. Build both players with development options off into a fresh directory, for example `Builds/Release-0.0.1/macOS/The Line Holds.app` and `Builds/Release-0.0.1/Windows/The Line Holds.exe`.
+
+The Apple silicon 0.0.1 build uses an ad-hoc signature. Unity's architecture processing invalidated four bundled framework signatures. For this ad-hoc build, the repair before packaging was:
+
+```sh
+app='TheLineHolds/Builds/Release-0.0.1/macOS/The Line Holds.app'
+for framework in "$app"/Contents/Frameworks/*.dylib; do
+  codesign --verify --strict "$framework" 2>/dev/null || codesign --force --sign - --preserve-metadata=identifier,entitlements,flags "$framework" || exit 1
+done
+codesign --force --sign - --preserve-metadata=identifier,entitlements,flags "$app"
+python3 Tools/Validation/package_builds.py --builds TheLineHolds/Builds/Release-0.0.1 --version 0.0.1
+```
+
+Release packaging checks the app signature and requires both binaries. Extract the macOS ZIP and launch its app to check the version and graphics backend in the player log. The Windows ZIP includes the executable, its data folder and the runtime libraries.

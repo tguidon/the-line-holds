@@ -37,6 +37,7 @@ namespace TheLineHolds
             CameraControls.Initialize(battleCamera,this);
             EnemyViews=new EnemyViewPool(dynamicRoot,battleCamera,healthMaterial,combatEffects);
             hud.Initialize(this); MainMenu();
+            Debug.Log($"The Line Holds {Application.version} ready on {Application.platform} ({SystemInfo.graphicsDeviceType}).");
         }
         public void NewMatch(int seed=0)
         {
