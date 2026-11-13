@@ -543,11 +543,19 @@ def barn():
   for y in [-1.5,-1,-.5,0,.5,1,1.5]:part('Barn siding',(side*1.19,y,1),(.018,.025,.86),'Bark',edge=.002)
   part('Barn doors',(side*.47,-1.695,.89),(.45,.025,.77),'Shutter',edge=.006)
   part('Door brace',(side*.47,-1.73,.88),(.025,.025,.7),'Sand',rot=(0,side*.47,0),edge=.003)
-  part('Roof pitch',(side*.62,0,2.12),(.77,1.87,.06),'RoofSlate',rot=(0,side*.5,0),edge=.008)
-  verts=[(-1.18,side*1.68,1.88),(1.18,side*1.68,1.88),(0,side*1.68,2.53)]
-  m=bpy.data.meshes.new('Barn gable');m.from_pydata(verts,[],[(0,1,2)] if side<0 else [(2,1,0)])
-  o=bpy.data.objects.new('Barn gable',m);bpy.context.collection.objects.link(o);m.materials.append(materials['Wood'])
- part('Barn ridge',(0,0,2.51),(.07,1.9,.055),'RoofTrim',edge=.008)
+  for end in [-1,1]:
+   part('Door hinge',(side*.80,-1.735,.90+end*.52),(.14,.022,.024),'Steel',edge=.004)
+  part('Door jamb',(side*.99,-1.72,.99),(.055,.055,.86),'Bark',edge=.007)
+  for y in [-.72,.75]:
+   part('Loft window frame',(side*1.205,y,1.41),(.036,.24,.27),'Bark',edge=.007)
+   part('Loft glass',(side*1.248,y,1.41),(.018,.19,.22),'WindowGlass',edge=.004)
+   part('Loft mullion',(side*1.27,y,1.41),(.018,.016,.22),'Wood',edge=.003)
+ part('Door lintel',(0,-1.72,1.84),(1.04,.065,.065),'Bark',edge=.01)
+ roof_gable(1.24,1.71,1.88,.65,'RoofClay')
+ for side in [-1,1]:
+  beam('Gable rake',(side*1.21,-1.735,1.89),(0,-1.735,2.53),.036,.036,'Wood')
+ part('Hayloft shutter',(0,-1.745,2.12),(.22,.024,.18),'Shutter',edge=.004)
+ part('Hayloft sill',(0,-1.785,1.94),(.27,.073,.031),'Wood',edge=.005)
  combine_static('Barn')
 
 def roof_gable(hx,hy,eave,rise,mat='RoofSlate'):

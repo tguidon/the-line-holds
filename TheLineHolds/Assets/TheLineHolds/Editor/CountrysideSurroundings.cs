@@ -30,7 +30,7 @@ namespace TheLineHolds.Editor
                 var prefab=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/TheLineHolds/Prefabs/"+key+".prefab");if(!prefab)throw new Exception("Missing "+key);
                 var go=(GameObject)PrefabUtility.InstantiatePrefab(prefab);go.transform.SetParent(props);go.transform.position=BattleRoute.OnGround(x,z);go.transform.rotation=Quaternion.Euler(0,yaw,0);go.transform.localScale=Vector3.one*size;
             }
-            foreach(var building in CountrysideLayout.Buildings)
+            foreach(var building in CountrysideLayout.Buildings.Concat(BattlefieldFarm.Buildings))
                 Model(building.Key,building.Position.x,building.Position.y,building.Scale,building.Yaw);
             // Farm boundaries have deliberate gaps at access lanes; hedges follow the same clearances.
             void Hedge(float x0,float z0,float x1,float z1)
@@ -60,6 +60,14 @@ namespace TheLineHolds.Editor
             {
                 var p=building.Position+new Vector2(building.Radius+.7f,.5f);if(CountrysideLayout.RoadDistance(p)>1.3f)Model("Crate",p.x,p.y,.65f,17);
             }
+            foreach(Transform prop in props.Cast<Transform>().ToArray())
+            {
+                if(prop.name!="Pine" && prop.name!="Bush")continue;
+                var p=prop.position;
+                if(BattlefieldFarm.Occupied(new Vector2(p.x,p.z),prop.name=="Pine"?1.2f:.45f))
+                    UnityEngine.Object.DestroyImmediate(prop.gameObject);
+            }
+            BattlefieldFarm.Plant(root);
             PastureDetail.Build(root);
             // Batch by material and spatial sector; distant leaves retain useful culling.
             var groups=new Dictionary<string,(Material material,List<CombineInstance> parts)>();
@@ -95,7 +103,7 @@ namespace TheLineHolds.Editor
                 float lane=1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(edge-.08f,edge+.18f,distance));
                 if(lane>0)c=Color.Lerp(c,FieldPigment.Road(px,pz,distance,px),lane);
                 if(Mathf.Abs(px)<35 && Mathf.Abs(pz)<30)c=Color.Lerp(c,yard,CountrysideLayout.YardWeight(new Vector2(px,pz))*.72f);
-                float field=0;foreach(var center in fields){float dx=Mathf.Abs(px-center.x),fieldZ=Mathf.Abs(pz-center.y);field=Mathf.Max(field,(1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(4,5,dx)))*(1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(2.5f,3.5f,fieldZ))));}c=Color.Lerp(c,straw,field*.18f);c*=.965f+fine*.07f;pixels[z*n+x]=c;
+                float field=0;foreach(var center in fields){float dx=Mathf.Abs(px-center.x),fieldZ=Mathf.Abs(pz-center.y);field=Mathf.Max(field,(1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(4,5,dx)))*(1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(2.5f,3.5f,fieldZ))));}c=Color.Lerp(c,straw,field*.18f);c=BattlefieldFarm.Paint(px,pz,c);c*=.965f+fine*.07f;pixels[z*n+x]=c;
             }
             var texture=new Texture2D(n,n,TextureFormat.RGB24,true);texture.SetPixels32(pixels);texture.Apply();string path=DioramaSurface.Root+"/SurroundingPasture.png";File.WriteAllBytes(path,texture.EncodeToPNG());UnityEngine.Object.DestroyImmediate(texture);AssetDatabase.ImportAsset(path);
             var importer=(TextureImporter)AssetImporter.GetAtPath(path);importer.maxTextureSize=2048;importer.anisoLevel=8;importer.textureCompression=TextureImporterCompression.CompressedHQ;importer.SaveAndReimport();return AssetDatabase.LoadAssetAtPath<Texture2D>(path);

@@ -55,7 +55,7 @@ namespace TheLineHolds.Editor
             {
                 int i=z*width+x;float px=x*24f/(width-1)-12,pz=z*14f/(height-1)-7;
                 float fine=Mathf.PerlinNoise(px*8+17,pz*8+9);
-                Color c=FieldPigment.Grass(px,pz);
+                Color c=BattlefieldFarm.Paint(px,pz,FieldPigment.Grass(px,pz));
                 float edge=.91f+(Mathf.PerlinNoise(px*3+80,pz*3+80)-.5f)*.32f;
                 float blend=1-FieldPigment.Ramp(edge-.09f,edge+.16f,distance[i]);
                 if(blend>0)

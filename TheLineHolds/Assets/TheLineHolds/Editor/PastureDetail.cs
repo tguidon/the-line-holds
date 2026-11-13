@@ -16,9 +16,10 @@ namespace TheLineHolds.Editor
                 if(CountrysideLayout.Reserved(p) || Mathf.PerlinNoise(x*.65f+37,z*.65f+52)<.38f)continue;
                 var tile=new Vector2Int(Mathf.FloorToInt(x/10),Mathf.FloorToInt(z/10));if(!batches.TryGetValue(tile,out var data))data=(new List<Vector3>(),new List<int>());
                 var ground=BattleRoute.OnGround(x,z)-Vector3.up*.045f;
+                bool cleared=BattlefieldFarm.Occupied(p,.05f);
                 for(int blade=0;blade<5;blade++)
                 {
-                    float angle=R()*Mathf.PI*2;var side=new Vector3(Mathf.Cos(angle),0,Mathf.Sin(angle));var root=ground+new Vector3((R()-.5f)*.18f,0,(R()-.5f)*.18f);float h=.10f+R()*.18f,w=.012f+R()*.013f;int i=data.vertices.Count;
+                    float angle=R()*Mathf.PI*2;var side=new Vector3(Mathf.Cos(angle),0,Mathf.Sin(angle));var root=ground+new Vector3((R()-.5f)*.18f,0,(R()-.5f)*.18f);float h=.10f+R()*.18f,w=.012f+R()*.013f;if(cleared)continue;int i=data.vertices.Count;
                     data.vertices.Add(root-side*w);data.vertices.Add(root+side*w);data.vertices.Add(root+Vector3.up*h+side*.055f);data.triangles.AddRange(new[]{i,i+2,i+1});
                 }
                 batches[tile]=data;
