@@ -22,6 +22,8 @@ The match starts with 300 funds and 20 lives. Kill rewards depend on enemy type;
 - `AgentScripts/VerifyPrototype.cs`: focused checks against the actual simulation and authored data.
 - `Tools/Blender/generate_assets.py` and `miniatures.blend`: original editable model sources.
 
+Download desktop builds from [GitHub Releases](https://github.com/tguidon/the-line-holds/releases). Maintainers can follow the [desktop release and Apple notarization guide](Tools/Validation/README.md#desktop-releases).
+
 ## Repeatable commands
 
 From the repository root, with Unity CLI installed:

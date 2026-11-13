@@ -65,14 +65,90 @@ Build separate review outputs with `unity command build run --target StandaloneO
 
 ### Desktop releases
 
-Set the game version in Unity Player Settings and increment the macOS build number. The scene and identity generators preserve these values. Build both players with development options off into a fresh directory, for example `Builds/Release-0.0.1/macOS/The Line Holds.app` and `Builds/Release-0.0.1/Windows/The Line Holds.exe`.
+Run these commands from the repository root on the signing Mac. Install the project’s Unity editor version, macOS and Windows standalone modules, Xcode command line tools, and GitHub CLI. Sign in to GitHub with release write access. Use a fresh build directory for each version.
 
-For a public GitHub release, use a Developer ID Application identity with its private key in the login keychain. Save notarization credentials once in Terminal with `xcrun notarytool store-credentials TheLineHolds-notary`. The signing tool reads that named profile from Keychain.
+#### Build both players
+
+1. Set the version in **Player Settings → Player → Version** and increment the standalone macOS build number. For 0.0.2 these values are `0.0.2` and `4`. Commit the updated `ProjectSettings.asset` with any release tooling. Check the branch and remote tags before selecting a new version.
+2. Set the paths below in the same shell. Open the project in Unity and wait for the editor to be ready.
 
 ```sh
-app='TheLineHolds/Builds/Release-0.0.1/macOS/The Line Holds.app'
-Tools/Validation/notarize_mac.sh "$app" 'Developer ID Application: YOUR NAME (TEAMID)' TheLineHolds-notary
-python3 Tools/Validation/package_builds.py --builds TheLineHolds/Builds/Release-0.0.1 --version 0.0.1
+version=0.0.2
+tag="v$version"
+project="$PWD/TheLineHolds"
+release="$project/Builds/Release-$version"
+app="$release/macOS/The Line Holds.app"
+mac_zip="$release/Packages/The-Line-Holds-$version-macOS.zip"
+win_zip="$release/Packages/The-Line-Holds-$version-Windows-x64.zip"
+unity status --project-path "$project" --until-ready
+unity command build run --project-path "$project" --target StandaloneOSX --output-path "$app" --options '[]' --confirm true
+unity command build status --project-path "$project" | head -11
 ```
 
-If a submission is interrupted after upload, use the printed submission ID with `xcrun notarytool info` or `log` and the same keychain profile. After acceptance, staple the ticket to the submitted app and validate it before packaging. Extract the final ZIP in a fresh directory, run `syspolicy_check distribution` on the extracted app, and launch it to check the player log for the main menu on Metal. For a signing-only replacement, use the original version tag and the original Windows ZIP.
+Wait for the macOS build to report `Succeeded`, then run the Windows build and check its own report. Empty build options produce release players.
+
+```sh
+unity command build run --project-path "$project" --target StandaloneWindows64 --output-path "$release/Windows/The Line Holds.exe" --options '[]' --confirm true
+unity command build status --project-path "$project" | head -11
+```
+
+#### Sign and notarize the macOS app
+
+Use the **Developer ID Application** certificate with its private key in the login keychain. Copy the full identity name from the first command. On a new Mac, use the interactive credentials command once and enter the Apple account details at its prompts. The release script uses the saved Keychain profile.
+
+```sh
+security find-identity -v -p codesigning
+xcrun notarytool store-credentials TheLineHolds-notary
+```
+
+```sh
+identity='Developer ID Application: YOUR NAME (TEAMID)'
+Tools/Validation/notarize_mac.sh "$app" "$identity" TheLineHolds-notary
+```
+
+The script signs nested libraries and plug-ins first, signs the app with hardened runtime and the Unity entitlements, verifies the signature, and submits a ZIP to Apple. Keep the printed submission ID. After Apple accepts the submission, the script staples the ticket to the app, validates the ticket, and checks Gatekeeper distribution policy.
+
+If the connection drops after submission, check the existing submission before resubmitting. An `Invalid` result has a diagnostic log. For an `Accepted` result, staple the same signed app that was submitted. A rebuilt or re-signed app needs a new submission.
+
+```sh
+xcrun notarytool info "$submission" --keychain-profile TheLineHolds-notary
+xcrun notarytool log "$submission" --keychain-profile TheLineHolds-notary
+# After Accepted:
+xcrun stapler staple "$app"
+xcrun stapler validate "$app"
+syspolicy_check distribution "$app"
+```
+
+#### Package, verify and publish
+
+Package the stapled app and Windows player. The packager verifies the Mac signature and ticket, preserves bundle metadata, and excludes Windows debug symbols and backup folders. Test the final archives and launch the extracted app. Check version, menu and deployment to a battlefield.
+
+```sh
+python3 Tools/Validation/package_builds.py --builds "$release" --version "$version"
+unzip -tq "$mac_zip" && unzip -tq "$win_zip"
+review_dir=$(mktemp -d)
+ditto -x -k "$mac_zip" "$review_dir"
+xcrun stapler validate "$review_dir/The Line Holds.app"
+syspolicy_check distribution "$review_dir/The Line Holds.app"
+open "$review_dir/The Line Holds.app"
+shasum -a 256 "$mac_zip" "$win_zip"
+```
+
+Tag the exact release commit. Push the source and annotated tag, then create a draft with the two ZIPs attached. Write player-facing changes and installation instructions in a temporary notes file. Replace `$notes` with its path.
+
+```sh
+git tag -a "$tag" -m "The Line Holds $version"
+git push --atomic origin main "$tag"
+gh release create "$tag" "$mac_zip" "$win_zip" --verify-tag --draft --title "The Line Holds $version" --notes-file "$notes"
+gh workflow run windows-release-check.yml --ref "$tag" -f version="$version"
+gh run list --workflow windows-release-check.yml
+gh run watch "$run_id" --exit-status
+```
+
+The Windows runner downloads the staged ZIP, launches the player, deploys from the title screen, and checks the game version in its battlefield startup log. The [Windows playtest checklist](windows-checklist.md) covers hands-on campaign and audio checks. Compare the uploaded filenames, byte counts and SHA-256 digests with the local archives before publishing. If a previous attempt created a draft, resume that draft. For a signing-only replacement of an existing Mac release, retain the original source tag and Windows ZIP.
+
+```sh
+gh release view "$tag" --json isDraft,assets --jq '{draft:.isDraft,assets:[.assets[]|{name,size,digest}]}'
+gh release edit "$tag" --draft=false --latest
+gh release view "$tag" --json url,isDraft,tagName,assets --jq '{url,isDraft,tagName,files:[.assets[].name]}'
+```
