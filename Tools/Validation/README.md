@@ -140,7 +140,7 @@ Tag the exact release commit. Push the source and annotated tag, then create a d
 git tag -a "$tag" -m "The Line Holds $version"
 git push --atomic origin main "$tag"
 gh release create "$tag" "$mac_zip" "$win_zip" --verify-tag --draft --title "The Line Holds $version" --notes-file "$notes"
-gh workflow run windows-release-check.yml --ref "$tag" -f version="$version"
+gh workflow run windows-release-check.yml --ref main -f version="$version"
 gh run list --workflow windows-release-check.yml
 gh run watch "$run_id" --exit-status
 ```

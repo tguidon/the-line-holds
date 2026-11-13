@@ -7,13 +7,14 @@ on:
         required: true
         type: string
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
-  launch:
+  download:
     runs-on: windows-2022
-    timeout-minutes: 8
+    timeout-minutes: 5
+    permissions:
+      contents: write # GitHub only exposes drafts to collaborators with push access.
     steps:
       - name: Download the versioned Windows player
         shell: pwsh
@@ -26,12 +27,27 @@ jobs:
           gh release download "v$env:VERSION" --repo $env:GITHUB_REPOSITORY --pattern $zip
           if ($LASTEXITCODE -ne 0) { throw 'Release download failed' }
           Write-Host "Archive SHA-256: $((Get-FileHash $zip).Hash)"
-          Expand-Archive -LiteralPath $zip -DestinationPath "$env:RUNNER_TEMP/game"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-player
+          path: The-Line-Holds-*-Windows-x64.zip
+          compression-level: 0
+          retention-days: 1
+
+  launch:
+    needs: download
+    runs-on: windows-2022
+    timeout-minutes: 8
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-player
       - name: Launch on Windows and deploy from the title screen
         shell: pwsh
         env:
           VERSION: ${{ inputs.version }}
         run: |
+          Expand-Archive -LiteralPath "The-Line-Holds-$env:VERSION-Windows-x64.zip" -DestinationPath "$env:RUNNER_TEMP/game"
           $game = "$env:RUNNER_TEMP/game/Windows/The Line Holds.exe"
           $version = $env:VERSION
           $log = "$env:RUNNER_TEMP/player.log"
