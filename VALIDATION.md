@@ -85,7 +85,7 @@ The step 2 normal-speed standalone match passed in **312 seconds**, with **18,43
 
 macOS release, Windows cross-build, and macOS QA builds succeed with zero build warnings/errors. Release builds exclude Pipeline's server/compiler assemblies. Packages exclude build backups/symbols and pass ZIP CRC checks. Outputs stay ignored under `TheLineHolds/Builds/`.
 
-Windows runtime verification remains deferred by the user. Use a future Windows VM and `Tools/Validation/windows-checklist.md` before release on that platform.
+Windows runtime testing is deferred and does not block publishing the Windows ZIP. Follow the [Windows release checklist](Tools/Validation/windows-checklist.md).
 
 The editor and QA session opened for validation are closed at handoff; generated font atlas changes are discarded. One updated macOS release copy is left at its main menu for visual review. No live method-reload overrides or temporary input settings remain.
 

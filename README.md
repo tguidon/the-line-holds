@@ -57,7 +57,7 @@ Then run **The Line Holds → Rebuild Prototype** to update the material assignm
 
 Git LFS tracks Blender, FBX, audio, font, and image binaries. Unity caches and build output are ignored. No cloud service is needed for the prototype.
 
-Verification scripts and the Windows playtest checklist are in `Tools/Validation/`. Run `python3 Tools/Validation/package_builds.py` after successful builds to create shareable ZIPs under `TheLineHolds/Builds/Packages/`; Windows backup/symbol folders are excluded. See `VALIDATION.md` for the recorded results and deferred Windows check.
+Verification scripts and the Windows release checklist are in `Tools/Validation/`. Run `python3 Tools/Validation/package_builds.py` after successful builds to create shareable ZIPs under `TheLineHolds/Builds/Packages/`; Windows backup/symbol folders are excluded. See `VALIDATION.md` for the recorded results and deferred Windows check.
 
 For visual authoring without resetting gameplay data, stop Play Mode and run:
 

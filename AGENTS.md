@@ -19,4 +19,4 @@
 - Start with a small playable prototype and iterate in working increments.
 - Validate changes through compilation, focused tests where useful, and Play Mode checks. Inspect visual changes from the intended camera view.
 - Keep build commands repeatable and maintain separate macOS and Windows outputs.
-- Validate macOS on the Mac. For Windows, build the x64 player and inspect its archive only. Never run the Windows version, including on a VM or hosted runner. A successful build is sufficient for release.
+- Validate macOS on the Mac. Cross-build Windows x64 on the same Mac, verify the ZIP, and upload it to GitHub Releases. Do not use GitHub Actions Windows runners for any job or run the Windows player anywhere. Revisit Windows runtime testing only when the user requests it.

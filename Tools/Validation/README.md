@@ -142,7 +142,7 @@ git push --atomic origin main "$tag"
 gh release create "$tag" "$mac_zip" "$win_zip" --verify-tag --draft --title "The Line Holds $version" --notes-file "$notes"
 ```
 
-Windows acceptance is build-only. Confirm Unity reports a successful x64 build and the ZIP passes its integrity check. Never launch the Windows player locally, in a VM, or on a hosted runner.
+For Windows, the local Mac cross-build and ZIP integrity check are sufficient to publish. Attach that ZIP directly to GitHub Releases. Do not use a GitHub Actions Windows runner for any step. Runtime testing is deferred; leave the Windows player unopened.
 
 Compare the uploaded filenames, byte counts and SHA-256 digests with the local archives before publishing. If a previous attempt created a draft, resume that draft. For a signing-only replacement of an existing Mac release, retain the original source tag and Windows ZIP.
 
