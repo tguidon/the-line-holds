@@ -1,4 +1,4 @@
-// Run against the two authored layouts using the same campaign assets, purchase order and seed.
+// Run against the three authored layouts using the same campaign assets, purchase costs, role order and seed.
 using System;
 using System.Linq;
 using System.Text;
@@ -13,35 +13,43 @@ public static class CheckWinterCampaign
     {
         var game=UnityEngine.Object.FindAnyObjectByType<BattleController>();
         var report=new StringBuilder();
-        foreach (bool winter in new[]{false,true})
+        foreach (string name in new[]{"Countryside","Winter Forest","Saint-Aubin"})
         {
-            var route=winter?WinterLayout.Route():BattleRoute.Countryside();
-            var pads=winter?WinterLayout.Pads:BattleRoute.DefaultPads;
+            bool winter=name=="Winter Forest", town=name=="Saint-Aubin";
+            var route=town?TownLayout.Route(false):winter?WinterLayout.Route():BattleRoute.Countryside();
+            var pads=town?TownLayout.Pads:winter?WinterLayout.Pads:BattleRoute.DefaultPads;
+            var other=town?TownLayout.Route(true):null;
+            var order=town?new[]{4,8,5,9,3,6,7,0,1,2}:Order;
             float minClear=float.MaxValue,minCover=float.MaxValue;
             foreach(var pad in pads)
             {
                 float covered=0;
-                for(float d=0;d<route.Length;d+=.05f)
+                foreach(var entrance in other==null?new[]{route}:new[]{route,other})
                 {
-                    var offset=route.Position(d)-pad;offset.y=0;
-                    minClear=Mathf.Min(minClear,offset.magnitude);
-                    if(offset.magnitude<=game.defenses[0].range)covered+=.05f;
+                    float laneCoverage=0;
+                    for(float d=0;d<entrance.Length;d+=.05f)
+                    {
+                        var offset=entrance.Position(d)-pad;offset.y=0;
+                        minClear=Mathf.Min(minClear,offset.magnitude);
+                        if(offset.magnitude<=game.defenses[0].range)laneCoverage+=.05f;
+                    }
+                    covered=Mathf.Max(laneCoverage,covered);
                 }
                 minCover=Mathf.Min(covered,minCover);
             }
-            report.AppendLine($"{(winter?"Winter Forest":"Countryside")} {route.Length:F1} m, minimum clearance {minClear:F2} m, minimum MG coverage {minCover:F1} m");
+            report.AppendLine($"{name} {route.Length:F1} m, minimum clearance {minClear:F2} m, minimum MG coverage {minCover:F1} m");
             if(minClear<2.45f || minCover<4.5f)throw new Exception("Lost roadside clearance or base MG coverage");
             foreach(int seed in new[]{42,1944,2026}) foreach(bool mixed in new[]{true,false})
             {
-                var m=new MatchState(game.waves,route,pads,seed);
+                var m=new MatchState(game.waves,route,pads,seed,other,town?new BattleRoute(TownLayout.Entrance(false)).Length:0);
                 float finalDepth=0;
                 for(int tick=0;!m.Ended && tick<120000;tick++)
                 {
                     if(tick%30==0)
                     {
-                        for(int i=0;i<Order.Length;i++)
-                            if(m.Towers[Order[i]]==null && !m.Build(Order[i],game.defenses[mixed?Roles[i]:0]))break;
-                        foreach(int pad in Order)
+                        for(int i=0;i<order.Length;i++)
+                            if(m.Towers[order[i]]==null && !m.Build(order[i],game.defenses[mixed?Roles[i]:0]))break;
+                        foreach(int pad in order)
                         {
                             var tower=m.Towers[pad];
                             if(tower==null)continue;
@@ -53,8 +61,8 @@ public static class CheckWinterCampaign
                     if(m.Wave==10)foreach(var enemy in m.Enemies)finalDepth=Mathf.Max(finalDepth,enemy.Distance/route.Length);
                 }
                 if(mixed && (m.Phase!=MatchPhase.Victory || finalDepth<.75f || m.Lives<15))
-                    throw new Exception("Mixed defenses lost the campaign balance target");
-                if(!mixed && m.Phase!=MatchPhase.Defeat)throw new Exception("MG-only campaign should lose");
+                    throw new Exception($"{name} seed {seed} mixed defense target: {m.Lives} lives, {finalDepth:P0} penetration");
+                if(!mixed && m.Phase!=MatchPhase.Defeat)throw new Exception($"{name} MG-only campaign should lose");
                 report.AppendLine($"  {seed} {(mixed?"mixed":"MG only")}: {m.Phase} wave {m.Wave}, {m.Lives} lives, final penetration {finalDepth:P0}");
             }
         }
