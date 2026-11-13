@@ -54,6 +54,7 @@ namespace TheLineHolds
                 }
             }
             foreach(var p in game.Route.Points)Include(p);
+            if(game.SecondRoute!=null)foreach(var p in game.SecondRoute.Points)Include(p);
             foreach(var p in game.Sites)Include(p);
             float scale=Mathf.Sqrt(Screen.width/1600f*Screen.height/900f);
             float bottom=Mathf.Clamp(120*scale/Mathf.Max(1,Screen.height)+.03f,.13f,.25f);

@@ -33,7 +33,7 @@ namespace TheLineHolds
             return best;
         }
         static Vector3 PredictedPosition(MatchState match, EnemyState enemy, float seconds) =>
-            match.Route.Position(enemy.Distance + enemy.Speed * seconds, enemy.LateralOffset+enemy.AvoidanceOffset);
+            match.RouteFor(enemy.Entrance).Position(enemy.Distance + enemy.Speed * seconds, enemy.LateralOffset+enemy.AvoidanceOffset);
         public static float DamageFor(DefenseDefinition defense, EnemyDefinition enemy) =>
             defense.damage * (enemy.armored ? defense.armorDamageMultiplier : defense.infantryDamageMultiplier);
         static float FlatDistance(Vector3 a, Vector3 b)

@@ -1,0 +1,50 @@
+// Structural checks only: no campaign playthrough or balance tuning.
+using System;
+using System.Linq;
+using TheLineHolds;
+using UnityEngine;
+using UnityEditor;
+
+public static class CheckTownLayout
+{
+    public static string All()
+    {
+        void Check(bool ok,string reason){if(!ok)throw new Exception(reason);}
+        var a=TownLayout.Route(false);var b=TownLayout.Route(true);
+        float merge=new BattleRoute(TownLayout.Entrance(false)).Length;
+        Check(merge/a.Length>=.25f && merge/a.Length<=.30f,"Merge fraction: "+merge/a.Length);
+        Check(Mathf.Abs(a.Length-b.Length)<.001f,"Unequal approach lengths");
+        for(float d=merge;d<a.Length;d+=.1f)Check((a.Position(d)-b.Position(d)).magnitude<.001f,"Disconnected shared street");
+        var sites=TownLayout.Pads;
+        var mg=AssetDatabase.LoadAssetAtPath<DefenseDefinition>("Assets/TheLineHolds/Data/Defenses/MachineGun.asset");
+        float min=float.MaxValue;
+        foreach(var site in sites)
+        {
+            float nearest=float.MaxValue,coverage=0;
+            foreach(var r in new[]{a,b})
+            {
+                float length=0;
+                for(float d=0;d<r.Length;d+=.05f)
+                {
+                    float gap=Vector3.Distance(site,r.Position(d));
+                    nearest=Mathf.Min(gap,nearest);if(gap<=mg.range)length+=.05f;
+                }
+                coverage=Mathf.Max(coverage,length);
+            }
+            Check(nearest>=2.47f && coverage>=5f,$"Site {site}: clearance {nearest:F2}, coverage {coverage:F1}");
+            min=Mathf.Min(min,nearest);
+        }
+        var wave=AssetDatabase.LoadAssetAtPath<WaveDefinition>("Assets/TheLineHolds/Data/Waves/Wave1.asset");
+        for(int pattern=0;pattern<3;pattern++)
+        {
+            var match=new MatchState(new[]{wave},a,sites,42,b,merge);
+            var spawner=new WaveSpawner();spawner.Begin(wave,42,_=>-2,pattern);spawner.Step(match,500);
+            Check(match.Enemies.Count==wave.UnitCount && spawner.Complete,"Wave headcount changed");
+            var entries=match.Enemies.Select(e=>e.Entrance).Distinct().OrderBy(i=>i).ToArray();
+            Check(entries.SequenceEqual(pattern==2?new[]{0,1}:new[]{pattern}),"Incorrect entrance allocation");
+            foreach(var e in match.Enemies)
+                Check(Vector3.Distance(e.Position,match.RouteFor(e.Entrance).Position(-2,e.LateralOffset))<.001f,"Spawn off its lane");
+        }
+        return $"Both routes {a.Length:F2} m; junction at {merge:F2} m ({merge/a.Length:P1}); {sites.Length} sites, minimum centerline clearance {min:F2} m. Three entrance patterns preserve the roster.";
+    }
+}

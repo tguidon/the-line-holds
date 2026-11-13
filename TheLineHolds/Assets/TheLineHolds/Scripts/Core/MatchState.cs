@@ -6,6 +6,7 @@ namespace TheLineHolds
     public enum MatchPhase { Preparation, Combat, Victory, Defeat }
     public sealed class EnemyState
     {
+        public int Entrance;
         public int Id; public EnemyDefinition Definition; public float Health, Distance, LateralOffset;
         public float AvoidanceOffset;
         public float MaxHealth, SpeedMultiplier=1, SlowMultiplier=1, SlowRemaining;
@@ -47,6 +48,16 @@ namespace TheLineHolds
         public readonly List<ShotState> Shots = new List<ShotState>();
         public readonly TowerState[] Towers;
         public readonly BattleRoute Route;
+        public readonly BattleRoute SecondRoute;
+        readonly int[] waveEntrances;
+        public BattleRoute RouteFor(int entrance) => entrance==1 ? SecondRoute : Route;
+        public bool ShareTraffic(EnemyState a,EnemyState b,float lookAhead)
+        {
+            if(a.Entrance==b.Entrance)return true;
+            // Symmetric approaches have the same distance coordinate at the junction.
+            return Mathf.Max(a.Distance,b.Distance)+lookAhead>=mergeDistance;
+        }
+        readonly float mergeDistance;
         public readonly Vector3[] Pads;
         readonly WaveDefinition[] waves;
         readonly Economy economy = new Economy(StartingFunds);
@@ -57,9 +68,21 @@ namespace TheLineHolds
         public event Action<ShotState> ShotFired;
         public event Action<ShotState> ShotImpacted;
         public event Action<string> Journal;
-        public MatchState(WaveDefinition[] waves, BattleRoute route, Vector3[] pads,int seed=1944)
+        public MatchState(WaveDefinition[] waves, BattleRoute route, Vector3[] pads,int seed=1944,BattleRoute secondRoute=null,float mergeDistance=0)
         {
             if (waves == null || waves.Length == 0) throw new ArgumentException("Waves required.");
+            SecondRoute=secondRoute;this.mergeDistance=mergeDistance;
+            if(secondRoute!=null)
+            {
+                // Shuffle the whole campaign so every entrance pattern appears without a fixed cycle.
+                var random=new System.Random(seed^941);
+                waveEntrances=new int[waves.Length];
+                for(int i=0;i<waves.Length;i++)
+                {
+                    int j=random.Next(i+1);
+                    waveEntrances[i]=waveEntrances[j];waveEntrances[j]=i%3;
+                }
+            }
             Seed=seed; this.waves = waves; Route = route; Pads = (Vector3[])pads.Clone(); Towers = new TowerState[pads.Length];
         }
         public bool Build(int pad, DefenseDefinition defense)
@@ -89,11 +112,11 @@ namespace TheLineHolds
             tower.Cooldown=Mathf.Min(tower.Cooldown,tower.Definition.interval);
             Emit("place",Pads[pad]);return true;
         }
-        public bool StartWave(Func<float> entryDistance=null)
+        public bool StartWave(Func<int,float> entryDistance=null)
         {
             if (Paused || Phase != MatchPhase.Preparation) return false;
             Wave++;
-            spawner.Begin(waves[Wave - 1],Seed+Wave*7919,entryDistance);
+            spawner.Begin(waves[Wave - 1],Seed+Wave*7919,entryDistance,waveEntrances==null?0:waveEntrances[Wave-1]);
             Phase = MatchPhase.Combat;
             Journal?.Invoke($"Wave {Wave} started; funds={Funds}, lives={Lives}");
             return true;

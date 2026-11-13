@@ -54,8 +54,8 @@ namespace TheLineHolds
             {
                 present.Add(enemy.Id);var v=Get(enemy);v.Root.transform.position=enemy.Position;
                 var direction=enemy.Definition.spawnSeparation>0
-                    ? match.Route.Position(enemy.Distance+HalfWheelbase,0)-match.Route.Position(enemy.Distance-HalfWheelbase,0)
-                    : match.Route.Position(enemy.Distance+.1f,enemy.LateralOffset+enemy.AvoidanceOffset)-enemy.Position;
+                    ? match.RouteFor(enemy.Entrance).Position(enemy.Distance+HalfWheelbase,0)-match.RouteFor(enemy.Entrance).Position(enemy.Distance-HalfWheelbase,0)
+                    : match.RouteFor(enemy.Entrance).Position(enemy.Distance+.1f,enemy.LateralOffset+enemy.AvoidanceOffset)-enemy.Position;
                 if(direction.sqrMagnitude>.00001f)v.Root.transform.rotation=Quaternion.LookRotation(direction);
                 v.Visual.Tick(enemy,dt);
                 if(dt>0 && v.Visual.SmokeDue){effects.DamageSmoke(enemy.Position+Vector3.up*.7f);v.Visual.SmokeEmitted();}

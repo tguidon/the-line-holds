@@ -6,7 +6,9 @@ namespace TheLineHolds
 {
     public sealed class BattleController : MonoBehaviour
     {
-        public bool winterForest;
+        public bool winterForest, saintAubin;
+        public BattleRoute SecondRoute { get; private set; }
+        float mergeDistance;
         public BattleRoute Route { get; private set; }
         public Vector3[] Sites { get; private set; }
         public WaveDefinition[] waves;
@@ -34,8 +36,13 @@ namespace TheLineHolds
         void Start()
         {
             Application.targetFrameRate=60;
-            Route = winterForest ? WinterLayout.Route() : BattleRoute.Countryside();
-            Sites = winterForest ? WinterLayout.Pads : BattleRoute.DefaultPads;
+            if(saintAubin)
+            {
+                SecondRoute=TownLayout.Route(true);
+                mergeDistance=new BattleRoute(TownLayout.Entrance(false)).Length;
+            }
+            Route = saintAubin ? TownLayout.Route(false) : winterForest ? WinterLayout.Route() : BattleRoute.Countryside();
+            Sites = saintAubin ? TownLayout.Pads : winterForest ? WinterLayout.Pads : BattleRoute.DefaultPads;
             combatEffects.SurfaceHeight = Route.SurfaceHeight;
             ring = new GameObject("Range preview").AddComponent<LineRenderer>(); ring.transform.SetParent(dynamicRoot);
             ring.sharedMaterial=rangeMaterial; ring.positionCount=97; ring.loop=false; ring.widthMultiplier=.055f; ring.useWorldSpace=true;
@@ -49,7 +56,7 @@ namespace TheLineHolds
         public void NewMatch(int seed=0)
         {
             Unsubscribe(); ClearViews(); audioPlayer.ResetAudio(); InMenu=false; Placement=SelectedPad=-1;
-            Match=new MatchState(waves,Route,Sites,seed==0?System.Environment.TickCount:seed);GameSpeed=1;hud.CloseOptions();
+            Match=new MatchState(waves,Route,Sites,seed==0?System.Environment.TickCount:seed,SecondRoute,mergeDistance);GameSpeed=1;hud.CloseOptions();
             Match.Cue += OnCue; Match.ShotFired += OnShotFired; Match.ShotImpacted += OnShotImpacted; Match.EnemyDamaged+=EnemyViews.Hit; Match.EnemyKilled+=OnEnemyKilled;
             Match.EnemyReachedBase+=OnBaseHit;
             CameraControls.ResetView(); Notice="Deploy your defenses. Wave 1 waits for your order.";
@@ -90,7 +97,7 @@ namespace TheLineHolds
             if(Match!=null && Match.StartWave(FindOffscreenEntry)) { Cancel(); Notice=waves[Match.Wave-1].briefing; }
         }
         readonly Plane[] entryPlanes=new Plane[6];
-        float FindOffscreenEntry()
+        float FindOffscreenEntry(int entrance)
         {
             GeometryUtility.CalculateFrustumPlanes(battleCamera,entryPlanes);
             // Allow for the longest vehicle, the health bar and the outer infantry lane.
@@ -99,7 +106,7 @@ namespace TheLineHolds
             do
             {
                 distance-=1;
-                bounds.center=Match.Route.Position(distance)+Vector3.up;
+                bounds.center=Match.RouteFor(entrance).Position(distance)+Vector3.up;
             } while(GeometryUtility.TestPlanesAABB(entryPlanes,bounds));
             return distance;
         }
