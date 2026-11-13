@@ -1,61 +1,61 @@
-# Visual direction
+# The Line Holds map art guide
 
-Style: A painted Normandy countryside diorama with soft, rounded forms, worn earth, layered hedgerows, and readable military miniatures. This follows the user's requested diorama direction; avoid angular terrain strips, cone trees, and cube foliage.
+Build a historical miniature that a player can read while a wave is moving. At the reset gameplay camera, the eye should find the incoming column, follow the worn road around each bend, and land on the defended objective. Buildings and fields tell the player what place they are defending.
 
-Palette: meadow moss `#607044`, meadow grass `#85905B`, dry grass `#A4A273`, road earth `#AF9D76`, shadow earth `#514537`, cool backdrop `#61736D`. Existing olive uniforms, steel, sandbags, and muted gold UI remain part of the established palette.
+![Countryside at normal gameplay zoom. A clay-roofed barn and wheat field sit behind the northern bend. A stone cottage frames the foreground, and a patrol passes the brick gate.](TheLineHolds/Screenshots/farmstead-gameplay.png)
 
-Mood: Warm afternoon sunlight with cool sky fill, soft shadows, restrained color grading, and visible contact between miniatures and ground. The road and build pads take priority over decorative detail.
+Use this frame for **composition and scale**. Use the patrol frame for the transition from offscreen approach to playable road, and the armor frame for the space between a turning gun and a passing vehicle. [Patrol approaching the gate](TheLineHolds/Screenshots/road-entry-patrol.png) · [Upgraded howitzer during wave nine](TheLineHolds/Screenshots/road-clearance-howitzer.png)
 
-## Repeatable authoring
+## What carries between levels
 
-Run `Tools/Blender/generate_assets.py` in headless Blender. `--only Pine,Farmhouse,Crate,Sandbags` exports just those environment models. All editable model scenes remain in `Tools/Blender/miniatures.blend`.
+| Art reference | Quality to carry forward | How it reads in our setting |
+| --- | --- | --- |
+| Age of Empires II: Definitive Edition | Recognizable silhouettes from the gameplay camera | The barn has a long ridge and paired doors. The anti-tank gun has a shield and long barrel. Each reads before the player can see individual boards or bolts. |
+| Age of Empires III: Definitive Edition | Architectural character and selective color | A clay roof picks out the working farm. Cool slate, lime plaster, painted shutters and masonry sills tie the neighboring buildings together. Detail the roof, gables and sides that the orbit camera reveals. |
+| Company of Heroes 2 and 3 | Grounded materials, directional light and evidence of use | Set the stone footing into the slope. Let wheel wear break over firm ground, leave grit on the shoulder, and place supplies where a crew would reach them. |
 
-With Countryside open and Play Mode stopped, run `TheLineHolds.Editor.DioramaBuilder.Map()` through Unity CLI. It replaces its own landscape, preserves controller references and pad objects, generates meadow/road and earth textures, combines small vegetation, and saves the scene. It does not tune combat data. Seed 1944 makes the ground detail repeatable.
+Give each level its own geography, sightlines and civilian activity. Countryside pairs a barn with planted rows, a cut headland, an implement shed and a wagon track. A mill by a crossing could use a mill yard, a loading door and a cart track to explain the same relationships. Find room for that activity inside the normal view. A few related props tell the story more clearly than an even scatter across the meadow.
 
-`BattleRoute.Ground(x,z)` is shared by terrain, pad placement, range previews, and unit movement. Road corners use short quadratic transitions. The road pigment and wheel ruts are baked into the meadow texture, so there is no visible coplanar road overlay to clip at hills.
+## Compose from the gameplay camera
 
-The map-wide surface is the base for step 2a. Steps 2b and 2c establish matching tower and enemy targets. Step 3 can add authored local stories and richer variations; steps 4 and 5 can expand motion and combat feedback after visual review.
+1. **Block in the playable ground.** Place the route, approach, objective and legal gun sites. Fit the overview to the playable route and sites with the HUD visible. Keep that fit as the widest view. Let players pan farther when inspecting a bend up close.
+2. **Give the road a beginning and an end.** Run the incoming lane beyond the visible frame so the column can march into view. At the entrance, use a landmark traffic can pass through. Give the objective a different outline and function. Countryside uses paired brick gateposts and a parked cart at one end, a roofed sentry box, flag and raised boom at the other.
+3. **Separate traffic from firing positions.** Paint a broad traveled center, intermittent wheel marks and feathered shoulders into the same surface the units follow. Make each legal site a tamped clearing with low stakes and a faint access track. On Countryside the worn road is about 1.9 m wide and the closest pad center is about 2.5 m from the road centerline. For a different bend, judge the gap with the largest vehicle alongside a fully upgraded cannon aimed across the road. Check the range ring and actual engagement after moving a pad.
+4. **Frame the fight.** Place the civilian landmark in a visible pocket beyond a bend and use lower forms on the near side of the road. Gather crop rows, timber, crates, flowers or walling where work takes place. Move a tree if its canopy hides a turning point or makes an empty pad look occupied. Carry the same turf, leaf scale and connected lanes beyond the playable area so resized windows and rotated views still look inhabited.
 
-## Leaf and fortification refinement
+## Materials, light and scale
 
-Tree crowns and shrubs use individually shaped, ridged leaves over branches, with a shared leaf-vein texture and three related green materials. Avoid smooth cloud-shaped canopy balls. Bush meshes combine by material for efficient drawing. Sandbag walls form full circles with two staggered courses; bags follow the tangent of the wall, and the gun mechanism rotates within the fixed wall. Cannon wheels/trails and mortar supplies fit inside their respective rings.
+Start with the shared Unity materials. These hex values are authoring colors. Compare the lit result to the gameplay frame, since sun, sky fill and tone mapping affect the final pixels.
 
-Architecture uses crisp plaster/stone corners with very small edge breaks. Farmhouse roofs descend from one ridge to matching eaves, with closed gables, coursed slate and seated chimney details. Keep building corners and roof planes more angular than foliage and fabric. Static detail is combined by material.
+| Surface | Countryside colors | Treatment |
+| --- | --- | --- |
+| Meadow and crops | Hollow green `#526849`, meadow `#839461`, hay `#AFAB73` | Vary growth in patches. Use small grass tufts, branched hedges with shaped leaves, and cultivated rows with a worked-soil edge. |
+| Road and yard | Clay `#957958`, chalk `#C2B093`, wheel track `#695942` | Keep the center quiet beneath units. Concentrate stones and debris at edges. Match pigment and terrain height where the battlefield meets the surrounding pasture. |
+| Buildings | Oak `#927456`, plaster `#CCBD97`, masonry `#B0AA94`, slate `#526775`, clay tile `#A45741` | Seat structures on foundations. Use crisp gables, tile courses, lintels and shutters. Reserve the strongest roof accent for a landmark. |
+| Military miniatures | Olive `#5D6953`, steel `#59656B`, sandbag cloth `#9D9279` | Keep timber and cloth matte, give steel a modest highlight, and use fixed sandbag rings around moving mechanisms. |
 
-## Battlefield composition
+Use one warm directional sun, cool sky fill, and soft contact shadows. Countryside starts from sun `#FFF1DA`, intensity 2.2, Unity rotation (38°, 38°, 0°), with sky fill `#849BA8`, ACES tone mapping and bloom intensity 0.12. Match roof edges, gun shields and wheel shadows from the normal camera before adjusting the grade. [Terrain pigment](TheLineHolds/Assets/TheLineHolds/Editor/FieldPigment.cs) · [Shared material finishes](TheLineHolds/Assets/TheLineHolds/Editor/FoliageMaterials.cs) · [URP lighting setup](TheLineHolds/Assets/TheLineHolds/Editor/DioramaBuilder.cs)
 
-Gun sites are bare-earth clearings with faint access tracks and low timber markers, with no numbering or raised display pedestals. The original ten placement anchors are preserved. Enemy and defended endpoints use physical farm-gate/checkpoint details and two-sided painted wood signs; their lettering is baked into board textures so it stays attached during camera orbit. Road pigment reaches both map edges. Exposed earth uses three wavy horizons, world-sized grain/stone detail, a muted root mat, and embedded stones. Small crop plots, farm fences and a timber-lined field position give the unused margins a purpose. Keep the whole vehicle corridor free of scenery.
+## Readability during a wave
 
-## Weapon operation and effects
+| Role | Shape at overview | Firing cue |
+| --- | --- | --- |
+| Machine gun | Compact tripod or nest, receiver and feed drum | Quick receiver kick, short warm flash, tracer and brass |
+| Anti-tank gun | Shield, wheels and a prominent aiming barrel | Barrel slides inside the fixed carriage, heavier shell streak, localized impact |
+| Mortar | Broad braced bed with an elevated open tube | Launch puff, arcing shell with a short smoke tail, ground-level blast |
 
-Machine guns use quick warm flashes, short tracers, restrained receiver kick and ejected brass. Cannon barrels slide independently of their fixed shield/wheels, recover more slowly, and raise a little dust. Mortar tubes point upward toward the target, with a launch puff and an olive shell travelling along an arc. Weapon effects start at authored muzzle sockets rather than the simulation's generic shot origin. Short earth-colored puffs, warm armor sparks and restrained mortar smoke preserve target/road readability. No camera shake, hit-stop or combat-stat changes are part of this pass.
+For an upgrade, change a major visible component such as a twin mount, heavy tube or armored shield. Keep the muzzle socket with the moving barrel. A runner’s satchel and long stride, a rifleman’s pack, and an assault soldier’s heavier kit should distinguish the infantry in motion. Preserve the differences between a canvas truck, wheeled armored car, tracked light tank and skirted heavy tank. Keep hit sparks, dust and smoke brief enough to follow the lead unit and see which emplacement fired. [Combat reference frame](TheLineHolds/Screenshots/miniatures-wave.png)
 
-Five shared world-space particle emitters and warmed projectile objects keep transient effects bounded. Pause freezes effects and mechanical recovery with the match. Edited recorded sounds give each role its own report and hit response; soft impacts and armor strikes stay quieter than heavy weapons. Audio uses the existing CLI-only gain layer, a bounded priority voice pool and camera-relative stereo. Rebuild these assets with `CombatPresentationBuilder.Build()` after model generation. Keep the shipped audio attribution file.
+## Author a new level
 
-## Enemy life and campaign readability
+The current project ships one authored map. Its runtime creates the Countryside route and default pads directly. The camera also reads those defaults, and the map builder writes meshes and textures under shared asset names. Duplicating the Unity scene alone still points at Countryside data. For a second playable map, give it its own route, approach, sites, terrain and generated asset paths, then connect the simulation, camera and scenery bake to that same layout. Reuse the shared prefabs, materials, pigment functions and lighting. [Route and terrain](TheLineHolds/Assets/TheLineHolds/Scripts/Core/BattleRoute.cs) · [Match setup](TheLineHolds/Assets/TheLineHolds/Scripts/Presentation/BattleController.cs) · [Camera fit](TheLineHolds/Assets/TheLineHolds/Scripts/Presentation/MapCameraControls.cs)
 
-Infantry have distance-driven body/leg movement and a small carried-weapon sway. Vehicles roll their wheel details around the imported axle axis and sway subtly on the road. Hit reactions and damage wear affect only miniature children; gameplay roots stay on the route. Infantry fall briefly; vehicles flash, smoke, lean and retire. Actor models/bars are reused, with a 24-corpse budget and clean reset. Suppressed enemies show amber bars; undamaged infantry omit health bars to reduce clutter.
+Author models at metre scale in Blender. Keep the editable source and generation script with the FBX. Match existing prefab forward axes, origins, material assignments and moving parts. For example, the Blender generator accepts `--only Barn` to export the barn FBX while saving the editable scenes. The farm example reserves a footprint for buildings, crops and access tracks. Use the same footprint for ground pigment and vegetation clearance, then batch static detail by material and area. Set the dressing seed so a rebuild reproduces the placement. [Blender generator](Tools/Blender/generate_assets.py) · [Farm layout, pigment and crop geometry](TheLineHolds/Assets/TheLineHolds/Editor/BattlefieldFarm.cs) · [Scenery batching](TheLineHolds/Assets/TheLineHolds/Editor/CountrysideSurroundings.cs)
 
-The seven archetypes retain the established military palette: light field caps for runners, armored vests for assault infantry, canvas-backed trucks, compact armored cars and a larger reinforced tank. Higher tower tiers gain small gold markings. Upgrade inspection adapts to the available choices and uses the same command-panel style. Next-wave intel fixes composition while formation timing varies. No new package, external art, camera shake or computer-use workflow is part of this pass.
+For the existing Countryside scene, stop Play Mode and use **The Line Holds → Visuals → Build Diorama Map** to rebuild its landscape. **Refresh Historic Miniatures** refreshes its actor prefabs, field dressing, pigment and lighting. Drive the open editor through Unity CLI. [Project commands](README.md#repeatable-commands)
 
-## November 10 playtest polish
+## Review a map in play
 
-The miniature palette is retained, but the cutaway slab is removed from the scene. Four continuous pasture aprons extend 90 metres in each direction, with original barns, farmhouses, loose trees, bushes, farm fences and supply yards. Core route and build anchors stay fixed. Meadow pigment matches across the boundary; fields use normalized soft masks. Scenery combines by material and spatial sector for useful culling. The worn road is about 1.9 m wide before its feathered edges, versus 1.28 m previously. Vegetation clears the wider corridor. The default overview is closer (10.8 orthographic size).
-
-The HUD uses compact icon-led resources and controls, a three-choice build dock, on-demand intel/help, short transient notices and a small closable upgrade inspector. Pause, menu and scoring copy is shortened. Hand-authored line icons use CanvasRenderer geometry; no icon font is required. Upgrade models have reinforced shields, larger mechanisms, distinct long/twin/heavy barrels, supply crates and gold identification details, with a short purchase burst and scale recovery. Original Blender scenes retain every tier/branch model.
-
-Infantry use continuous seeded lateral positions, varied individual release gaps and a gentle distance-driven lateral drift. Verge passing has per-unit width variation. Vehicles keep the existing safe longitudinal gap. Armor hits use localized sparks/puffs at the facing hull edge; whole-vehicle brightening is disabled. Destruction uses pooled fire puffs, smoke and small 3D debris. Audio adds an original quiet wind/leaf/bird bed with independent mute and combat/pause ducking through the existing gain layer. The new app icon is imagegen artwork; its final prompt and saved path are in `Tools/Blender/APP_ICON.md`.
-
-Startup and Reset now fit the playable route, sites and endpoint landmarks to the current aspect ratio with HUD clearance. Resizing an untouched overview refits it; manually adjusted views stay under player control. The earlier fixed 10.8 zoom is superseded.
-
-## Connected countryside refinement
-
-Surrounding pasture shares the core's grass-tuft scale, pigment and leaf materials. Roads form a connected village network and terminate at yards, junctions or the map boundary. Original stone cottages, an inn, dairy, open tool sheds and wells vary the skyline; all building facades have window detail and roofs have visible courses. Hedges, fenced crop plots and an orchard give the land a purpose. Retain the core battle route and placement anchors. `RefineCountryside.All` replaces only the surrounding scenery through the Editor, using `CountrysideLayout` and `PastureDetail`. Grass and static scenery are spatially batched for culling.
-
-## Normandy miniatures at gameplay zoom
-
-The battle road runs from a brick-pier farm gate and parked cart to a slate-roofed sentry box with a recognition flag and raised barrier. Wheel wear fades over harder ground. Limestone chips collect at the shoulders. White survey stakes and a broken timber rim mark the ten tamped gun sites. Keep the wildflowers, walling and supplies near field boundaries so the centre of a fight has a quiet background.
-
-Machine guns sit on open tripods, anti-tank guns carry a shield and long barrel, and mortars show an elevated open bore above a braced bed. Specialist tubes recoil with their mechanisms. The twin suppressor and barrage mounts alternate muzzle sockets on successive shots. Straight tracers, heavier shell streaks and a short smoke tail on the mortar arc use the simulation’s existing flight times. Ground-level dust spreads with the actual blast radius.
-
-Regenerate models with the Blender generator, then use **The Line Holds → Visuals → Refresh Historic Miniatures** in the Countryside scene. This rebuilds the actor prefabs, field dressing, ground pigment, material finishes and lighting. The farm cart and sentry box are authored within the FieldGate and Checkpoint Blender scenes.
+- Capture the reset overview with the HUD at 1600×900. Trace the route from entrance to objective, locate each legal site, and identify the civilian landmark. Resize to a narrower and a wider window. Countryside was checked at 1024×768 and 1920×800 as well. Watch an arrival after resizing or rotating. [Overview check](TheLineHolds/AgentScripts/CheckOverview.cs) · [Native entrance and clearance check](TheLineHolds/AgentScripts/CheckRoadEntry.cs)
+- Place each tower role and inspect an upgrade on a tight bend. Capture a busy wave with a large vehicle passing a firing position. Check silhouettes, aim, range, impact and whether the lead enemy stays visible. Use the same camera, wave, seed and playback speed when comparing before and after. [Model and capture checks](TheLineHolds/AgentScripts/ReviewMiniatures.cs)
+- Complete a wave with earned purchases. Compare frame rate in the same encounter and player configuration if the dressing or effects budget changed. Adapt Countryside-specific assertions, including named landmarks and the ten-site count, to the new map. Keep the accepted overview and combat captures alongside the level. Earlier passes and their measured results are in the [visual review history](VISUAL_REVIEW.md).

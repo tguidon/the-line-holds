@@ -63,7 +63,7 @@ For visual authoring without resetting gameplay data, stop Play Mode and run:
 unity command script eval --project-path "$PWD/TheLineHolds" 'TheLineHolds.Editor.DioramaBuilder.Map();'
 ```
 
-See `ART_DIRECTION.md` for palette, lighting, generator details, and the visual target. Steps 2a–2c are implemented; review their captures under `TheLineHolds/Screenshots/diorama-*.png` before the next composition pass.
+For a new level, start with the current gameplay reference, material and lighting recipes, and map review checklist in the [map art guide](ART_DIRECTION.md). The repo includes the [battlefield art skill](.agents/skills/battlefield-art/SKILL.md) for authoring and reviewing maps against that guide.
 
 ### Pending review build
 
