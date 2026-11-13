@@ -9,6 +9,7 @@ namespace TheLineHolds
         public readonly float Length;
         readonly float[] cumulative;
         readonly BattleRoute approach;
+        public readonly Func<float, float, float> SurfaceHeight;
 
         // The western farm lane is ordered outwards from the gateway.
         public static readonly Vector2[] WesternLane = {
@@ -23,10 +24,11 @@ namespace TheLineHolds
             for(int i=0;i<WesternLane.Length;i++)lane[i+1]=OnGround(WesternLane[i].x,WesternLane[i].y);
             return new BattleRoute(battlefield,new BattleRoute(lane));
         }
-        public BattleRoute(Vector3[] points, BattleRoute approach=null)
+        public BattleRoute(Vector3[] points, BattleRoute approach=null, Func<float,float,float> surfaceHeight=null)
         {
             if (points == null || points.Length < 2) throw new ArgumentException("Route needs two points.");
             this.approach=approach;
+            SurfaceHeight=surfaceHeight ?? Ground;
             Points = (Vector3[])points.Clone(); cumulative = new float[points.Length];
             for (int i = 1; i < points.Length; i++) cumulative[i] = cumulative[i-1] + Vector3.Distance(points[i-1], points[i]);
             Length = cumulative[cumulative.Length-1];
@@ -49,7 +51,7 @@ namespace TheLineHolds
             var position = Position(distance);
             var direction = Position(Mathf.Min(Length, distance + .1f)) - Position(distance - .1f);
             position += Vector3.Cross(Vector3.up, direction).normalized * lateralOffset;
-            position.y = Ground(position.x, position.z) + .035f;
+            position.y = SurfaceHeight(position.x, position.z) + .035f;
             return position;
         }
         public static float Ground(float x) => Ground(x, 0);
@@ -64,7 +66,7 @@ namespace TheLineHolds
             OnGround(-8.3f,4.55f), OnGround(-4,5.65f), OnGround(.15f,4.65f), OnGround(1,1),
             OnGround(-1.4f,-2.35f), OnGround(3,-4.5f), OnGround(7.45f,-3.5f), OnGround(8.45f,0), OnGround(6.45f,3.05f), OnGround(8,5), OnGround(11,5)
         });
-        static Vector3[] Rounded(Vector3[] corners)
+        internal static Vector3[] Rounded(Vector3[] corners, Func<float,float,Vector3> onGround=null)
         {
             var points = new System.Collections.Generic.List<Vector3> { corners[0] };
             for (int i=1; i<corners.Length-1; i++)
@@ -75,7 +77,7 @@ namespace TheLineHolds
                 {
                     float t=j/8f;
                     var p=(1-t)*(1-t)*a+2*(1-t)*t*corners[i]+t*t*b;
-                    points.Add(OnGround(p.x,p.z));
+                    points.Add((onGround ?? OnGround)(p.x,p.z));
                 }
             }
             points.Add(corners[corners.Length-1]); return points.ToArray();

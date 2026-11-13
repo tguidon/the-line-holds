@@ -14,6 +14,7 @@ namespace TheLineHolds
         TextMeshProUGUI lives,funds,status,notice,waveInfo,selection,selectionStats,modalTitle,modalSubtitle,modalStats;
         UnityEngine.UI.Button sellButton,speedButton,startWave,retry,menu,play,quit,pauseButton,soundButton;
         readonly UnityEngine.UI.Button[] shops=new UnityEngine.UI.Button[3],upgradeButtons=new UnityEngine.UI.Button[2];
+        UnityEngine.UI.Button forest;
         readonly StarGraphic[] ratingStars=new StarGraphic[3];
         readonly Color ink=new Color(.075f,.105f,.09f,.96f),paper=new Color(.94f,.92f,.83f),muted=new Color(.71f,.76f,.66f),accent=new Color(.91f,.75f,.39f);
         bool showHelp,showIntel,showOptions;string hint;
@@ -82,7 +83,8 @@ namespace TheLineHolds
             starRow=Group("Victory stars",card);var sr=(RectTransform)starRow.transform;Place(sr,new Vector2(32,-144),new Vector2(180,40));
             for(int i=0;i<3;i++){var go=new GameObject("Rating star",typeof(RectTransform),typeof(StarGraphic));go.transform.SetParent(sr,false);Place((RectTransform)go.transform,new Vector2(i*50,0),new Vector2(34,34));ratingStars[i]=go.GetComponent<StarGraphic>();ratingStars[i].raycastTarget=false;}
             modalStats=Label(card,"",new Vector2(32,-201),new Vector2(416,76),19,paper);
-            play=Button(card,"Play",new Vector2(32,-294),new Vector2(416,48),()=>game.NewMatch());
+            play=Button(card,"Countryside",new Vector2(32,-294),new Vector2(200,48),()=>game.Deploy(false));
+            forest=Button(card,"Winter Forest",new Vector2(248,-294),new Vector2(200,48),()=>game.Deploy(true));
             retry=Button(card,"Play again",new Vector2(32,-294),new Vector2(416,48),()=>game.NewMatch());
             menu=Button(card,"Main menu",new Vector2(32,-354),new Vector2(200,38),()=>game.MainMenu());
             quit=Button(card,"Quit",new Vector2(248,-354),new Vector2(200,38),Quit);
@@ -131,9 +133,9 @@ namespace TheLineHolds
                 }
             }
             bool show=game.InMenu || active && m.Ended;modal.SetActive(show);if(!show)return;
-            bool end=active && m.Ended;play.gameObject.SetActive(game.InMenu);retry.gameObject.SetActive(end);menu.gameObject.SetActive(active);quit.gameObject.SetActive(game.InMenu);
+            bool end=active && m.Ended;play.gameObject.SetActive(game.InMenu);forest.gameObject.SetActive(game.InMenu);retry.gameObject.SetActive(end);menu.gameObject.SetActive(active);quit.gameObject.SetActive(game.InMenu);
             starRow.SetActive(end && m.Stars>0);for(int i=0;i<3;i++)ratingStars[i].color=end && i<m.Stars?accent:new Color(.27f,.33f,.28f);
-            if(game.InMenu){modalTitle.text="The Line Holds";modalSubtitle.text="Normandy, 1944";modalStats.text="Hold the road through 10 attacks.\nBuild. Upgrade. Adapt.";}
+            if(game.InMenu){modalTitle.text="The Line Holds";modalSubtitle.text="Choose your battlefield";modalStats.text="Normandy farm road or forest signal post.\nHold the line through ten attacks.";}
             else if(end){modalTitle.text=m.Phase==MatchPhase.Victory?"The line held.":"Regroup.";modalSubtitle.text=m.Phase==MatchPhase.Victory?"Victory":"The defenses fell";modalStats.text=$"{m.Lives} lives saved     {m.CompletedWaves} / {m.TotalWaves} waves\n{m.Killed} defeated     {m.Escaped} escaped";}
         }
         static string ShortName(DefenseDefinition d)=>d.tier==1?(d.role==DefenseRole.MachineGun?"MG nest":d.role==DefenseRole.Cannon?"Anti-tank":"Mortar"):d.displayName.Replace("machine gun","MG").Replace("anti-tank","gun").Replace(" nest","");

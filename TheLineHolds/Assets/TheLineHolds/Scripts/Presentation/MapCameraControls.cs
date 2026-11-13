@@ -53,8 +53,8 @@ namespace TheLineHolds
                     min=Vector2.Min(min,new Vector2(q.x,q.y));max=Vector2.Max(max,new Vector2(q.x,q.y));
                 }
             }
-            foreach(var p in BattleRoute.DefaultPoints)Include(p);
-            foreach(var p in BattleRoute.DefaultPads)Include(p);
+            foreach(var p in game.Route.Points)Include(p);
+            foreach(var p in game.Sites)Include(p);
             float scale=Mathf.Sqrt(Screen.width/1600f*Screen.height/900f);
             float bottom=Mathf.Clamp(120*scale/Mathf.Max(1,Screen.height)+.03f,.13f,.25f);
             float top=Mathf.Clamp(86*scale/Mathf.Max(1,Screen.height)+.03f,.11f,.22f);

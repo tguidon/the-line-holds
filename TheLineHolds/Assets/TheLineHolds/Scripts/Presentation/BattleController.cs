@@ -6,6 +6,21 @@ namespace TheLineHolds
 {
     public sealed class BattleController : MonoBehaviour
     {
+        public bool winterForest;
+        public BattleRoute Route { get; private set; }
+        public Vector3[] Sites { get; private set; }
+        static string deploymentScene;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetDeployment() => deploymentScene = null;
+
+        public void Deploy(bool winter)
+        {
+            if (winter == winterForest) { NewMatch(); return; }
+            deploymentScene = winter ? "WinterForest" : "Countryside";
+            UnityEngine.SceneManagement.SceneManager.LoadScene(deploymentScene);
+        }
+
         public WaveDefinition[] waves;
         public DefenseDefinition[] defenses;
         public Transform dynamicRoot;
@@ -31,18 +46,24 @@ namespace TheLineHolds
         void Start()
         {
             Application.targetFrameRate=60;
+            Route = winterForest ? WinterLayout.Route() : BattleRoute.Countryside();
+            Sites = winterForest ? WinterLayout.Pads : BattleRoute.DefaultPads;
+            combatEffects.SurfaceHeight = Route.SurfaceHeight;
             ring = new GameObject("Range preview").AddComponent<LineRenderer>(); ring.transform.SetParent(dynamicRoot);
             ring.sharedMaterial=rangeMaterial; ring.positionCount=97; ring.loop=false; ring.widthMultiplier=.055f; ring.useWorldSpace=true;
             CameraControls=battleCamera.gameObject.AddComponent<MapCameraControls>();
             CameraControls.Initialize(battleCamera,this);
             EnemyViews=new EnemyViewPool(dynamicRoot,battleCamera,healthMaterial,combatEffects);
-            hud.Initialize(this); MainMenu();
+            hud.Initialize(this);
+            if (deploymentScene == gameObject.scene.name) NewMatch();
+            else MainMenu();
+            deploymentScene = null;
             Debug.Log($"The Line Holds {Application.version} ready on {Application.platform} ({SystemInfo.graphicsDeviceType}).");
         }
         public void NewMatch(int seed=0)
         {
             Unsubscribe(); ClearViews(); audioPlayer.ResetAudio(); InMenu=false; Placement=SelectedPad=-1;
-            Match=new MatchState(waves,BattleRoute.Countryside(),BattleRoute.DefaultPads,seed==0?System.Environment.TickCount:seed);GameSpeed=1;hud.CloseOptions();
+            Match=new MatchState(waves,Route,Sites,seed==0?System.Environment.TickCount:seed);GameSpeed=1;hud.CloseOptions();
             Match.Cue += OnCue; Match.ShotFired += OnShotFired; Match.ShotImpacted += OnShotImpacted; Match.EnemyDamaged+=EnemyViews.Hit; Match.EnemyKilled+=OnEnemyKilled;
             CameraControls.ResetView(); Notice="Deploy your defenses. Wave 1 waits for your order.";
         }
@@ -173,7 +194,7 @@ namespace TheLineHolds
             {
                 bool valid=Placement<0 || (Match.Towers[pad]==null && Match.Funds>=definition.cost);
                 ring.startColor=ring.endColor=valid?new Color(.86f,.76f,.39f):new Color(.95f,.28f,.2f);
-                for(int j=0;j<97;j++) { float a=j/96f*Mathf.PI*2; var p=Match.Pads[pad]+new Vector3(Mathf.Cos(a)*definition.range,0,Mathf.Sin(a)*definition.range); p.y=BattleRoute.Ground(p.x,p.z)+.18f; ring.SetPosition(j,p); }
+                for(int j=0;j<97;j++) { float a=j/96f*Mathf.PI*2; var p=Match.Pads[pad]+new Vector3(Mathf.Cos(a)*definition.range,0,Mathf.Sin(a)*definition.range); p.y=Route.SurfaceHeight(p.x,p.z)+.18f; ring.SetPosition(j,p); }
             }
             bool show=allowed && Placement>=0 && hover>=0 && Match.Towers[hover]==null;
             if(show && previewType!=Placement)

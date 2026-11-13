@@ -16,6 +16,7 @@ namespace TheLineHolds
         Transform root;
         int created;
         public int ProjectileObjectsCreated => created;
+        public System.Func<float,float,float> SurfaceHeight = BattleRoute.Ground;
         public int ActiveProjectiles => flights.Count;
         public int ParticleCount { get { int n = 0; foreach (var ps in emitters) n += ps.particleCount; return n; } }
         sealed class Flight
@@ -108,7 +109,7 @@ namespace TheLineHolds
                 BlastSkirt(shot.Destination, shot.Definition.splashRadius);
             if (style == WeaponStyle.Mortar)
             {
-                p.y = BattleRoute.Ground(p.x, p.z) + .05f;
+                p.y = SurfaceHeight(p.x, p.z) + .05f;
                 Puff(flash, p + Vector3.up * .12f, Vector3.up * .4f, .65f, .12f, new Color(1.3f, .74f, .26f));
                 GroundDust(p, 6, .78f);
                 for (int i = 0; i < 4; i++) Puff(smoke, p + Vector3.up * V(.2f, .4f), new Vector3(V(-.45f, .45f), V(.6f, 1.3f), V(-.45f, .45f)), V(.38f, .63f), V(.28f, .52f), new Color(.35f, .32f, .25f, .75f));
@@ -126,7 +127,7 @@ namespace TheLineHolds
         void BlastSkirt(Vector3 centre, float radius)
         {
             // Low, discontinuous dust follows the real blast footprint, leaving the target visible.
-            centre.y=BattleRoute.Ground(centre.x,centre.z)+.07f;
+            centre.y=SurfaceHeight(centre.x,centre.z)+.07f;
             float start=V(0,2*Mathf.PI);
             for(int i=0;i<9;i++)
             {
@@ -138,7 +139,7 @@ namespace TheLineHolds
         }
         void GroundDust(Vector3 p, int count, float spread)
         {
-            p.y = BattleRoute.Ground(p.x, p.z) + .08f;
+            p.y = SurfaceHeight(p.x, p.z) + .08f;
             for (int i = 0; i < count; i++)
             {
                 float angle = V(0, Mathf.PI * 2), speed = V(.25f, 1) * spread;
