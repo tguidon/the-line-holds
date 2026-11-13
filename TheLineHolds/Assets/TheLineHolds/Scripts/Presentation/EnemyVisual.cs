@@ -52,11 +52,19 @@ namespace TheLineHolds
                 float fade=1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.65f,1,t));body.localScale=scale*fade;
                 Tint();return deathAge>=DeathDuration;
             }
-            float phase=enemy.Distance*(vehicle?7:10)+enemy.Id*.73f;
-            body.localPosition=position+Vector3.up*(vehicle?Mathf.Sin(phase)*.012f:Mathf.Abs(Mathf.Sin(phase))*.025f);
-            body.localRotation=rotation*Quaternion.Euler(vehicle?Mathf.Sin(phase*.6f)*1.1f:2,0,Mathf.Sin(phase)*(vehicle?1.1f:2.5f)+hit*22);
-            infantry?.Pose(enemy.Distance,enemy.Id);
-            for(int i=0;i<wheels.Length;i++)wheels[i].localRotation=wheelBinds[i]*Quaternion.AngleAxis(enemy.Distance*450,wheelAxes[i]);
+            if(vehicle)
+            {
+                // The route supplies hull attitude. Only roll the wheels during travel.
+                for(int i=0;i<wheels.Length;i++)
+                    wheels[i].localRotation=wheelBinds[i]*Quaternion.AngleAxis(enemy.Distance*450,wheelAxes[i]);
+            }
+            else
+            {
+                float phase=enemy.Distance*10+enemy.Id*.73f;
+                body.localPosition=position+Vector3.up*(Mathf.Abs(Mathf.Sin(phase))*.025f);
+                body.localRotation=rotation*Quaternion.Euler(2,0,Mathf.Sin(phase)*2.5f+hit*22);
+                infantry?.Pose(enemy.Distance,enemy.Id);
+            }
             Tint();smokeClock-=dt;return false;
         }
         public bool SmokeDue => vehicle && health<.35f && smokeClock<=0;

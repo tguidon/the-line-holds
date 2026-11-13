@@ -5,6 +5,8 @@ namespace TheLineHolds
     // Models and their bars are reused across waves; defeated actors retire without affecting the simulation.
     public sealed class EnemyViewPool
     {
+        // Half the wheelbase used to align the chassis across a bend or a change in grade.
+        const float HalfWheelbase=.85f;
         sealed class View { public GameObject Root; public Transform Bar; public EnemyVisual Visual; public EnemyState State; public GameObject Prefab;public Renderer BarRenderer; public MaterialPropertyBlock BarTint=new MaterialPropertyBlock();public bool Slowed; }
         readonly Dictionary<int,View> active=new Dictionary<int,View>();
         readonly Dictionary<GameObject,Stack<View>> free=new Dictionary<GameObject,Stack<View>>();
@@ -51,7 +53,9 @@ namespace TheLineHolds
             foreach(var enemy in match.Enemies)
             {
                 present.Add(enemy.Id);var v=Get(enemy);v.Root.transform.position=enemy.Position;
-                var direction=match.Route.Position(enemy.Distance+.1f,enemy.LateralOffset+enemy.AvoidanceOffset)-enemy.Position;
+                var direction=enemy.Definition.spawnSeparation>0
+                    ? match.Route.Position(enemy.Distance+HalfWheelbase,0)-match.Route.Position(enemy.Distance-HalfWheelbase,0)
+                    : match.Route.Position(enemy.Distance+.1f,enemy.LateralOffset+enemy.AvoidanceOffset)-enemy.Position;
                 if(direction.sqrMagnitude>.00001f)v.Root.transform.rotation=Quaternion.LookRotation(direction);
                 v.Visual.Tick(enemy,dt);
                 if(dt>0 && v.Visual.SmokeDue){effects.DamageSmoke(enemy.Position+Vector3.up*.7f);v.Visual.SmokeEmitted();}
