@@ -8,7 +8,7 @@ namespace TheLineHolds
         Transform body; Vector3 position,scale; Quaternion rotation;
         Transform[] wheels; Quaternion[] wheelBinds; Vector3[] wheelAxes; Renderer[] surfaces; Color[] colors;
         MaterialPropertyBlock block; InfantryVisual infantry;
-        float hit,deathAge,smokeClock,tintHit=-1,tintHealth=-1; bool vehicle,dying; float health=1;
+        float hit,deathAge,smokeClock,tintHit=-1,tintHealth=-1; bool vehicle,dying,striking; float health=1;
         public bool Dying => dying;
         public float DeathDuration => vehicle ? 1.35f : .85f;
         public void Initialize(bool isVehicle)
@@ -24,13 +24,26 @@ namespace TheLineHolds
                 wheelAxes=wheels.Select(t=>{var size=t.GetComponent<MeshFilter>().sharedMesh.bounds.size;return size.x<size.y && size.x<size.z?Vector3.right:size.y<size.z?Vector3.up:Vector3.forward;}).ToArray();
                 surfaces=body.GetComponentsInChildren<Renderer>();colors=surfaces.Select(r=>r.sharedMaterial.color).ToArray();block=new MaterialPropertyBlock();
             }
-            hit=deathAge=smokeClock=0;tintHit=-1;dying=false;health=1;body.localPosition=position;body.localRotation=rotation;body.localScale=scale;Tint();
+            hit=deathAge=smokeClock=0;tintHit=-1;dying=striking=false;health=1;body.localPosition=position;body.localRotation=rotation;body.localScale=scale;Tint();
         }
         public void Hit(float fraction){health=Mathf.Clamp01(fraction);hit=.16f;Tint();}
+        public void StrikeBase(){striking=true;deathAge=0;}
         public void Die(){dying=true;deathAge=0;hit=.12f;}
         public bool Tick(EnemyState enemy,float dt)
         {
             hit=Mathf.Max(0,hit-dt);
+            if(striking)
+            {
+                deathAge+=dt;
+                float duration=vehicle?.65f:.42f;
+                float t=Mathf.Clamp01(deathAge/duration);
+                // The front of the miniature meets the objective, recoils, then clears the lane.
+                float kick=Mathf.Sin(Mathf.PI*Mathf.Min(1,t/.55f));
+                body.localPosition=position+Vector3.back*kick*(vehicle?.30f:.15f);
+                body.localRotation=Quaternion.Euler(vehicle?-6*kick:14*kick,0,0)*rotation;
+                body.localScale=scale*(1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.55f,1,t)));
+                return t>=1;
+            }
             if(dying)
             {
                 deathAge+=dt;float t=Mathf.Clamp01(deathAge/DeathDuration);

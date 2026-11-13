@@ -2,7 +2,7 @@
 
 November 9, 2026. This expands the initial prototype into a ten-wave battlefield. Final player playtesting is roadmap step 7; this is the baseline to evaluate, not a claim of finished balance.
 
-Start with 300 funds and 20 lives. Build on the ten clearings, click a deployed tower to upgrade it, and call the next wave when ready. Orders work during combat. Each escape costs one life. Wave completion pays 70, 80, …, 160 funds exactly once. A victory scores three stars at 18–20 lives, two at 10–17, and one at 1–9. The 1x/2x control changes game pace; pause freezes combat while tower management and camera controls remain available.
+Start with 300 funds and 20 lives. Build on the ten clearings, click a deployed tower to upgrade it, and call the next wave when ready. Orders work during combat. Each enemy that reaches the base costs one life. Infantry strike with a short thud, wheeled vehicles with a metallic impact, and tanks with a heavier blast. The impact throws up dust in Countryside and powder in Winter Forest. Wave completion pays 70, 80, …, 160 funds exactly once. A victory scores three stars at 18–20 lives, two at 10–17, and one at 1–9. The 1x/2x control changes game pace; pause freezes combat while tower management and camera controls remain available.
 
 ## Battlefields
 

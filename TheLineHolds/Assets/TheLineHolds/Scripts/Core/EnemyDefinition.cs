@@ -1,12 +1,15 @@
 using UnityEngine;
 namespace TheLineHolds
 {
+    public enum BaseHitWeight { Infantry, Wheeled, LightTank, HeavyTank }
+
     [CreateAssetMenu(menuName = "The Line Holds/Enemy")]
     public sealed class EnemyDefinition : ScriptableObject
     {
         public string displayName;
         [TextArea] public string description;
         public bool armored;
+        public BaseHitWeight baseHit;
         [Min(0)] public float spawnSeparation;
         [Min(1)] public float health = 40;
         [Min(.01f)] public float speed = 1.15f;

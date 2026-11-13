@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: Heavy tanks
   description: Very durable armor. Upgrade your anti-tank guns.
   armored: 1
+  baseHit: 3
   spawnSeparation: 4.4
   health: 1250
   speed: 0.9

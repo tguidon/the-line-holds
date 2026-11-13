@@ -166,8 +166,34 @@ namespace TheLineHolds
         {
             for(int i=0;i<18;i++){float a=i*Mathf.PI*2/18;Puff(purchase,p+new Vector3(Mathf.Cos(a)*.7f,.1f,Mathf.Sin(a)*.7f),new Vector3(Mathf.Cos(a)*.3f,1.1f,Mathf.Sin(a)*.3f),.11f,.65f,new Color(1,.83f,.36f));}
         }
+        public void Pause()
+        {
+            foreach(var ps in emitters)ps.Pause(false);
+        }
         public void TickPurchases(float dt)=>purchase.Simulate(dt,false,false);
-        public void Escape(Vector3 p) => GroundDust(p, 4, .4f);
+        public void BaseHit(Vector3 end,Vector3 forward,BaseHitWeight weight,bool snow)
+        {
+            var (size,chips)=weight switch
+            {
+                BaseHitWeight.Wheeled => (1.05f,6),
+                BaseHitWeight.LightTank => (1.65f,9),
+                BaseHitWeight.HeavyTank => (2.25f,13),
+                _ => (.62f,3)
+            };
+            // Lift the plume above the arriving miniature so the hit reads at overview zoom.
+            var contact=end+forward*.36f+Vector3.up*(.48f+size*.58f);
+            var side=Vector3.Cross(Vector3.up,forward);
+            Puff(flash,contact,Vector3.up*.2f,size,.15f,new Color(1.6f,.95f,.42f));
+            var powder=snow?new Color(.81f,.88f,.94f,.82f):new Color(.66f,.56f,.40f,.82f);
+            for(int i=0;i<chips;i++)
+            {
+                var spray=-forward*V(.45f,1.4f)+side*V(-1,1)+Vector3.up*V(.8f,1.7f);
+                Puff(sparks,contact,spray*(1+size),V(.055f,.095f),V(.15f,.32f),new Color(1.5f,.93f,.47f));
+                Puff(dust,end+Vector3.up*.13f,spray*size*.7f,size*V(.46f,.77f),V(.30f,.62f),powder);
+            }
+            if(weight==BaseHitWeight.LightTank || weight==BaseHitWeight.HeavyTank)
+                Puff(smoke,contact,Vector3.up*1.35f,size*.94f,.86f,new Color(.34f,.32f,.29f,.78f));
+        }
         public void Tick(float dt, IReadOnlyList<ShotState> shots)
         {
             foreach (var ps in emitters) ps.Simulate(dt, false, false);

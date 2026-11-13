@@ -10,8 +10,8 @@ namespace TheLineHolds.Editor
   const string Root="Assets/TheLineHolds";
   static T Asset<T>(string path) where T:ScriptableObject
   {string p=Root+"/Data/"+path+".asset";var a=AssetDatabase.LoadAssetAtPath<T>(p);if(!a){a=ScriptableObject.CreateInstance<T>();AssetDatabase.CreateAsset(a,p);}return a;}
-  static EnemyDefinition Enemy(string key,string name,string hint,float hp,float speed,int reward,bool armor,float gap=0)
-  {var e=Asset<EnemyDefinition>("Enemies/"+key);e.displayName=name;e.description=hint;e.health=hp;e.speed=speed;e.reward=reward;e.armored=armor;e.spawnSeparation=gap;e.prefab=AssetDatabase.LoadAssetAtPath<GameObject>(Root+"/Prefabs/"+key+".prefab");EditorUtility.SetDirty(e);return e;}
+  static EnemyDefinition Enemy(string key,string name,string hint,float hp,float speed,int reward,bool armor,float gap=0,BaseHitWeight baseHit=BaseHitWeight.Infantry)
+  {var e=Asset<EnemyDefinition>("Enemies/"+key);e.displayName=name;e.description=hint;e.health=hp;e.speed=speed;e.reward=reward;e.armored=armor;e.spawnSeparation=gap;e.baseHit=baseHit;e.prefab=AssetDatabase.LoadAssetAtPath<GameObject>(Root+"/Prefabs/"+key+".prefab");EditorUtility.SetDirty(e);return e;}
   static DefenseDefinition Defense(string key,string name,string hint,DefenseRole role,int tier,int cost,float range,float interval,float damage,float splash,float armor,float slow=1,float duration=0)
   {
    var d=Asset<DefenseDefinition>("Defenses/"+key);d.displayName=name;d.description=hint;d.role=role;d.tier=tier;d.cost=cost;d.range=range;d.interval=interval;d.damage=damage;d.splashRadius=splash;d.flightTime=role==DefenseRole.Mortar?.95f:role==DefenseRole.Cannon?.35f:.12f;d.infantryDamageMultiplier=role==DefenseRole.Cannon && splash==0?.65f:1;d.armorDamageMultiplier=armor;d.priority=role==DefenseRole.Mortar?TargetPriority.Cluster:role==DefenseRole.Cannon?TargetPriority.Armor:TargetPriority.First;d.slowMultiplier=slow;d.slowDuration=duration;d.upgrades=Array.Empty<UpgradeOption>();
@@ -27,10 +27,10 @@ namespace TheLineHolds.Editor
    var inf=Enemy("Infantry","Riflemen","Regular infantry. Machine guns are efficient.",68,1.2f,4,false);
    var scout=Enemy("Scout","Runners","Fast, fragile scouts. Cover the rear bends.",38,2.05f,4,false);
    var assault=Enemy("AssaultInfantry","Assault troops","Durable infantry. Mortars punish their clusters.",150,1.05f,7,false);
-   var truck=Enemy("Truck","Trucks","Fast unarmored transport. Machine guns can help.",200,1.85f,12,false,4.4f);
-   var car=Enemy("ArmoredCar","Armored cars","Quick armor. Anti-tank coverage at several bends.",270,1.9f,15,true,4.4f);
-   var tank=Enemy("LightTank","Light tanks","Slow armor. Anti-tank guns are the main counter.",530,1.15f,22,true,4.4f);
-   var heavy=Enemy("HeavyTank","Heavy tanks","Very durable armor. Upgrade your anti-tank guns.",1250,.9f,38,true,4.4f);
+   var truck=Enemy("Truck","Trucks","Fast unarmored transport. Machine guns can help.",200,1.85f,12,false,4.4f,BaseHitWeight.Wheeled);
+   var car=Enemy("ArmoredCar","Armored cars","Quick armor. Anti-tank coverage at several bends.",270,1.9f,15,true,4.4f,BaseHitWeight.Wheeled);
+   var tank=Enemy("LightTank","Light tanks","Slow armor. Anti-tank guns are the main counter.",530,1.15f,22,true,4.4f,BaseHitWeight.LightTank);
+   var heavy=Enemy("HeavyTank","Heavy tanks","Very durable armor. Upgrade your anti-tank guns.",1250,.9f,38,true,4.4f,BaseHitWeight.HeavyTank);
    var mg=Defense("MachineGun","Machine-gun nest","Single infantry / weak vs armor",DefenseRole.MachineGun,1,75,4.4f,.32f,8,0,.15f);
    var gun=Defense("AntiTank","Anti-tank gun","Armor priority / single target",DefenseRole.Cannon,1,125,5.8f,2,95,0,1);
    var mortar=Defense("Mortar","Mortar","Targets clusters / splash damage",DefenseRole.Mortar,1,150,4.8f,3.8f,42,1.4f,.35f);

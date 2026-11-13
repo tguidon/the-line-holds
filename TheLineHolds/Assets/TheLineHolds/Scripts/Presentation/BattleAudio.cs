@@ -20,8 +20,8 @@ namespace TheLineHolds
         readonly AudioSource[] voices = new AudioSource[VoiceLimit];
         readonly float[] levels = new float[VoiceLimit];
         readonly int[] priorities = new int[VoiceLimit];
-        readonly float[] nextCue = new float[8];
-        readonly int[] sequence = new int[8];
+        readonly float[] nextCue = new float[12];
+        readonly int[] sequence = new int[12];
         AudioSource ui;
         Camera view;
         bool paused;
@@ -52,6 +52,17 @@ namespace TheLineHolds
             AudioClip clip = cue == "place" ? placement : cue == "escape" ? escape : cue == "wave" ? wave : cue == "victory" ? victory : cue == "defeat" ? defeat : null;
             if (clip) { ui.volume = .35f * sfxGain; ui.PlayOneShot(clip); }
         }
+        public void BaseHit(Vector3 p,BaseHitWeight weight)
+        {
+            var (clips,level,pitch)=weight switch
+            {
+                BaseHitWeight.Wheeled => (armorHit,.48f,.85f),
+                BaseHitWeight.LightTank => (shellImpact,.60f,.84f),
+                BaseHitWeight.HeavyTank => (mortarImpact,.75f,.70f),
+                _ => (softHit,.33f,1.08f)
+            };
+            World(clips,8+(int)weight,p,level,4,0,pitch);
+        }
         public void VehicleDestroyed(Vector3 p) => World(mortarImpact,7,p,.3f,3,.08f);
         public void Fire(DefenseDefinition definition, Vector3 position)
         {
@@ -69,7 +80,7 @@ namespace TheLineHolds
             else if (style == WeaponStyle.Cannon) World(shellImpact, 5, shot.Destination, .34f, 2, .04f);
             else World(softHit, 3, shot.Destination, .12f, 0, .045f);
         }
-        void World(AudioClip[] clips, int family, Vector3 p, float level, int priority, float spacing)
+        void World(AudioClip[] clips, int family, Vector3 p, float level, int priority, float spacing,float pitch=1f)
         {
             if (paused || clips == null || clips.Length == 0 || Time.unscaledTime < nextCue[family]) return;
             int slot = -1;
@@ -80,7 +91,7 @@ namespace TheLineHolds
             nextCue[family] = Time.unscaledTime + spacing;
             int take = sequence[family]++;
             var source = voices[slot]; source.Stop(); source.clip = clips[take % clips.Length];
-            source.pitch = .97f + (take % 5) * .015f;
+            source.pitch = pitch*(.97f + (take % 5) * .015f);
             // A diorama mix: camera-relative stereo without distance loss from the elevated camera.
             if (!view) view = Camera.main;
             source.panStereo = view ? Mathf.Clamp((view.WorldToViewportPoint(p).x - .5f) * 1.2f, -.65f, .65f) : 0;

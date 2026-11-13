@@ -51,6 +51,7 @@ namespace TheLineHolds
             Unsubscribe(); ClearViews(); audioPlayer.ResetAudio(); InMenu=false; Placement=SelectedPad=-1;
             Match=new MatchState(waves,Route,Sites,seed==0?System.Environment.TickCount:seed);GameSpeed=1;hud.CloseOptions();
             Match.Cue += OnCue; Match.ShotFired += OnShotFired; Match.ShotImpacted += OnShotImpacted; Match.EnemyDamaged+=EnemyViews.Hit; Match.EnemyKilled+=OnEnemyKilled;
+            Match.EnemyReachedBase+=OnBaseHit;
             CameraControls.ResetView(); Notice="Deploy your defenses. Wave 1 waits for your order.";
         }
         public void MainMenu()
@@ -78,6 +79,7 @@ namespace TheLineHolds
         {
             if(Match==null || Match.Ended) return;
             Match.Paused=!Match.Paused; audioPlayer.SetPaused(Match.Paused);
+            if(Match.Paused)combatEffects.Pause();
         }
         public void Escape()
         {
@@ -202,6 +204,15 @@ namespace TheLineHolds
             view.GetComponent<TowerVisual>().Configure(Match.Towers[pad].Definition,combatEffects.shellMaterial);
             return view;
         }
+        void OnBaseHit(EnemyState enemy)
+        {
+            Vector3 end=Route.Points[Route.Points.Length-1];
+            Vector3 forward=Vector3.ProjectOnPlane(end-Route.Position(Route.Length-.5f),Vector3.up).normalized;
+            var weight=enemy.Definition.baseHit;
+            EnemyViews.StrikeBase(enemy,forward);
+            combatEffects.BaseHit(end,forward,weight,winterForest);
+            audioPlayer.BaseHit(end,weight);
+        }
         void OnEnemyKilled(EnemyState enemy)
         {
             EnemyViews.Kill(enemy);
@@ -220,15 +231,15 @@ namespace TheLineHolds
         void OnCue(string cue,Vector3 position)
         {
             // Legacy journal cues remain available to core checks; weapon events carry exact shot context.
-            if(cue=="fire" || cue=="impact")return;
+            if(cue=="fire" || cue=="impact" || cue=="escape")return;
             audioPlayer.Play(cue);
             if(cue=="wave")Notice=$"Round held. +${MatchState.WaveReward(Match.Wave)} supplies. "+Match.NextWave.briefing;
-            if(cue=="escape")combatEffects.Escape(position);
         }
         void Unsubscribe()
         {
             if(Match==null)return;
             Match.Cue-=OnCue; Match.ShotFired-=OnShotFired; Match.ShotImpacted-=OnShotImpacted; Match.EnemyDamaged-=EnemyViews.Hit; Match.EnemyKilled-=OnEnemyKilled;
+            Match.EnemyReachedBase-=OnBaseHit;
         }
         void OnDestroy() { Unsubscribe(); }
     }

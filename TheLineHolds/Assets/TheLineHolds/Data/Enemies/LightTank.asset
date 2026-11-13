@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: Light tanks
   description: Slow armor. Anti-tank guns are the main counter.
   armored: 1
+  baseHit: 2
   spawnSeparation: 4.4
   health: 530
   speed: 1.15

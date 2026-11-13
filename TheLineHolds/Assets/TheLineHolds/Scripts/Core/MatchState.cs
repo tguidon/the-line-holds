@@ -53,7 +53,7 @@ namespace TheLineHolds
         readonly WaveSpawner spawner = new WaveSpawner();
         readonly CombatSystem combat = new CombatSystem();
         public event Action<string, Vector3> Cue;
-        public event Action<EnemyState> EnemyDamaged, EnemyKilled;
+        public event Action<EnemyState> EnemyDamaged, EnemyKilled, EnemyReachedBase;
         public event Action<ShotState> ShotFired;
         public event Action<ShotState> ShotImpacted;
         public event Action<string> Journal;
@@ -129,6 +129,7 @@ namespace TheLineHolds
             Enemies.Remove(enemy);
             Escaped++;
             Lives--;
+            EnemyReachedBase?.Invoke(enemy);
             Emit("escape", enemy.Position);
             if (Lives <= 0) Finish(MatchPhase.Defeat);
         }

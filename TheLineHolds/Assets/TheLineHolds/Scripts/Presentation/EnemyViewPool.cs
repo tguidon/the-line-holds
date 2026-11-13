@@ -30,9 +30,20 @@ namespace TheLineHolds
         public void Hit(EnemyState enemy){var v=Get(enemy);v.Visual.Hit(enemy.Health/enemy.MaximumHealth);}
         public void Kill(EnemyState enemy)
         {
-            var v=Get(enemy);active.Remove(enemy.Id);v.Bar.gameObject.SetActive(false);v.Visual.Die();retiring.Add(v);
+            var v=Retire(enemy);v.Visual.Die();
             effects.Destruction(enemy.Position,enemy.Definition.spawnSeparation>0);
+        }
+        public void StrikeBase(EnemyState enemy,Vector3 forward)
+        {
+            var v=Retire(enemy);
+            v.Root.transform.SetPositionAndRotation(enemy.Position,Quaternion.LookRotation(forward));
+            v.Visual.StrikeBase();
+        }
+        View Retire(EnemyState enemy)
+        {
+            var v=Get(enemy);active.Remove(enemy.Id);v.Bar.gameObject.SetActive(false);retiring.Add(v);
             if(retiring.Count>24){Return(retiring[0]);retiring.RemoveAt(0);}
+            return v;
         }
         public void Sync(MatchState match,float dt)
         {
