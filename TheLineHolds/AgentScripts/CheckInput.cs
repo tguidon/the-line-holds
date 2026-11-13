@@ -79,7 +79,7 @@ public static class CheckInput
             float zoom = game.battleCamera.orthographicSize;
             MouseEvent(0, 120); await Frame(); Check(game.battleCamera.orthographicSize < zoom, "wheel zooms");
             MouseEvent(0, 4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, MapCameraControls.MinimumZoom), "close zoom minimum clamps");
-            MouseEvent(0, -4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, Mathf.Max(MapCameraControls.MaximumZoom,game.CameraControls.OverviewSize)), "zoom maximum clamps");
+            MouseEvent(0, -4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, game.CameraControls.OverviewSize), "zoom maximum clamps");
             await Key(UnityEngine.InputSystem.Key.R);
             Check(Vector3.Distance(homePosition,game.battleCamera.transform.position)<.001f && Mathf.Approximately(game.battleCamera.orthographicSize,game.CameraControls.OverviewSize), "R resets overview");
             await Key(UnityEngine.InputSystem.Key.E); Check(Quaternion.Angle(homeRotation,game.battleCamera.transform.rotation)>1,"E rotates map");

@@ -7,7 +7,7 @@ namespace TheLineHolds
     [DefaultExecutionOrder(-50)]
     public sealed class MapCameraControls : MonoBehaviour
     {
-        public const float MinimumZoom = 5.5f, MaximumZoom = 18;
+        public const float MinimumZoom = 5.5f;
         public float OverviewSize { get; private set; }
         Camera view;
         BattleController game;
@@ -35,6 +35,12 @@ namespace TheLineHolds
         }
         public void ResetView()
         {
+            FitOverview();
+            focus=homeFocus;yaw=0;dragging=false;overview=true;
+            view.orthographicSize=OverviewSize;Apply();
+        }
+        void FitOverview()
+        {
             // Project playable ground and landmark headroom into the original camera axes.
             // Fit both dimensions inside the map's usable region, leaving room for the HUD.
             var inverse=Quaternion.Inverse(homeRotation);
@@ -56,15 +62,15 @@ namespace TheLineHolds
             OverviewSize=Mathf.Max(MinimumZoom,Mathf.Max((max.x-min.x)/(2*view.aspect*.88f),(max.y-min.y)/(2*height)));
             var center=(min+max)*.5f;
             homeFocus=homeRotation*new Vector3(center.x,center.y-(bottom-top)*OverviewSize,0);
-            focus=homeFocus;yaw=0;dragging=false;overview=true;
             fittedWidth=Screen.width;fittedHeight=Screen.height;fittedAspect=view.aspect;
-            view.orthographicSize=OverviewSize;Apply();
         }
         public void Rotate(float degrees) { overview=false; yaw=Mathf.Repeat(yaw+degrees,360); Apply(); }
         public void Zoom(float amount)
         {
             if(Mathf.Approximately(amount,0))return;
-            overview=false;view.orthographicSize=Mathf.Clamp(view.orthographicSize+amount,MinimumZoom,Mathf.Max(MaximumZoom,OverviewSize));
+            view.orthographicSize=Mathf.Clamp(view.orthographicSize+amount,MinimumZoom,OverviewSize);
+            overview=overview && Mathf.Approximately(view.orthographicSize,OverviewSize);
+            ClampFocus();Apply();
         }
         void Pan(Vector2 movement)
         {
@@ -72,8 +78,15 @@ namespace TheLineHolds
             var right=Vector3.ProjectOnPlane(transform.right,Vector3.up).normalized;
             var forward=Vector3.ProjectOnPlane(transform.up,Vector3.up).normalized;
             focus+=right*movement.x+forward*movement.y;
-            focus.x=Mathf.Clamp(focus.x,-11,11); focus.z=Mathf.Clamp(focus.z,-6,6);
-            Apply();
+            ClampFocus();Apply();
+        }
+        void ClampFocus()
+        {
+            // At overview the battle stays central. Close inspection can reach either end of the road.
+            float close=Mathf.InverseLerp(OverviewSize,MinimumZoom,view.orthographicSize);
+            float x=Mathf.Lerp(1.75f,11,close),z=Mathf.Lerp(1.2f,6,close);
+            focus.x=Mathf.Clamp(focus.x,homeFocus.x-x,homeFocus.x+x);
+            focus.z=Mathf.Clamp(focus.z,homeFocus.z-z,homeFocus.z+z);
         }
         void Apply()
         {
@@ -83,7 +96,16 @@ namespace TheLineHolds
         }
         void Update()
         {
-            if(overview && (Screen.width!=fittedWidth || Screen.height!=fittedHeight || !Mathf.Approximately(view.aspect,fittedAspect)))ResetView();
+            if(Screen.width!=fittedWidth || Screen.height!=fittedHeight || !Mathf.Approximately(view.aspect,fittedAspect))
+            {
+                if(overview)ResetView();
+                else
+                {
+                    FitOverview();
+                    view.orthographicSize=Mathf.Min(view.orthographicSize,OverviewSize);
+                    ClampFocus();Apply();
+                }
+            }
             if(game==null || game.InMenu || game.Match==null || game.Match.Ended)
             { dragging=false; return; }
             var keyboard=Keyboard.current;
