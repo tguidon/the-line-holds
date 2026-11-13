@@ -44,17 +44,22 @@ try
     await Arrival(latest);
     report.AppendLine("Spawn stayed offscreen after resizing and orbiting during the wave");
     var route=g.Match.Route;
+    var mg=g.defenses.Single(d=>d.role==DefenseRole.MachineGun);
     for(int site=0;site<g.Match.Pads.Length;site++)
     {
         var pad=g.Match.Pads[site];
         Check(Vector3.Distance(pad,g.padViews[site].position)<.005f,"Build click target does not match its pad");
-        float nearest=float.MaxValue;
-        for(float d=0;d<=route.Length;d+=.05f){
-            var delta=route.Position(d)-pad;
-            nearest=Mathf.Min(nearest,new Vector2(delta.x,delta.z).magnitude);
+        float nearest=float.MaxValue, covered=0;
+        for(float d=0;d<route.Length;d+=.05f){
+            float step=Mathf.Min(.05f,route.Length-d);
+            var delta=route.Position(d+step*.5f)-pad;
+            float distance=new Vector2(delta.x,delta.z).magnitude;
+            nearest=Mathf.Min(nearest,distance);
+            if(distance<=mg.range)covered+=step;
         }
         Check(nearest>=2.47f,"Pad too close to traffic: "+nearest);
         Check(nearest<g.defenses.Min(w=>w.range),"Base weapon cannot reach closest traffic");
+        Check(covered>=5f,$"Countryside pad {site} covers only {covered:F1} m of the enemy route with a base MG");
     }
     return report.ToString()+"All ten pads have roadside clearance and can engage the road with every base weapon.";
 }
