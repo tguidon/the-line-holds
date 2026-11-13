@@ -9,18 +9,6 @@ namespace TheLineHolds
         public bool winterForest;
         public BattleRoute Route { get; private set; }
         public Vector3[] Sites { get; private set; }
-        static string deploymentScene;
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void ResetDeployment() => deploymentScene = null;
-
-        public void Deploy(bool winter)
-        {
-            if (winter == winterForest) { NewMatch(); return; }
-            deploymentScene = winter ? "WinterForest" : "Countryside";
-            UnityEngine.SceneManagement.SceneManager.LoadScene(deploymentScene);
-        }
-
         public WaveDefinition[] waves;
         public DefenseDefinition[] defenses;
         public Transform dynamicRoot;
@@ -55,9 +43,7 @@ namespace TheLineHolds
             CameraControls.Initialize(battleCamera,this);
             EnemyViews=new EnemyViewPool(dynamicRoot,battleCamera,healthMaterial,combatEffects);
             hud.Initialize(this);
-            if (deploymentScene == gameObject.scene.name) NewMatch();
-            else MainMenu();
-            deploymentScene = null;
+            NewMatch();
             Debug.Log($"The Line Holds {Application.version} ready on {Application.platform} ({SystemInfo.graphicsDeviceType}).");
         }
         public void NewMatch(int seed=0)
@@ -71,6 +57,7 @@ namespace TheLineHolds
         {
             Unsubscribe();
             Match=null; InMenu=true; Placement=SelectedPad=-1; ClearViews(); audioPlayer.ResetAudio();
+            UnityEngine.SceneManagement.SceneManager.LoadScene(TitleMenu.SceneName);
         }
         void ClearViews()
         {

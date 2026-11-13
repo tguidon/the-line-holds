@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/TheLineHolds/Scenes/MainMenu.unity
+    guid: 076eaaa388c41442fa9d03ccff4ad048
+  - enabled: 1
     path: Assets/TheLineHolds/Scenes/Countryside.unity
     guid: 196149fdd064541bfbe75851a9393ff5
   - enabled: 1

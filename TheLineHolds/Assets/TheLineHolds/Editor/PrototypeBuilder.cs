@@ -55,7 +55,7 @@ namespace TheLineHolds.Editor
             PlayerSettings.runInBackground=true;
             EditorUtility.SetDirty(profile); EditorUtility.SetDirty(urp);
             EditorSceneManager.SaveScene(scene,Root+"/Scenes/Countryside.unity");
-            EditorBuildSettings.scenes=MapScenes.Select(path=>new EditorBuildSettingsScene(path,true)).ToArray();
+            EditorBuildSettings.scenes=BuildScenes.Select(path=>new EditorBuildSettingsScene(path,true)).ToArray();
             AssetDatabase.SaveAssets(); DioramaBuilder.Map(); DioramaBuilder.RefreshModels(new[]{"Infantry","LightTank"}); CombatPresentationBuilder.Build(); CampaignBuilder.Build(); Debug.Log("[Builder] Countryside saved: 10 pads, 5 waves, 3 defenses, 2 enemies; URP HDR and camera postprocessing enabled.");
         }
         // Apply balance without rebuilding the map, materials, prefabs, or audio.
@@ -223,11 +223,13 @@ namespace TheLineHolds.Editor
         public static void BuildMac() { BuildPlayer(BuildTarget.StandaloneOSX,"Builds/macOS/The Line Holds.app"); }
         [MenuItem("The Line Holds/Build/Windows")]
         public static void BuildWindows() { BuildPlayer(BuildTarget.StandaloneWindows64,"Builds/Windows/The Line Holds.exe"); }
-        internal static readonly string[] MapScenes={Root+"/Scenes/Countryside.unity",Root+"/Scenes/WinterForest.unity"};
+        internal const string CountrysideScene=Root+"/Scenes/Countryside.unity", WinterScene=Root+"/Scenes/WinterForest.unity";
+        internal const string MenuScene=Root+"/Scenes/"+TitleMenu.SceneName+".unity";
+        internal static readonly string[] BuildScenes={MenuScene,CountrysideScene,WinterScene};
         static void BuildPlayer(BuildTarget target,string output)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(output));
-            var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=MapScenes,locationPathName=output,target=target,options=BuildOptions.None});
+            var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=BuildScenes,locationPathName=output,target=target,options=BuildOptions.None});
             if(report.summary.result!=UnityEditor.Build.Reporting.BuildResult.Succeeded)throw new Exception("Build failed: "+report.summary.result);
             Debug.Log("[Build] "+output+" succeeded");
         }

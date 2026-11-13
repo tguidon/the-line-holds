@@ -19,9 +19,10 @@ try
     await Resize(1600,900);
     foreach(bool winter in new[]{false,true})
     {
-        var game=Game();game.MainMenu();game.hud.Refresh();
+        var game=Game();if(game)game.MainMenu();
+        await Wait.Until(()=>UnityEngine.Object.FindAnyObjectByType<TitleMenu>()!=null,timeoutMs:15000);
         string label=winter?"Winter Forest":"Countryside";
-        game.hud.GetComponentsInChildren<Button>().Single(b=>b.name==label).onClick.Invoke();
+        UnityEngine.Object.FindObjectsByType<Button>().Single(b=>b.name==label).onClick.Invoke();
         await Wait.Until(()=>Game() && Game().Match!=null && Game().winterForest==winter,timeoutMs:20000);
         game=Game();game.NewMatch(42);
         game.Choose(0);game.ClickPad(3);game.ClickPad(4);game.Choose(2);game.ClickPad(6);game.Cancel();game.StartNextWave();
@@ -46,4 +47,4 @@ try
     }
     return report.ToString();
 }
-finally{Screen.SetResolution(original.x,original.y,FullScreenMode.Windowed);Game().MainMenu();}
+finally{Screen.SetResolution(original.x,original.y,FullScreenMode.Windowed);if(Game())Game().MainMenu();}

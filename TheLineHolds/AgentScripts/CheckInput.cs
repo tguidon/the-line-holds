@@ -13,7 +13,8 @@ public static class CheckInput
     public static async Task<string> All()
     {
         var game = UnityEngine.Object.FindAnyObjectByType<BattleController>();
-        if (!Application.isPlaying || game == null) throw new Exception("Enter prototype Play Mode first.");
+        if (!Application.isPlaying) throw new Exception("Enter prototype Play Mode first.");
+        string battlefield=game && game.winterForest?"Winter Forest":"Countryside";
         var settings = InputSystem.settings;
         var background = settings.backgroundBehavior;
         var editorRouting = settings.editorInputBehaviorInPlayMode;
@@ -40,7 +41,7 @@ public static class CheckInput
         }
         async Task Button(string prefix)
         {
-            prefix=prefix switch {"DEPLOY"=>game.winterForest?"Winter Forest":"Countryside","Shop Machine"=>"Shop MG","SELL"=>"Sell","RESET VIEW"=>"Reset view",">"=>"Rotate right","+"=>"Zoom in","-"=>"Zoom out","START WAVE"=>"Send wave","RESUME"=>"Pause","RETRY"=>"Restart","MAIN MENU"=>"Main menu",_=>prefix};
+            prefix=prefix switch {"DEPLOY"=>battlefield,"Shop Machine"=>"Shop MG","SELL"=>"Sell","RESET VIEW"=>"Reset view",">"=>"Rotate right","+"=>"Zoom in","-"=>"Zoom out","START WAVE"=>"Send wave","RESUME"=>"Pause","RETRY"=>"Restart","MAIN MENU"=>"Main menu",_=>prefix};
             bool camera=prefix=="Reset view" || prefix=="Rotate right" || prefix=="Zoom in" || prefix=="Zoom out";
             var all=UnityEngine.Object.FindObjectsByType<Button>(FindObjectsInactive.Include);
             if((prefix=="Restart" || prefix=="Main menu") && !all.Any(b=>b.gameObject.activeInHierarchy && b.name.StartsWith(prefix,StringComparison.Ordinal)))await Button("Options");
@@ -59,9 +60,11 @@ public static class CheckInput
             mouse = InputSystem.AddDevice<Mouse>("PrototypeInputCheckMouse");
             keyboard = InputSystem.AddDevice<Keyboard>("PrototypeInputCheckKeyboard");
             mouse.MakeCurrent(); keyboard.MakeCurrent();
-            game.MainMenu(); await Frame();
+            if(game)game.MainMenu(); await Frame();
             await Button("DEPLOY");
-            Check(!game.InMenu && game.Match.Funds == 300, "mouse starts match");
+            await Unity.Pipeline.Scripting.Wait.Until(()=>UnityEngine.Object.FindAnyObjectByType<BattleController>()?.Match!=null,timeoutMs:20000);
+            game=UnityEngine.Object.FindAnyObjectByType<BattleController>();
+            Check(game.Match.Funds == 300, "mouse starts match");
             await Button("Shop Machine"); Check(game.Placement == 0, "mouse selects defense");
             pointer = Pad(3); MouseEvent(1); await Frame(); MouseEvent(); await Frame();
             Check(game.Match.Towers[3] != null && game.Match.Funds == 225, "moving from shop to pad and clicking in one input frame places tower");
@@ -130,7 +133,7 @@ public static class CheckInput
             await Key(UnityEngine.InputSystem.Key.Escape); await Button("RETRY");
             Check(game.Match.Wave == 0 && game.Match.Funds == 300 && game.Match.Lives == 20, "pause Restart resets match");
             await Key(UnityEngine.InputSystem.Key.Escape); await Button("MAIN MENU");
-            Check(game.InMenu && game.Match == null, "pause Main Menu clears match");
+            Check(!game && UnityEngine.Object.FindAnyObjectByType<TitleMenu>(), "pause Main Menu unloads the battle");
             const string result = "PASS frame-driven mouse placement/inspection/selling, rejected purchases, right-click, Escape priority, close zoom limits, orbit/modifier-drag/pan/reset buttons and keys, rotated placement, UI scroll isolation, wave start, pause/resume/restart/menu";
             Debug.Log("[Input verification] " + result);
             return result;
@@ -142,7 +145,7 @@ public static class CheckInput
             foreach (var original in originals) if (original.enabled) InputSystem.EnableDevice(original.device);
             settings.backgroundBehavior = background;
             settings.editorInputBehaviorInPlayMode = editorRouting;
-            game.MainMenu();
+            if(game)game.MainMenu();
         }
     }
 }

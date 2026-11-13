@@ -7,13 +7,15 @@ using TheLineHolds;
 using UnityEngine.UI;
 using Unity.Pipeline.Scripting;
 BattleController Game()=>UnityEngine.Object.FindAnyObjectByType<BattleController>();
-void Press(string label)=>Game().hud.GetComponentsInChildren<Button>().Single(b=>b.name==label).onClick.Invoke();
+void Press(string label)=>UnityEngine.Object.FindObjectsByType<Button>().Single(b=>b.name==label).onClick.Invoke();
 void Check(bool value,string error){if(!value)throw new Exception(error);}
 var game=Game();
-game.MainMenu();game.hud.Refresh();
+if(game)game.MainMenu();
+await Wait.Until(()=>UnityEngine.Object.FindAnyObjectByType<TitleMenu>()!=null,timeoutMs:15000);
 Press("Countryside");
 await Wait.Until(()=>Game() && !Game().InMenu && !Game().winterForest,timeoutMs:15000);
-game=Game();game.MainMenu();game.hud.Refresh();
+game=Game();if(game)game.MainMenu();
+await Wait.Until(()=>UnityEngine.Object.FindAnyObjectByType<TitleMenu>()!=null,timeoutMs:15000);
 Press("Winter Forest");
 await Wait.Until(()=>Game() && Game().winterForest && Game().Match!=null,timeoutMs:15000);
 game=Game();game.NewMatch(42);

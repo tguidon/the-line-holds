@@ -19,7 +19,7 @@ namespace TheLineHolds.Editor
             var current = EditorSceneManager.GetActiveScene();
             if (current.isDirty) throw new InvalidOperationException("Save the open scene before building Winter Forest.");
             // Copy the current campaign wiring, then replace both countryside scenery roots before saving.
-            var scene = EditorSceneManager.OpenScene(PrototypeBuilder.MapScenes[0]);
+            var scene = EditorSceneManager.OpenScene(PrototypeBuilder.CountrysideScene);
             var game = Object.FindAnyObjectByType<BattleController>();
             Object.DestroyImmediate(GameObject.Find("Layered countryside diorama"));
             Object.DestroyImmediate(GameObject.Find("Diorama landscape"));
@@ -40,8 +40,8 @@ namespace TheLineHolds.Editor
             WinterSurface.Build(root);
             new WinterScenery(root).Build();
             WinterWeather.Build(root,game.battleCamera);
-            EditorSceneManager.SaveScene(scene,PrototypeBuilder.MapScenes[1]);
-            EditorBuildSettings.scenes = PrototypeBuilder.MapScenes.Select(p=>new EditorBuildSettingsScene(p,true)).ToArray();
+            EditorSceneManager.SaveScene(scene,PrototypeBuilder.WinterScene);
+            EditorBuildSettings.scenes = PrototypeBuilder.BuildScenes.Select(p=>new EditorBuildSettingsScene(p,true)).ToArray();
             AssetDatabase.SaveAssets();
         }
 
