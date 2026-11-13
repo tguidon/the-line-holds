@@ -14,6 +14,13 @@ namespace TheLineHolds.Editor
         readonly System.Random random=new(1944);
         readonly Vector2[] trail=WinterSurface.Trail;
         readonly Vector3[] sites=WinterLayout.Pads;
+        // The original forest breaks determine the seeded stands. Keep their spacing when a
+        // build site moves, then clear any sampled scenery that overlaps the current sites.
+        static readonly Vector2[] forestBreaks={
+            new(-10,2), new(-6.5f,8.5f), new(-9.9f,-4.4f), new(-4,3.4f), new(.5f,3),
+            new(8.8f,3), new(-3.8f,-2.4f), new(.3f,-3), new(3,-8), new(8.8f,-.55f)
+        };
+        bool NearSite(Vector2 p,float squaredRadius)=>sites.Any(s=>new Vector2(s.x-p.x,s.z-p.y).sqrMagnitude<squaredRadius);
         readonly List<Vector2> trunks=new();
         readonly Dictionary<string,GameObject> models=new();
         readonly Dictionary<string,Material> finishes=new();
@@ -96,24 +103,28 @@ namespace TheLineHolds.Editor
                 bool interior=Mathf.Abs(p.x)<14 && p.y>-9 && p.y<9;
                 if(interior && grove<.59f)continue;
                 if(RoadClearance(p)<(interior?2.2f:1.85f) || (p-Hut).sqrMagnitude<7.5f
-                    || sites.Any(s=>new Vector2(s.x-p.x,s.z-p.y).sqrMagnitude<4.8f)
+                    || forestBreaks.Any(q=>(q-p).sqrMagnitude<4.8f)
                     || Pits.Any(s=>(s-p).sqrMagnitude<3.4f))continue;
                 float size=Between(.47f,1.12f);
                 if(interior || (p.y < -6 && p.y > -12 && Mathf.Abs(p.x)<14))size*=.7f;
                 // From the reset view the crowns project northwest of their trunks.
                 var crown=p+new Vector2(-.57f,.82f)*(size*3.8f);
-                if(sites.Any(s=>new Vector2(s.x-crown.x,s.z-crown.y).sqrMagnitude<2.7f)
+                if(forestBreaks.Any(q=>(q-crown).sqrMagnitude<2.7f)
                     || (p-new Vector2(11.9f,-5.2f)).sqrMagnitude<5)continue;
-                Place(random.Next(7)==0?"SilverBirch":"SnowSpruce",p.x,p.y,size,Between(0,360));
+                string tree=random.Next(7)==0?"SilverBirch":"SnowSpruce";
+                float yaw=Between(0,360);
+                if(!NearSite(p,4.8f) && !NearSite(crown,2.7f))Place(tree,p.x,p.y,size,yaw);
                 trunks.Add(p);
             }
             // Scatter wind-bared stones and saplings at the margins, avoiding traffic and gun sites.
             for(int i=0;i<230;i++)
             {
                 var p=new Vector2(Between(-23,23),Between(-18,18));
-                if(RoadClearance(p)<1.25f || sites.Any(s=>new Vector2(s.x-p.x,s.z-p.y).sqrMagnitude<1.6f)
+                if(RoadClearance(p)<1.25f || forestBreaks.Any(q=>(q-p).sqrMagnitude<1.6f)
                     || Pits.Any(s=>(s-p).sqrMagnitude<1.8f) || (p-Hut).sqrMagnitude<4)continue;
-                Place(random.Next(5)==0?"SnowSpruce":"SnowyOutcrop",p.x,p.y,Between(.11f,.34f),Between(0,360));
+                string detail=random.Next(5)==0?"SnowSpruce":"SnowyOutcrop";
+                float size=Between(.11f,.34f),yaw=Between(0,360);
+                if(!NearSite(p,1.6f))Place(detail,p.x,p.y,size,yaw);
             }
             BakeChunks();
         }

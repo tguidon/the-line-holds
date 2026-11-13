@@ -13,7 +13,7 @@ namespace TheLineHolds
             new(6.8f,-3.1f), new(11,-3.4f)
         };
         static readonly Vector2[] sites = {
-            new(-10,2), new(-6.5f,8.5f), new(-9.9f,-4.4f), new(-4,3.4f),
+            new(-10,2), new(-6.5f,8.5f), new(-7.1f,2.55f), new(-4,3.4f),
             new(.5f,3), new(8.8f,3), new(-3.8f,-2.4f), new(.3f,-3),
             new(3,-8), new(8.8f,-.55f)
         };
