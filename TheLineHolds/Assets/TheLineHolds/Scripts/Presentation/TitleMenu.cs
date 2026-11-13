@@ -8,7 +8,7 @@ namespace TheLineHolds
     public sealed class TitleMenu : MonoBehaviour
     {
         public const string SceneName = "MainMenu";
-        public Button countryside, winterForest, quit;
+        public Button countryside, winterForest, saintAubin, quit;
         public RectTransform content;
         bool deploying;
 
@@ -17,6 +17,7 @@ namespace TheLineHolds
             Application.targetFrameRate=60;
             countryside.onClick.AddListener(()=>Deploy("Countryside"));
             winterForest.onClick.AddListener(()=>Deploy("WinterForest"));
+            saintAubin.onClick.AddListener(()=>Deploy("SaintAubin"));
             quit.onClick.AddListener(Quit);
             EventSystem.current.SetSelectedGameObject(countryside.gameObject);
             Fit();

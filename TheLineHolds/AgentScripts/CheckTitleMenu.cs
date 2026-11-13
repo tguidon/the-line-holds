@@ -36,21 +36,21 @@ try
             Check(corners.All(p=>p.x>=0 && p.x<=Screen.width && p.y>=0 && p.y<=Screen.height),"Clipped "+b.name);
         }
         var previews=Menu().GetComponentsInChildren<RawImage>().Where(i=>i.name.EndsWith(" preview")).ToArray();
-        Check(previews.Length==2 && previews.All(i=>i.texture) && previews[0].texture!=previews[1].texture,"Missing distinct photographs");
+        Check(previews.Length==3 && previews.All(i=>i.texture) && previews.Select(i=>i.texture).Distinct().Count()==3,"Missing distinct photographs");
     }
-    foreach(bool winter in new[]{false,true})
+    foreach(string map in new[]{"Countryside","WinterForest","SaintAubin"})
     {
-        Click(winter?Menu().winterForest:Menu().countryside);
+        Click(map=="WinterForest"?Menu().winterForest:map=="SaintAubin"?Menu().saintAubin:Menu().countryside);
         await Wait.Until(()=>Battle() && Battle().Match!=null,timeoutMs:20000);
         await Task.Delay(150);
         var g=Battle();
-        Check(!Menu() && g.winterForest==winter && g.Match.Funds==300 && g.Match.Lives==20 && g.Match.Wave==0,"Wrong deployment");
+        Check(!Menu() && SceneManager.GetActiveScene().name==map && g.Match.Funds==300 && g.Match.Lives==20 && g.Match.Wave==0,"Wrong deployment");
         var options=g.hud.GetComponentsInChildren<Button>().Single(b=>b.name=="Options");
         Click(options);await Task.Delay(120);
         Click(g.hud.GetComponentsInChildren<Button>().Single(b=>b.name=="Main menu"));
         await Wait.Until(()=>Menu() && !Battle() && EventSystem.current && EventSystem.current.currentSelectedGameObject==Menu().countryside.gameObject,timeoutMs:10000);
         await Task.Delay(150);
     }
-    return "Passed standalone title at 1600x900, 1024x768 and 1920x800. Both photograph buttons deployed fresh matches and both Options menus unloaded them.";
+    return "Passed standalone title at 1600x900, 1024x768 and 1920x800. All three photograph buttons deployed fresh matches and their Options menus unloaded them.";
 }
 finally{Screen.SetResolution(original.x,original.y,FullScreenMode.Windowed);}

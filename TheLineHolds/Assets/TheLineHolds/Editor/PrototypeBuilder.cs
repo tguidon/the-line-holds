@@ -225,7 +225,8 @@ namespace TheLineHolds.Editor
         public static void BuildWindows() { BuildPlayer(BuildTarget.StandaloneWindows64,"Builds/Windows/The Line Holds.exe"); }
         internal const string CountrysideScene=Root+"/Scenes/Countryside.unity", WinterScene=Root+"/Scenes/WinterForest.unity";
         internal const string MenuScene=Root+"/Scenes/"+TitleMenu.SceneName+".unity";
-        internal static readonly string[] BuildScenes={MenuScene,CountrysideScene,WinterScene};
+        internal const string TownScene=Root+"/Scenes/SaintAubin.unity";
+        internal static readonly string[] BuildScenes={MenuScene,CountrysideScene,WinterScene,TownScene};
         static void BuildPlayer(BuildTarget target,string output)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(output));

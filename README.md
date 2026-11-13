@@ -74,3 +74,9 @@ The logging track doubles back around a rock outcrop before reaching the radio h
 To rebuild the scenery, run **The Line Holds → Visuals → Build Winter Forest** in Edit Mode. The build uses the current Countryside campaign references and writes `Scenes/WinterForest.unity` and its own assets under `Art/WinterForest/`. Regenerate the original models with Blender and `Tools/Blender/winter_forest.py`, passing the repository root after `--`. Run `AgentScripts/CheckWinterCampaign.cs` with entry `CheckWinterCampaign.Compare` for the matched-seed balance comparison.
 
 [Opening patrol](TheLineHolds/Screenshots/winter-forest-patrol.png) · [Wave nine armor](TheLineHolds/Screenshots/winter-forest-armor.png)
+
+### Saint-Aubin route prototype
+
+Choose **Saint-Aubin** in the Unity project's main menu to inspect the [town layout](TheLineHolds/Screenshots/saint-aubin-layout.png). The intact houses and roofless plots reserve building footprints for the spring town art pass. The ten round sites are buildable.
+
+In Edit Mode, **The Line Holds → Visuals → Build Saint-Aubin blockout** regenerates its scene and paving from the movement paths. Run `AgentScripts/CheckTownLayout.cs` with entry `CheckTownLayout.All` to check the junction, pad coverage, and wave entrance patterns. Difficulty comparison and final scenery follow route approval.

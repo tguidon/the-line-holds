@@ -14,5 +14,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/TheLineHolds/Scenes/WinterForest.unity
     guid: c72ec698dae0e49fe9a5499d233e4d99
+  - enabled: 1
+    path: Assets/TheLineHolds/Scenes/SaintAubin.unity
+    guid: ceee059af77c7401fbaeae2248ab3422
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

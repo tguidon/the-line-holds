@@ -49,13 +49,15 @@ namespace TheLineHolds.Editor
             Label(content,"Hold the road through ten attacks.",710,186,570,44,21,Ivory,
                 alignment:TextAlignmentOptions.MidlineRight);
             menu.countryside=Card(content,0,"Countryside","NORMANDY","Defend the farm road.","Countryside");
-            menu.winterForest=Card(content,654,"Winter Forest","SIGNAL POST","Hold the snowbound switchback.","WinterForest");
+            menu.winterForest=Card(content,432,"Winter Forest","SIGNAL POST","Hold the snowbound switchback.","WinterForest");
+            menu.saintAubin=Card(content,864,"Saint-Aubin","MARKET SQUARE","Hold the town hall.","SaintAubin");
             Line(content,0,695,1280,1,Rule);
             menu.quit=Action(content,"Quit game",1150,707,130,40,Ink);
             Label(menu.quit.transform,"Quit game",0,0,130,40,19,Ivory,alignment:TextAlignmentOptions.Center);
-            Link(menu.countryside,menu.winterForest,menu.quit);
-            Link(menu.winterForest,menu.countryside,menu.quit);
-            Link(menu.quit,menu.countryside,menu.winterForest);
+            Link(menu.countryside,menu.saintAubin,menu.winterForest,menu.quit);
+            Link(menu.winterForest,menu.countryside,menu.saintAubin,menu.quit);
+            Link(menu.saintAubin,menu.winterForest,menu.countryside,menu.quit);
+            Link(menu.quit,menu.countryside,menu.saintAubin,menu.saintAubin);
             new GameObject("Menu input",typeof(EventSystem),typeof(InputSystemUIInputModule));
             EditorSceneManager.SaveScene(scene,PrototypeBuilder.MenuScene);
             EditorBuildSettings.scenes=PrototypeBuilder.BuildScenes.Select(p=>new EditorBuildSettingsScene(p,true)).ToArray();
@@ -64,13 +66,13 @@ namespace TheLineHolds.Editor
 
         static Button Card(Transform parent,float x,string name,string location,string brief,string preview)
         {
-            const float w=626, photoHeight=285;
+            const float w=416, photoHeight=285;
             var button=Action(parent,name,x,252,w,416,DioramaSurface.Hex("D8D0BF"));
             var card=button.transform;
             var photo=Rect(card,name+" preview",8,8,w-16,photoHeight).gameObject.AddComponent<RawImage>();
             photo.texture=Texture(preview);photo.raycastTarget=false;
-            float visibleHeight=(photoHeight/(w-16))*photo.texture.width/photo.texture.height;
-            photo.uvRect=new Rect(0,(1-visibleHeight)*.5f,1,visibleHeight);
+            float aspect=(w-16)/photoHeight*photo.texture.height/photo.texture.width;
+            photo.uvRect=aspect<1?new Rect((1-aspect)/2,0,aspect,1):new Rect(0,(1-1/aspect)/2,1,1/aspect);
             Label(card,location,22,301,w-48,23,15,Ink,FontStyles.Bold,spacing:5);
             Label(card,name,20,324,w-110,50,39,Ink,FontStyles.Bold);
             Label(card,brief,22,376,w-104,30,19,Ink);
@@ -108,10 +110,10 @@ namespace TheLineHolds.Editor
             colors.pressedColor=Gold;colors.fadeDuration=.1f;button.colors=colors;return button;
         }
 
-        static void Link(Button from,Button across,Button vertical)
+        static void Link(Button from,Button left,Button right,Button vertical)
         {
             var n=from.navigation;n.mode=Navigation.Mode.Explicit;
-            n.selectOnLeft=n.selectOnRight=across;n.selectOnUp=n.selectOnDown=vertical;from.navigation=n;
+            n.selectOnLeft=left;n.selectOnRight=right;n.selectOnUp=n.selectOnDown=vertical;from.navigation=n;
         }
 
         static void Label(Transform parent,string text,float x,float y,float w,float h,int size,Color color,
