@@ -63,7 +63,7 @@ For visual authoring without resetting gameplay data, stop Play Mode and run:
 unity command script eval --project-path "$PWD/TheLineHolds" 'TheLineHolds.Editor.DioramaBuilder.Map();'
 ```
 
-For a new level, start with the current gameplay reference, material and lighting recipes, and map review checklist in the [map art guide](ART_DIRECTION.md). The repo includes the [battlefield art skill](.agents/skills/battlefield-art/SKILL.md) for authoring and reviewing maps against that guide.
+For a new level, start with the gameplay reference, guidance on distinct routes and scenery density, and examples for snow, town and beach maps in the [map art guide](ART_DIRECTION.md). The repo includes the [battlefield art skill](.agents/skills/battlefield-art/SKILL.md) for authoring and reviewing maps against that guide.
 
 ### Pending review build
 

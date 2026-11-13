@@ -1,12 +1,13 @@
 ---
 name: battlefield-art
-description: Author or review a The Line Holds map, landmarks, or battlefield scenery in the project's historical miniature style. Use for new level art, map dressing, and gameplay-camera composition.
+description: Design or review distinct routes, landmarks and scenery for The Line Holds maps across settings, using the game's historical miniature style and gameplay camera.
 ---
 
 # Battlefield art
 
-Start with the [map art guide](../../../ART_DIRECTION.md). Open its farmstead overview and upgraded-howitzer frame before choosing scale, color or prop density. Treat the guide as the shared source for visual decisions. Use Countryside’s buildings and measurements as examples when the new setting calls for different landmarks.
+Read the [map art guide](../../../ART_DIRECTION.md) and inspect its overview and combat frames. Use the frames to judge miniature scale, silhouette, the distribution of detail, signs of life and clarity during a wave. Choose materials, lighting, terrain and landmarks for the requested place and weather.
 
-- **For a new map**, identify the layout the simulation, camera and terrain bake will read. Countryside currently hardcodes its route and pads and writes named meshes and textures into a shared directory. Trace those references and choose level-specific outputs before running a generator for another scene. Reuse the material library and lighting recipe.
-- **For a dressing pass**, work from a reset gameplay frame with the HUD. Trace the approach, bends, objective and buildable ground. Place the local activity in a visible pocket, reserve space for roofs and tree crowns, and carry the same footprint into the terrain paint and vegetation pass. Check the updated composition again from the original camera.
-- **For a review**, use the guide’s play checks that apply to the change. Check a large vehicle beside an upgraded tower for road clearance, or a narrower and wider window for landmark framing. For implementation work, save the relevant gameplay captures and report what was tested. For a critique, identify the specific obstruction or visual mismatch in the frame.
+- **New level.** Sketch a distinct path from offscreen approach to defended objective before placing scenery. Use the geography to explain its shape. Compare the turns and firing opportunities with existing maps. State where players can cover a column for a long stretch, catch it twice, or cover its final approach. Choose build sites for that layout.
+- **Implementation.** Trace the layout used by movement, spawn approach, camera fit and terrain paint. The current generators and runtime read Countryside defaults and share output paths. Connect each consumer to the intended map and give its generated assets their own paths. Scope a scenery pass on an existing map to the requested changes.
+- **Dressing.** Choose an activity specific to the place. Cluster its visible evidence near landmarks and leave quieter ground behind combat. Use a normal gameplay frame with the HUD to check density, sightlines, and the tallest foreground silhouettes. The guide includes optional snow, town and beach examples.
+- **Review.** Trace the path in the reset view. Check an arrival after resizing, a large vehicle beside an upgraded tower, and the lead enemy under fire. For a new level, compare its undecorated route and tower coverage with an existing level as well as comparing the finished art. Report what the gameplay frames and play checks show.
