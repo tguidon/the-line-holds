@@ -8,7 +8,7 @@
 
 ## Development workflow
 - Commit work at validated checkpoints as development progresses, using small, logically grouped commits with clear messages. Keep each Unity asset with its `.meta` file, review the staged diff, and exclude generated files, local settings, secrets, and build output before committing. Do not wait until the entire prototype or feature is finished to record its history.
-- Prefer the installed Unity CLI and agent skills for project setup, editor automation, tests, and builds.
+- Use the installed CLI, skills, and MCPs for project work. If Computer Use is essential, pause, explain why those tools cannot complete the task, and wait for the user before using it.
 - Install the Unity Pipeline package when creating the project and verify the live editor connection with `unity status`.
 - Drive a connected editor through the CLI; do not hand-edit scene, prefab, or asset YAML while it is open.
 - Prefer reusable C# editor tools and Blender scripts over manual setup. Keep automation in version control.
@@ -19,4 +19,4 @@
 - Start with a small playable prototype and iterate in working increments.
 - Validate changes through compilation, focused tests where useful, and Play Mode checks. Inspect visual changes from the intended camera view.
 - Keep build commands repeatable and maintain separate macOS and Windows outputs.
-- Verify platform-specific behavior on both operating systems before release; use a Windows machine or runner where the Windows build toolchain is required.
+- Validate macOS on the Mac. For Windows, build the x64 player and inspect its archive only. Never run the Windows version, including on a VM or hosted runner. A successful build is sufficient for release.

@@ -140,12 +140,11 @@ Tag the exact release commit. Push the source and annotated tag, then create a d
 git tag -a "$tag" -m "The Line Holds $version"
 git push --atomic origin main "$tag"
 gh release create "$tag" "$mac_zip" "$win_zip" --verify-tag --draft --title "The Line Holds $version" --notes-file "$notes"
-gh workflow run windows-release-check.yml --ref main -f version="$version"
-gh run list --workflow windows-release-check.yml
-gh run watch "$run_id" --exit-status
 ```
 
-The Windows runner downloads the staged ZIP, launches the player, deploys from the title screen, and checks the game version in its battlefield startup log. The [Windows playtest checklist](windows-checklist.md) covers hands-on campaign and audio checks. Compare the uploaded filenames, byte counts and SHA-256 digests with the local archives before publishing. If a previous attempt created a draft, resume that draft. For a signing-only replacement of an existing Mac release, retain the original source tag and Windows ZIP.
+Windows acceptance is build-only. Confirm Unity reports a successful x64 build and the ZIP passes its integrity check. Never launch the Windows player locally, in a VM, or on a hosted runner.
+
+Compare the uploaded filenames, byte counts and SHA-256 digests with the local archives before publishing. If a previous attempt created a draft, resume that draft. For a signing-only replacement of an existing Mac release, retain the original source tag and Windows ZIP.
 
 ```sh
 gh release view "$tag" --json isDraft,assets --jq '{draft:.isDraft,assets:[.assets[]|{name,size,digest}]}'

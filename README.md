@@ -2,7 +2,7 @@
 
 A two-map WWII tower defense prototype built with Unity **6000.6.7f1**, URP 17.6, C#, and original Blender miniatures.
 
-The local two-map macOS development build is `TheLineHolds/Builds/macOS-VehicleTravel/The Line Holds.app`. Open it and choose **Countryside** or **Winter Forest**. Windows runtime testing requires a Windows machine or runner.
+The local two-map macOS development build is `TheLineHolds/Builds/macOS-VehicleTravel/The Line Holds.app`. Open it and choose **Countryside** or **Winter Forest**. Windows validation is build-only.
 
 Open `TheLineHolds/` in Unity. The startup scene is `Assets/TheLineHolds/Scenes/MainMenu.unity`. Its field-manual cover shows a photograph of each battlefield. Press Play, select either battlefield from the menu, choose a defense from the build dock and click a cleared gun site. Click a tower to upgrade or sell it. Pausing freezes combat while you build, inspect, upgrade, sell or move the camera. The corner pause control resumes play; Options holds Restart and Main menu. Unaffordable upgrades show a lock and their shortfall. Escape cancels selection first, otherwise pauses. Middle-drag, Command+left-drag on macOS, Ctrl+left-drag on Windows, or Q/E rotates the map; Shift+middle-drag or WASD pans; the wheel zooms; R fits the complete route. Help contains camera buttons and shortcuts.
 
@@ -45,7 +45,7 @@ Launch the existing Mac release without rebuilding:
 unity build run "$PWD/TheLineHolds" --build-path "$PWD/TheLineHolds/Builds/macOS/The Line Holds.app"
 ```
 
-Build commands also appear under **The Line Holds → Build** in Unity. Outputs are separated under `TheLineHolds/Builds/macOS/` and `TheLineHolds/Builds/Windows/`. Windows requires its desktop build module/toolchain. The current prototype evaluation platform is macOS; Windows runtime testing is deferred and does not block prototype completion. Confirm a full match on Windows before a Windows release or treating that platform as verified.
+Build commands also appear under **The Line Holds → Build** in Unity. Outputs are separated under `TheLineHolds/Builds/macOS/` and `TheLineHolds/Builds/Windows/`. Windows requires its desktop build module/toolchain. Run gameplay checks on macOS. A successful Windows x64 build is sufficient for release.
 
 Regenerate the models:
 
