@@ -9,15 +9,16 @@ using Object=UnityEngine.Object;
 
 namespace TheLineHolds.Editor
 {
-    // Approval blockout. Only the footprint, height and condition of each block are represented.
-    public static class TownBlockoutBuilder
+    // The approved layout owns all road, gun site and building clearances.
+    public static class TownBuilder
     {
         internal const string Art="Assets/TheLineHolds/Art/SaintAubin";
         static Transform root;
+        static TownScenery scenery;
         static readonly Dictionary<string,Material> finishes=new();
         static Vector3[] pads, road;
         static readonly List<Rect> footprints=new();
-        [MenuItem("The Line Holds/Visuals/Build Saint-Aubin blockout")]
+        [MenuItem("The Line Holds/Visuals/Build Saint-Aubin")]
         public static void Build()
         {
             if(EditorApplication.isPlaying || EditorSceneManager.GetActiveScene().isDirty)
@@ -29,6 +30,7 @@ namespace TheLineHolds.Editor
             Directory.CreateDirectory(Art);AssetDatabase.Refresh();finishes.Clear();footprints.Clear();
             root=new GameObject("Saint-Aubin • market quarter").transform;
             game.saintAubin=true;
+            scenery=new TownScenery(root);
             // A higher, near-frontal view keeps the belfry below the central pad and the two
             // approach lanes readable without changing the existing orbit/zoom controls.
             game.battleCamera.transform.rotation=Quaternion.Euler(49,-17,0);
@@ -52,25 +54,18 @@ namespace TheLineHolds.Editor
                 }
             }
             game.padViews=new Transform[pads.Length];
-            var earth=Mat("Cleared earth","B29A72");var trim=Mat("Cut stone","D3C5A6");
+            var earth=Mat("Cleared earth","B09C7A");
+            earth.mainTexture=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/TheLineHolds/Art/Diorama/Lime and patina.png");
             for(int i=0;i<pads.Length;i++)
             {
                 float x=pads[i].x,z=pads[i].z;
                 var site=new GameObject("Gun site "+(i+1)).transform;site.SetParent(root);site.position=pads[i];
                 game.padViews[i]=site;
-                Disc("Stone lip",x,.028f,z,1.03f,.055f,trim,site);
-                Disc("Level bed",x,.058f,z,.91f,.024f,earth,site);
-                foreach(var dir in new[]{Vector2.left,Vector2.right,Vector2.up,Vector2.down})
-                    Box("Survey peg",x+.94f*dir.x,.105f,z+.94f*dir.y,.095f,.16f,.095f,Mat("Oak","735B40"),site);
+                Disc("Level bed",x,.038f,z,.96f,.072f,earth,site);
+                scenery.Place("GunSite",x,z,Vector3.one,22*i);
             }
-            // Town hall faces the arrival apron in the square. Keep its wings out of both streets.
-            House(5.55f,1.45f,2.75f,1.35f,1.55f,0,true);
-            Box("Town hall steps",5.55f,.085f,.65f,2.05f,.17f,.55f,trim);
-            Box("Town hall doorway",5.55f,.5f,.75f,.48f,.86f,.08f,Mat("Oak","735B40"));
-            Box("Belfry",5.55f,2.25f,1.45f,.68f,1.05f,.65f,trim);
-            Roof(5.55f,2.76f,1.45f,.9f,.86f,.45f,Mat("Slate","52636B"));
-            Box("Civic flagstaff",6.87f,1.16f,.5f,.055f,2.32f,.055f,Mat("Oak","735B40"));
-            Box("Town standard",7.12f,2.05f,.5f,.49f,.34f,.04f,Mat("Garrison blue","486680"));
+            footprints.Add(new Rect(4.12f,.64f,2.86f,1.62f));
+            scenery.Place("Mairie",5.55f,1.45f,Vector3.one);
             // Large front-row roofs would hide the road in the normal oblique view.
             // Reserve the traveled envelope plus room around every emplacement before adding a block.
             var random=new System.Random(2904);
@@ -79,13 +74,22 @@ namespace TheLineHolds.Editor
                 for(int col=0;col<9;col++)
                 {
                     float x=-8+col*3.45f+(row%2)*.48f,z=row*3.4f+.55f;
+                    x+=.26f*Mathf.Sin(col*6.1f+row*2.7f);
+                    z+=.29f*Mathf.Sin(col*1.7f-row*1.4f);
                     float w=2.0f+(float)random.NextDouble()*.65f,d=1.38f+(float)random.NextDouble()*.65f;
                     if(!Clear(x,z,w,d))continue;
                     float h=(z<0?.78f:1.02f)+(float)random.NextDouble()*.45f;
-                    House(x,z,w,d,h,placed++%5,false);
+                    var kind=placed++%5;
+                    string model=kind switch {0=>"Mercerie",1=>"BurnedHouse",2=>"Boulangerie",3=>"Maison",_=>"ShellHouse"};
+                    footprints.Add(new Rect(x-w/2,z-d/2,w,d));
+                    scenery.Place(model,x,z,new Vector3(w/2.5f,h/1.4f,d/1.75f),(row%3==0?180:0)+5f*Mathf.Sin(row*2.2f+col*3f));
                 }
+            scenery.Dress((x,z,r)=>Clear(x,z,r*2,r*2));
             var sun=Object.FindAnyObjectByType<Light>();
-            sun.shadowStrength=.65f;
+            sun.transform.rotation=Quaternion.Euler(43,31,0);
+            sun.color=DioramaSurface.Hex("FFF1DE");
+            sun.shadowStrength=.76f;
+            game.audioPlayer.ambienceGain=.51f;
             EditorSceneManager.SaveScene(scene,PrototypeBuilder.TownScene);
             EditorBuildSettings.scenes=PrototypeBuilder.BuildScenes.Select(p=>new EditorBuildSettingsScene(p,true)).ToArray();
             AssetDatabase.SaveAssets();
@@ -101,34 +105,6 @@ namespace TheLineHolds.Editor
             }
             return !road.Any(p=>Near(p,2.02f)) && !pads.Any(p=>Near(p,1.62f))
                 && !footprints.Any(existing=>existing.Overlaps(new Rect(r.xMin-.52f,r.yMin-.52f,w+1.04f,d+1.04f)));
-        }
-        static void House(float x,float z,float w,float d,float h,int kind,bool hall)
-        {
-            footprints.Add(new Rect(x-w/2,z-d/2,w,d));
-            var wall=Mat(kind%2==0?"Limewash":"Warm limestone",kind%2==0?"C9C1A9":"B4AA95");
-            var roof=kind==2?Mat("Clay tile","9E624F"):Mat("Slate","52636B");
-            if(kind==1 || kind==4)
-            {
-                Box("Roofless plot",x,.07f,z,w,.14f,d,Mat("Exposed floor","8E8374"));
-                Box("Surviving party wall",x-w/2+.1f,h*.41f,z,.2f,h*.82f,d,wall);
-                Box("Rear wall fragment",x-w*.2f,h*.33f,z+d/2-.1f,w*.6f,h*.66f,.2f,wall);
-                Box("Collapsed frontage",x+w*.13f,.16f,z-d/2+.09f,w*.74f,.32f,.18f,wall);
-            }
-            else
-            {
-                Box(hall?"Town hall":"Intact house",x,h*.5f,z,w,h,d,wall);
-                Roof(x,h,z,w+.12f,d+.14f,.48f,roof);
-                if(!hall)Box("Chimney",x-w*.27f,h+.43f,z+.16f,.24f,.65f,.25f,wall);
-            }
-        }
-        static void Roof(float x,float y,float z,float w,float d,float rise,Material finish)
-        {
-            float angle=Mathf.Atan2(rise,d/2)*Mathf.Rad2Deg;
-            foreach(int sign in new[]{-1,1})
-            {
-                var slope=Box("Roof pitch",x,y+rise/2,z+sign*d/4,w,.095f,Mathf.Sqrt(d*d/4+rise*rise),finish);
-                slope.localRotation=Quaternion.Euler(sign*angle,0,0);
-            }
         }
         internal static Material Mat(string name,string hex)
         {

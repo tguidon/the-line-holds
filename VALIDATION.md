@@ -148,3 +148,11 @@ The bare route was playable before scenery was added. At seed 42 the accelerated
 The macOS development player ran the opening encounter at 57.5 FPS on each map in separate four-second samples at 1600×900. After native resizes to 1024×768 and 1920×800, the Winter Forest patrol spawned 13 m and 24 m before the entrance and walked through the marker. The editor input check exercised mouse selection, purchases, upgrades' affordability, sales, zoom/orbit/pan, pause, restart and return to the menu. The winter camera check also covered a 110° orbit and verified that both weather emitters were running. Windows runtime validation is pending.
 
 Repeat with `CheckWinterCampaign.Compare` in Edit Mode, `PlayWinterForest.cs` and `CheckWinterView.cs` in Play Mode, and `CheckWinterPlayer.cs` against the development player. The accepted gameplay frames are the [opening patrol](TheLineHolds/Screenshots/winter-forest-patrol.png) and [wave nine armor](TheLineHolds/Screenshots/winter-forest-armor.png).
+
+## Saint-Aubin, November 13
+
+The two 54.68 m routes share their last 39.91 m. All ten sites have at least 2.56 m of centerline clearance and at least 5.4 m of base MG coverage on a reachable route. Narrow (4:3) and wide (2.4:1) camera fits and a 75-degree orbit kept both arrival points outside the frustum.
+
+`CheckWinterCampaign.Compare` used the same authored waves, prices, role order, upgrade rules and seeds on all three maps, with placements chosen for each layout. With mixed defenses, Saint-Aubin finished with 18, 19 and 18 lives on seeds 42, 1944 and 2026. Countryside and Winter Forest each finished with 19, 20 and 20. With only MGs, Saint-Aubin lost on wave 6 in all three runs, Winter Forest on wave 7, and Countryside on waves 7, 7 and 9.
+
+The menu-driven Mac Editor playthrough on the dressed scene (seed 42) completed all ten waves with 19 lives, 458 kills, one escape and 20 earned upgrades. Both single entrances and the split entrance occurred. The armored column and upgraded towers are visible in the [wave-nine capture](TheLineHolds/Screenshots/saint-aubin-armor.png).
