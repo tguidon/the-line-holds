@@ -27,7 +27,7 @@ namespace TheLineHolds.Editor
             AssetDatabase.Refresh();
             var root = new GameObject("Forest clearing").transform;
             game.winterForest = true;
-            game.audioPlayer.countryside = null;
+            game.audioPlayer.ambienceClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/TheLineHolds/Audio/WinterWind.wav");
             var pads = WinterLayout.Pads;
             game.padViews = new Transform[pads.Length];
             for (int i=0; i<pads.Length; i++)
@@ -38,6 +38,8 @@ namespace TheLineHolds.Editor
                 game.padViews[i] = site;
             }
             WinterSurface.Build(root);
+            new WinterScenery(root).Build();
+            WinterWeather.Build(root,game.battleCamera);
             EditorSceneManager.SaveScene(scene,PrototypeBuilder.MapScenes[1]);
             EditorBuildSettings.scenes = PrototypeBuilder.MapScenes.Select(p=>new EditorBuildSettingsScene(p,true)).ToArray();
             AssetDatabase.SaveAssets();

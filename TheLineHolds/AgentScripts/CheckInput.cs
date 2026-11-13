@@ -40,7 +40,7 @@ public static class CheckInput
         }
         async Task Button(string prefix)
         {
-            prefix=prefix switch {"DEPLOY"=>"Play","Shop Machine"=>"Shop MG","SELL"=>"Sell","RESET VIEW"=>"Reset view",">"=>"Rotate right","+"=>"Zoom in","-"=>"Zoom out","START WAVE"=>"Send wave","RESUME"=>"Pause","RETRY"=>"Restart","MAIN MENU"=>"Main menu",_=>prefix};
+            prefix=prefix switch {"DEPLOY"=>game.winterForest?"Winter Forest":"Countryside","Shop Machine"=>"Shop MG","SELL"=>"Sell","RESET VIEW"=>"Reset view",">"=>"Rotate right","+"=>"Zoom in","-"=>"Zoom out","START WAVE"=>"Send wave","RESUME"=>"Pause","RETRY"=>"Restart","MAIN MENU"=>"Main menu",_=>prefix};
             bool camera=prefix=="Reset view" || prefix=="Rotate right" || prefix=="Zoom in" || prefix=="Zoom out";
             var all=UnityEngine.Object.FindObjectsByType<Button>(FindObjectsInactive.Include);
             if((prefix=="Restart" || prefix=="Main menu") && !all.Any(b=>b.gameObject.activeInHierarchy && b.name.StartsWith(prefix,StringComparison.Ordinal)))await Button("Options");
@@ -75,7 +75,7 @@ public static class CheckInput
             Check(game.Placement == -1 && !game.Match.Paused, "Escape cancels placement before pausing");
             pointer = new Vector2(Screen.width*.5f,Screen.height*.5f); MouseEvent(); await Frame();
             var homePosition=game.battleCamera.transform.position;var homeRotation=game.battleCamera.transform.rotation;
-            var landmark=GameObject.Find("Enemy entry gateway").transform;var landmarkRotation=landmark.rotation;
+            var landmark=game.padViews[0];var landmarkRotation=landmark.rotation;
             float zoom = game.battleCamera.orthographicSize;
             MouseEvent(0, 120); await Frame(); Check(game.battleCamera.orthographicSize < zoom, "wheel zooms");
             MouseEvent(0, 4000); await Frame(); Check(Mathf.Approximately(game.battleCamera.orthographicSize, MapCameraControls.MinimumZoom), "close zoom minimum clamps");

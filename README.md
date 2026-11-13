@@ -1,10 +1,10 @@
 # The Line Holds
 
-A single-map WWII tower defense prototype built with Unity **6000.6.7f1**, URP 17.6, C#, and original Blender miniatures.
+A two-map WWII tower defense prototype built with Unity **6000.6.7f1**, URP 17.6, C#, and original Blender miniatures.
 
-To play without the Unity Editor, unzip `TheLineHolds/Builds/Packages/The-Line-Holds-macOS.zip` and open **The Line Holds.app**. The unpackaged local app is also available at `TheLineHolds/Builds/macOS/The Line Holds.app`. Choose **Deploy** to begin. The diorama pass adds rolling terrain, a worn road, leafy vegetation, refined miniatures, independent gun traverse, and infantry strides. The default window is now 1920×1080; smaller displays use a fitting size, and an existing saved window size migrates once. This is the current macOS prototype; Windows testing will use a Windows VM when you are ready.
+The local two-map macOS development build is `TheLineHolds/Builds/macOS-WinterForest/The Line Holds.app`. Open it and choose **Countryside** or **Winter Forest**. Windows runtime testing requires a Windows machine or runner.
 
-Open `TheLineHolds/` in Unity. The playable scene is `Assets/TheLineHolds/Scenes/Countryside.unity`. Press Play, choose a defense from the build dock and click a cleared gun site. Click a tower to upgrade or sell it. Pausing freezes combat while you build, inspect, upgrade, sell or move the camera. The corner pause control resumes play; Options holds Restart and Main menu. Unaffordable upgrades show a lock and their shortfall. Escape cancels selection first, otherwise pauses. Middle-drag, Command+left-drag on macOS, Ctrl+left-drag on Windows, or Q/E rotates the map; Shift+middle-drag or WASD pans; the wheel zooms; R fits the complete route. Help contains camera buttons and shortcuts.
+Open `TheLineHolds/` in Unity. The startup scene is `Assets/TheLineHolds/Scenes/Countryside.unity`. Press Play, select either battlefield from the menu, choose a defense from the build dock and click a cleared gun site. Click a tower to upgrade or sell it. Pausing freezes combat while you build, inspect, upgrade, sell or move the camera. The corner pause control resumes play; Options holds Restart and Main menu. Unaffordable upgrades show a lock and their shortfall. Escape cancels selection first, otherwise pauses. Middle-drag, Command+left-drag on macOS, Ctrl+left-drag on Windows, or Q/E rotates the map; Shift+middle-drag or WASD pans; the wheel zooms; R fits the complete route. Help contains camera buttons and shortcuts.
 
 Ten attacks mix irregular patrols, runner streams, infantry clusters, vehicle columns and combined assaults. Seven enemy types have distinct speeds and durability: riflemen, runners, assault troops, trucks, armored cars, light tanks and heavy tanks. The next attack's composition and tactical hint are shown before you call it. Formations and individual speeds vary within that announced plan. Vehicles retain safe spacing through bends.
 
@@ -65,6 +65,10 @@ unity command script eval --project-path "$PWD/TheLineHolds" 'TheLineHolds.Edito
 
 For a new level, start with the gameplay reference, guidance on distinct routes and scenery density, and examples for snow, town and beach maps in the [map art guide](ART_DIRECTION.md). The repo includes the [battlefield art skill](.agents/skills/battlefield-art/SKILL.md) for authoring and reviewing maps against that guide.
 
-### Pending review build
+### Winter Forest
 
-The latest tactical-pause/countryside build is staged at `TheLineHolds/Builds/macOS-Review/The Line Holds.app` (Windows cross-build: `Builds/Windows-Review/`). It has **not been launched**. The existing `Builds/macOS/` app and any current session were preserved while the user continued testing. On the next requested launch, use the review build and avoid opening a second copy. Validation: `Tools/Validation/tactical-pause-scenery.json`.
+The logging track doubles back around a rock outcrop before reaching the radio hut. Foxholes, sleds, wheel ruts and blowing powder dress the map. The ten staked clearings accept the same defenses as Countryside.
+
+To rebuild the scenery, run **The Line Holds → Visuals → Build Winter Forest** in Edit Mode. The build uses the current Countryside campaign references and writes `Scenes/WinterForest.unity` and its own assets under `Art/WinterForest/`. Regenerate the original models with Blender and `Tools/Blender/winter_forest.py`, passing the repository root after `--`. Run `AgentScripts/CheckWinterCampaign.cs` with entry `CheckWinterCampaign.Compare` for the matched-seed balance comparison.
+
+[Opening patrol](TheLineHolds/Screenshots/winter-forest-patrol.png) · [Wave nine armor](TheLineHolds/Screenshots/winter-forest-armor.png)

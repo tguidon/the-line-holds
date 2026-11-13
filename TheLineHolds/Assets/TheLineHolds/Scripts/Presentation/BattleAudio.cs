@@ -3,7 +3,8 @@ namespace TheLineHolds
 {
     public sealed class BattleAudio : MonoBehaviour
     {
-        public AudioClip placement, escape, wave, victory, defeat, countryside;
+        public AudioClip placement, escape, wave, victory, defeat;
+        [UnityEngine.Serialization.FormerlySerializedAs("countryside")] public AudioClip ambienceClip;
         [Range(0,1)] public float ambienceGain=.7f;
         public bool Muted { get; private set; }
         AudioSource ambience;
@@ -39,7 +40,7 @@ namespace TheLineHolds
         }
         void LateUpdate()
         {
-            if(countryside && ambience.clip!=countryside){ambience.clip=countryside;ambience.Play();}
+            if(ambienceClip && ambience.clip!=ambienceClip){ambience.clip=ambienceClip;ambience.Play();}
             var game=GetComponent<BattleController>();float target=ambienceGain*(paused?.35f:game && game.Match!=null && game.Match.Phase==MatchPhase.Combat?.65f:1);
             ambience.volume=Mathf.MoveTowards(ambience.volume,target,Time.unscaledDeltaTime*.45f);
             // Headless gain layer: no AudioMixer asset or UI authoring is required.

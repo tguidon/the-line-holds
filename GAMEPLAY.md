@@ -4,6 +4,13 @@ November 9, 2026. This expands the initial prototype into a ten-wave battlefield
 
 Start with 300 funds and 20 lives. Build on the ten clearings, click a deployed tower to upgrade it, and call the next wave when ready. Orders work during combat. Each escape costs one life. Wave completion pays 70, 80, …, 160 funds exactly once. A victory scores three stars at 18–20 lives, two at 10–17, and one at 1–9. The 1x/2x control changes game pace; pause freezes combat while tower management and camera controls remain available.
 
+## Battlefields
+
+Choose a battlefield in the main menu. Both maps use the same campaign, starting funds, defenses and scoring. Restart and Play again use the current battlefield.
+
+- **Countryside** follows a 52.7 m farm road between the brick gate and the checkpoint.
+- **Winter Forest** follows a 56.9 m packed logging track to a signal hut. The middle clearings can catch units twice as the column doubles back around the outcrop. The southern stretch gives rear defenses a long final shot. The ten staked clearings accept towers. The three dugouts are scenery.
+
 ## Enemies
 
 | Type | Base health | Speed, m/s | Reward | Counter |

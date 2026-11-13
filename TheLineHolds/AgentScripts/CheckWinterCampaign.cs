@@ -30,6 +30,7 @@ public static class CheckWinterCampaign
                 minCover=Mathf.Min(covered,minCover);
             }
             report.AppendLine($"{(winter?"Winter Forest":"Countryside")} {route.Length:F1} m, minimum clearance {minClear:F2} m, minimum MG coverage {minCover:F1} m");
+            if(minClear<2.45f || minCover<4.5f)throw new Exception("Lost roadside clearance or base MG coverage");
             foreach(int seed in new[]{42,1944,2026}) foreach(bool mixed in new[]{true,false})
             {
                 var m=new MatchState(game.waves,route,pads,seed);
@@ -51,6 +52,9 @@ public static class CheckWinterCampaign
                     m.Step(1f/60);
                     if(m.Wave==10)foreach(var enemy in m.Enemies)finalDepth=Mathf.Max(finalDepth,enemy.Distance/route.Length);
                 }
+                if(mixed && (m.Phase!=MatchPhase.Victory || finalDepth<.75f || m.Lives<15))
+                    throw new Exception("Mixed defenses lost the campaign balance target");
+                if(!mixed && m.Phase!=MatchPhase.Defeat)throw new Exception("MG-only campaign should lose");
                 report.AppendLine($"  {seed} {(mixed?"mixed":"MG only")}: {m.Phase} wave {m.Wave}, {m.Lives} lives, final penetration {finalDepth:P0}");
             }
         }

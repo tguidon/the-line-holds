@@ -132,3 +132,19 @@ A normal-speed native full match passed in **314 seconds / 18,701 rendered frame
 The final visibility-only refinement moves ricochets from the simulation's unit centre to the exposed hull edge, raises mortar smoke slightly, and uses additive warm flashes/sparks. Native close-up review checks this separately; it does not alter the earlier match's combat or audio logic. The full-match source hash and final source hash are recorded separately in `last-run.json`. Native screenshots distinguish staged launch/impact probes from real match captures. Signal checks do not replace the user's subjective listening review. Windows runtime testing remains deferred.
 
 Final QA/macOS/Windows builds pass with zero build errors/warnings. Final native probe, including exposed armor sparks, passes with zero console errors/warnings and nonzero unclipped mixed output. ZIP CRC and included audio credits pass (macOS 43.5 MiB; Windows 53.1 MiB). The editor and QA session are closed, generated font cache changes discarded, and one updated macOS release is left at the main menu.
+
+## Winter Forest — November 12, 2026
+
+The bare route was playable before scenery was added. At seed 42 the accelerated Play Mode run bought all defenses from earned funds, completed ten waves, and finished with 19 lives. The dressed run finished with 18 lives, 457 kills, two escapes, 20 upgrades and 176 final-wave shots from the rear positions. Both runs accounted for all 459 enemies.
+
+| Matched-seed simulation | Countryside | Winter Forest |
+| --- | --- | --- |
+| Route length | 52.7 m | 56.9 m |
+| Closest pad to road center | 2.49 m | 2.47 m |
+| Shortest base MG road coverage | 5.5 m | 4.6 m |
+| Mixed defenses, lives at seeds 42 / 1944 / 2026 | 19 / 20 / 20 | 18 / 20 / 20 |
+| MG only, defeat wave at the same seeds | 7 / 7 / 9 | 7 / 6 / 7 |
+
+The macOS development player ran the opening encounter at 57.5 FPS on each map in separate four-second samples at 1600×900. After native resizes to 1024×768 and 1920×800, the Winter Forest patrol spawned 13 m and 24 m before the entrance and walked through the marker. The editor input check exercised mouse selection, purchases, upgrades' affordability, sales, zoom/orbit/pan, pause, restart and return to the menu. The winter camera check also covered a 110° orbit and verified that both weather emitters were running. Windows runtime validation is pending.
+
+Repeat with `CheckWinterCampaign.Compare` in Edit Mode, `PlayWinterForest.cs` and `CheckWinterView.cs` in Play Mode, and `CheckWinterPlayer.cs` against the development player. The accepted gameplay frames are the [opening patrol](TheLineHolds/Screenshots/winter-forest-patrol.png) and [wave nine armor](TheLineHolds/Screenshots/winter-forest-armor.png).
