@@ -270,6 +270,124 @@ def handcart():
         box(side*.25,0,.48,.036,.74,.19,'wood')
     for i in range(4):box((i%2-.5)*.22,(i//2-.5)*.27,.50,.19,.24,.19,'ochre')
 
+def hip(x,y,z,w,d,h,topw,topd,color):
+    pts=[(x+sx*ww/2,y+sy*dd/2,zz) for ww,dd,zz in [(w,d,z),(topw,topd,z+h)]
+         for sx,sy in [(-1,-1),(1,-1),(1,1),(-1,1)]]
+    poly(pts,[(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7),(4,5,6,7)],color)
+
+def arch(x,y,base,r,depth):
+    # Individual voussoirs make a genuine opening with a shadowed soffit.
+    for i in range(9):
+        pts=[]
+        for yy in [y-depth/2,y+depth/2]:
+            for rr,k in [(r,i),(r+.092,i),(r+.092,i+1),(r,i+1)]:
+                t=math.pi*k/9
+                pts.append((x+rr*math.cos(t),yy,base+rr*math.sin(t)))
+        poly(pts,[(3,2,1,0),(4,5,6,7),(0,1,5,4),(2,3,7,6),(3,0,4,7)],'cream' if i%3 else 'stone')
+
+def urbanhouse(kind):
+    w,d=2.4,1.72
+    floors=3 if kind in ('Hotel','BrickTenement') else 2
+    wall={'Hotel':'chalk','Arcade':'plaster','GabledDraper':'cream','BrickTenement':'brick','RuinFacade':'grey'}[kind]
+    h=.84+floors*.49
+    ruined=kind=='RuinFacade'
+    if ruined:
+        # The street elevation survives, exposing the cut floors and fireplaces behind it.
+        ruins(3)
+        for x in [-.95,-.48,.03,.54,1.01]:
+            top=2.10 if x<.3 else 1.48
+            box(x,-.77,top/2,.145,.15,top,wall)
+            for z in [.73,1.37]:
+                box(x+.17,-.77,z,.38,.15,.105,'stone')
+        for i in range(7):
+            x=-.99+i*.295
+            beam((x,-.68,1.33),(x+.06,.26,1.13-i*.035),.035,.035,'coal',4)
+        return
+    arcade=kind=='Arcade'
+    box(0,.10 if arcade else 0,h/2,w,d-(.20 if arcade else 0),h,wall)
+    for sign in [-1,1]:
+        y=sign*d/2
+        if arcade and sign<0:
+            for j in range(4):box(-1.18+j*.79,-1.12,.34,.135,.24,.68,'stone')
+            for j in range(3):arch(-.785+j*.79,-1.12,.64,.328,.22)
+            box(0,-1.02,1.34,w,.41,.60,wall)
+            y=-1.225
+        for k in range(floors):
+            z=.99+k*.49
+            for col in [-.80,0,.80]:
+                window(col,y,z,.27,.32,sign,kind=='GabledDraper')
+        for z in [.77,h-.06]:
+            box(0,y+sign*.026,z,w+.055,.09,.065,'cream')
+        for x in [-.78,.78]:
+            window(x,y,.38,.49,.51,sign,False)
+        box(0,y+sign*.04,.31,.34,.09,.62,'wood')
+        if kind=='Hotel':
+            box(0,y+sign*.148,.91,w*.87,.32,.055,'stone')
+            box(0,y+sign*.285,1.05,w*.87,.025,.035,'iron')
+            for i in range(17):box((i-8)*.124,y+sign*.285,.982,.014,.018,.14,'iron')
+        if kind=='BrickTenement':
+            for i in range(3):
+                box((i-1)*.78,y+sign*.065,h-.17,.18,.09,.17,'stone')
+    for side in [-1,1]:
+        for y in [-.45,.19,.59]:
+            for story in range(floors):
+                z=.93+story*.49
+                box(side*(w/2+.015),y,z,.035,.15,.29,'dark')
+                box(side*(w/2+.04),y,z-.149,.083,.21,.036,'cream')
+    if kind in ('Hotel','Arcade'):
+        hip(0,0,h,2.49,2.0,.71,1.97,1.14,'slate3')
+        hip(0,0,h+.71,2.01,1.17,.11,1.78,.91,'zinc')
+        for sign in [-1,1]:
+            for x in [-.72,0,.72]:
+                box(x,sign*.80,h+.30,.32,.31,.43,'chalk')
+                window(x,sign*.955,h+.32,.19,.24,sign,False)
+                roof(x,sign*.81,h+.51,.40,.39,.14)
+    elif kind=='GabledDraper':
+        start=len(verts)
+        roof(0,0,h,1.83,2.46,.73,True)
+        for i in range(start,len(verts)):
+            x,y,z=verts[i];verts[i]=(-y,x,z)
+        for sign in [-1,1]:
+            for i in range(5):
+                box(0,sign*.87,h+.085+i*.147,2.34-i*.42,.135,.155,wall)
+            window(0,sign*.94,h+.28,.22,.28,sign,False)
+    else:roof(0,0,h,2.47,1.86,.38)
+    for x in [-.89,.84]:
+        box(x,.26,h+.51,.205,.28,.62,'brick')
+        for yy in [.19,.33]:beam((x,yy,h+.79),(x,yy,h+.96),.058,.051,'tile',8)
+
+def parish():
+    # Apse, nave and surviving west tower. The roof break exposes two trusses.
+    box(.43,0,.68,2.45,1.28,1.36,'grey')
+    roof(.11,0,1.36,1.76,1.43,.78)
+    for x in [.95,1.48]:
+        for sign in [-1,1]:
+            beam((x,sign*.65,1.38),(x,0,2.10),.038,.038,'wood',4)
+        beam((x,-.63,1.40),(x,.63,1.40),.039,.038,'coal',4)
+    for x in [-.57,-.04,.49,1.02,1.55]:
+        for sign in [-1,1]:
+            y=sign*.65
+            box(x,y+sign*.065,.50,.125,.23,1,'stone')
+            box(x+.16,y,.88,.135,.028,.52,'dark')
+            arch(x+.16,y+sign*.021,1.13,.068,.04)
+    box(-1.02,0,1.08,.83,1.06,2.16,'stone')
+    for z in [.78,1.68,2.15]:box(-1.02,0,z,.92,1.14,.065,'chalk')
+    for sign in [-1,1]:
+        for x in [-1.17,-.87]:
+            box(x,sign*.536,1.92,.137,.028,.31,'dark')
+            arch(x,sign*.552,2.06,.069,.045)
+    hip(-1.02,0,2.20,.96,1.18,.41,.55,.64,'slate3')
+    hip(-1.02,0,2.60,.56,.65,.80,.04,.06,'slate')
+    beam((-1.02,0,3.38),(-1.02,0,3.59),.018,.012,'iron')
+    beam((-1.11,0,3.52),(-.93,0,3.52),.013,.013,'iron')
+
+def fountain():
+    for r,z,h,c in [(.71,.05,.10,'grey'),(.61,.13,.12,'cream'),(.51,.185,.025,'glint')]:
+        beam((0,0,z-h/2),(0,0,z+h/2),r,r,c,24)
+    beam((0,0,.17),(0,0,.62),.16,.095,'stone',12)
+    beam((0,0,.52),(0,0,.65),.11,.37,'grey',20)
+    beam((0,0,.65),(0,0,.85),.065,.038,'green',10)
+
 def save_model(name, build, index):
     verts.clear();faces.clear();pigments.clear()
     build()
@@ -291,5 +409,7 @@ def save_model(name, build, index):
 
 kits=[(k,lambda k=k:townhouse(k)) for k in ['Mairie','Mercerie','Boulangerie','Maison']]
 kits += [('BurnedHouse',lambda:ruins(0)),('ShellHouse',lambda:ruins(2)),('AppleTree',orchard),('ProduceStall',stall),('StreetLamp',lamp),('SpringVerge',flowers),('GunSite',gun_site),('Handcart',handcart)]
+kits.extend((name,lambda name=name:urbanhouse(name)) for name in ['Hotel','Arcade','GabledDraper','BrickTenement','RuinFacade'])
+kits.extend([('Fountain',fountain),('ParishChurch',parish)])
 for i,(name,build) in enumerate(kits):save_model(name,build,i)
 bpy.ops.wm.save_as_mainfile(filepath=str(repo/'Tools/Blender/saint_aubin.blend'),compress=True)

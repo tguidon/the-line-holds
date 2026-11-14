@@ -149,10 +149,16 @@ The macOS development player ran the opening encounter at 57.5 FPS on each map i
 
 Repeat with `CheckWinterCampaign.Compare` in Edit Mode, `PlayWinterForest.cs` and `CheckWinterView.cs` in Play Mode, and `CheckWinterPlayer.cs` against the development player. The accepted gameplay frames are the [opening patrol](TheLineHolds/Screenshots/winter-forest-patrol.png) and [wave nine armor](TheLineHolds/Screenshots/winter-forest-armor.png).
 
-## Saint-Aubin, November 13
+## Saint-Aubin, first layout (superseded), November 13
 
 The two 54.68 m routes share their last 39.91 m. All ten sites have at least 2.56 m of centerline clearance and at least 5.4 m of base MG coverage on a reachable route. Narrow (4:3) and wide (2.4:1) camera fits and a 75-degree orbit kept both arrival points outside the frustum.
 
 `CheckWinterCampaign.Compare` used the same authored waves, prices, role order, upgrade rules and seeds on all three maps, with placements chosen for each layout. With mixed defenses, Saint-Aubin finished with 18, 19 and 18 lives on seeds 42, 1944 and 2026. Countryside and Winter Forest each finished with 19, 20 and 20. With only MGs, Saint-Aubin lost on wave 6 in all three runs, Winter Forest on wave 7, and Countryside on waves 7, 7 and 9.
 
 The menu-driven Mac Editor playthrough on the dressed scene (seed 42) completed all ten waves with 19 lives, 458 kills, one escape and 20 earned upgrades. Both single entrances and the split entrance occurred. The armored column and upgraded towers are visible in the [wave-nine capture](TheLineHolds/Screenshots/saint-aubin-armor.png).
+
+## Revised city streets, local review
+
+The revised 50.98 m playable route merges at 7.16 m (14.0%). Both single entrances and the mixed entrance passed the roster check. All ten sites have at least 2.55 m centerline clearance and cover at least 6.1 m of a reachable route with the base MG. The scene check samples the complete street and both approaches against building bounds, including the church and mairie.
+
+With mixed defenses, the revised city finished with 19, 20 and 16 lives on seeds 42, 1944 and 2026. MG-only defenses lost in wave six on all three. The menu-driven ten-wave run finished with 17 lives, 456 kills, three escapes and 19 earned upgrades. The [overview](TheLineHolds/Screenshots/saint-aubin-overview.png) and [fountain square](TheLineHolds/Screenshots/saint-aubin-square.png) show the local revision.

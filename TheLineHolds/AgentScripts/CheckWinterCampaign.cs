@@ -19,7 +19,7 @@ public static class CheckWinterCampaign
             var route=town?TownLayout.Route(false):winter?WinterLayout.Route():BattleRoute.Countryside();
             var pads=town?TownLayout.Pads:winter?WinterLayout.Pads:BattleRoute.DefaultPads;
             var other=town?TownLayout.Route(true):null;
-            var order=town?new[]{4,8,5,9,3,6,7,0,1,2}:Order;
+            var order=town?new[]{4,3,8,5,1,7,6,2,9,0}:Order;
             float minClear=float.MaxValue,minCover=float.MaxValue;
             foreach(var pad in pads)
             {

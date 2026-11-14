@@ -63,6 +63,13 @@ namespace TheLineHolds
             OverviewSize=Mathf.Max(MinimumZoom,Mathf.Max((max.x-min.x)/(2*view.aspect*.88f),(max.y-min.y)/(2*height)));
             var center=(min+max)*.5f;
             homeFocus=homeRotation*new Vector3(center.x,center.y-(bottom-top)*OverviewSize,0);
+            // Frame the market quarter to the east. Only room available beyond the western
+            // gate can be traded, so narrow windows still show both entrances and every pad.
+            if(game.saintAubin)
+            {
+                float margin=Mathf.Max(0,view.aspect*OverviewSize-(max.x-min.x)*.5f-.8f);
+                homeFocus+=homeRotation*Vector3.right*Mathf.Min(3.4f,margin);
+            }
             fittedWidth=Screen.width;fittedHeight=Screen.height;fittedAspect=view.aspect;
         }
         public void Rotate(float degrees) { overview=false; yaw=Mathf.Repeat(yaw+degrees,360); Apply(); }

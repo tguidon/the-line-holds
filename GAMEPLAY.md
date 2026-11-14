@@ -10,7 +10,7 @@ Choose a battlefield in the main menu. All three maps use the same campaign, sta
 
 - **Countryside** follows a 52.7 m farm road between the brick gate and the checkpoint.
 - **Winter Forest** follows a 56.9 m packed logging track to a signal hut. The middle clearings can catch units twice as the column doubles back around the outcrop. The southern stretch gives rear defenses a long final shot. The ten staked clearings accept towers. The three dugouts are scenery.
-- **Saint-Aubin** has two approaches from the outskirts. Either approach reaches the same junction at 14.77 m, then follows the block around to the town hall. Each route is 54.68 m. A wave can arrive on either road or both; the briefing does not reveal which.
+- **Saint-Aubin** has two approaches from the outskirts. Either approach reaches the same junction at 7.16 m, then winds between city blocks to the fountain square below the town hall. Each route is 50.98 m. A wave can arrive on either road or both; the briefing does not reveal which.
 
 ## Enemies
 

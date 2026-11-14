@@ -26,7 +26,7 @@ namespace TheLineHolds.Editor
             EditorUtility.SetDirty(pigments);
         }
 
-        internal void Place(string name,float x,float z,Vector3 scale,float yaw=0)
+        internal GameObject Place(string name,float x,float z,Vector3 scale,float yaw=0)
         {
             if(!models.TryGetValue(name,out var model))
             {
@@ -35,58 +35,44 @@ namespace TheLineHolds.Editor
                 if(!model)throw new InvalidOperationException("Missing Saint-Aubin scenery: "+name);
                 models.Add(name,model);
             }
-            var go=(GameObject)PrefabUtility.InstantiatePrefab(model,root);
-            go.transform.localPosition=new Vector3(x,0,z);
-            // Preserve the model import transform, including its FBX axis conversion.
-            go.transform.localRotation=Quaternion.Euler(0,yaw,0)*go.transform.localRotation;
-            go.transform.localScale=Vector3.Scale(go.transform.localScale,scale);
+            // Scale lot width, height and depth in Unity world axes, outside FBX axis conversion.
+            var lot=new GameObject(name);
+            lot.transform.SetParent(root,false);
+            lot.transform.SetLocalPositionAndRotation(new Vector3(x,0,z),Quaternion.Euler(0,yaw,0));
+            lot.transform.localScale=scale;
+            var go=(GameObject)PrefabUtility.InstantiatePrefab(model,lot.transform);
             if(AssetDatabase.GetAssetPath(model).EndsWith(".fbx",StringComparison.OrdinalIgnoreCase))
+            {
                 foreach(var renderer in go.GetComponentsInChildren<MeshRenderer>())
+                {
                     renderer.sharedMaterial=pigments;
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(renderer);
+                }
+            }
+            return lot;
         }
         void Prop(string name,float x,float z,float size,float angle=0)=>Place(name,x,z,Vector3.one*size,angle);
 
-        internal void Dress(Func<float,float,float,bool> clear)
+        internal void Dress()
         {
-            // The market occupies the two quiet sides of the hall rather than the turning apron.
-            Prop("ProduceStall",4.85f,3.42f,.90f,-7);
-            Prop("ProduceStall",6.55f,3.36f,.77f,4);
-            Prop("Handcart",6.97f,.01f,.72f,73);
-            Prop("ProduceStall",-5.85f,9.45f,.92f,6);
-            Prop("Handcart",-4.69f,9.52f,.78f,99);
-            Prop("Crate",6.98f,2.68f,.48f,12);
-            Prop("StreetLamp",7.27f,.64f,1);
-            Prop("StreetLamp",4.41f,.68f,.95f);
-            Prop("StreetLamp",2.02f,7.65f,.95f);
-            Prop("StreetLamp",11,-3.8f,.98f);
-            // Orchard blocks flank the two farm lanes. Keep trees back from traffic and gun sites.
-            for(int row=-5;row<=5;row++)
-                for(int col=0;col<7;col++)
+            Prop("Fountain",9.81f,4.44f,.91f);
+            Prop("ProduceStall",10.04f,5.18f,.69f,0);
+            Prop("Handcart",5.08f,4.88f,.61f,-32);
+            foreach(var p in new[]{new Vector2(-8.1f,1.64f),new Vector2(-2.04f,4.05f),
+                new Vector2(1.31f,-3.1f),new Vector2(8.68f,-3.27f),new Vector2(8.96f,5.00f)})
+                Prop("StreetLamp",p.x,p.y,.79f);
+            // Garden courts break up the masonry. Orchard growth is confined to the outer gate.
+            foreach(var p in new[]{new Vector2(-11.8f,7.15f),new Vector2(-3.98f,9.97f),
+                new Vector2(-1.81f,-7.94f),new Vector2(-6.92f,-5.6f),new Vector2(14.96f,-.04f),
+                new Vector2(9.27f,8.78f),new Vector2(1.03f,-8.25f)})
+                Prop("AppleTree",p.x,p.y,Between(.64f,.88f),Between(0,360));
+            for(int j=-4;j<=4;j++)
+                for(int i=0;i<3;i++)
                 {
-                    float x=-10.1f-col*2.56f+Between(-.42f,.42f);
-                    float z=row*2.85f+Between(-.42f,.42f);
-                    if(random.NextDouble()<.28 || !clear(x,z,.75f))continue;
-                    Prop("AppleTree",x,z,Between(.74f,1.18f),Between(0,360));
-                }
-            // Low garden detail fills the gaps between plots. Keep projected crowns away from sites.
-            for(int i=0;i<250;i++)
-            {
-                float x=Between(-9,22), z=Between(-14,16);
-                if(!clear(x,z,.36f))continue;
-                if(i%9==0 && clear(x,z,.86f))Prop("AppleTree",x,z,Between(.62f,.81f),Between(0,360));
-                else if(i%3==0)Prop("Bush",x,z,Between(.36f,.65f),Between(0,360));
-                else Prop("SpringVerge",x,z,Between(.65f,1.18f),Between(0,360));
-            }
-            for(int i=0;i<145;i++)
-            {
-                float x=Between(-26,-8.5f),z=Between(-12,14);
-                if(clear(x,z,.09f))Prop("SpringVerge",x,z,Between(.8f,1.7f),Between(0,360));
-            }
-            for(int i=0;i<6;i++)
-                foreach(float z in new[]{-8.48f,8.48f})
-                {
-                    float x=-11.8f-i*2.17f;
-                    if(clear(x,z,.15f))Prop("FieldFence",x,z,.78f);
+                    float x=-16.2f-i*2.81f+Between(-.42f,.42f),z=j*3.08f+Between(-.48f,.48f);
+                    if(Mathf.Abs(Mathf.Abs(z)-2.9f)<2.25f)continue;
+                    Prop("AppleTree",x,z,Between(.65f,.93f),Between(0,360));
+                    Prop("SpringVerge",x+.48f,z+.61f,1.1f);
                 }
         }
         float Between(float min,float max)=>Mathf.Lerp(min,max,(float)random.NextDouble());

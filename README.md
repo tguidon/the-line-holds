@@ -2,7 +2,7 @@
 
 A three-map WWII tower defense prototype built with Unity **6000.6.7f1**, URP 17.6, C#, and original Blender miniatures.
 
-The local 0.0.3 macOS player is `TheLineHolds/Builds/Release-0.0.3/macOS/The Line Holds.app`. Choose **Countryside**, **Winter Forest**, or **Saint-Aubin**. Windows validation is build-only.
+The previous Saint-Aubin layout is in the local 0.0.3 macOS player at `TheLineHolds/Builds/Release-0.0.3/macOS/The Line Holds.app`. Choose **Countryside**, **Winter Forest**, or **Saint-Aubin**. Windows validation is build-only.
 
 Open `TheLineHolds/` in Unity. The startup scene is `Assets/TheLineHolds/Scenes/MainMenu.unity`. Its field-manual cover shows a photograph of each battlefield. Press Play, select a battlefield from the menu, choose a defense from the build dock and click a cleared gun site. Click a tower to upgrade or sell it. Pausing freezes combat while you build, inspect, upgrade, sell or move the camera. The corner pause control resumes play; Options holds Restart and Main menu. Unaffordable upgrades show a lock and their shortfall. Escape cancels selection first, otherwise pauses. Middle-drag, Command+left-drag on macOS, Ctrl+left-drag on Windows, or Q/E rotates the map; Shift+middle-drag or WASD pans; the wheel zooms; R fits the complete route. Help contains camera buttons and shortcuts.
 
@@ -77,7 +77,7 @@ To rebuild the scenery, run **The Line Holds → Visuals → Build Winter Forest
 
 ### Saint-Aubin
 
-Two orchard lanes join at the edge of a Normandy market town. Each wave can use either lane or both. The briefing shows the enemy roster and keeps the entrance choice hidden. Follow the cobbled street past the shopfronts to the mairie. All ten stone-ringed sites accept defenses.
+Two short approaches join at the western gate, 14% into the route. The road passes between attached townhouses, turns around the drapers’ block, and opens onto the fountain square beside the mairie. Each wave can use either lane or both. The briefing shows the enemy roster and keeps the entrance choice hidden. All ten stone-ringed sites accept defenses.
 
 **The Line Holds → Visuals → Build Saint-Aubin** rebuilds the scene in Edit Mode. Regenerate the original buildings, blossom trees and market kit with `Tools/Blender/saint_aubin.py` using the same Blender command as above. Run `CheckTownLayout.All` for route and site clearance, `CheckWinterCampaign.Compare` for the three-map comparison, and `PlaySaintAubin.cs` in Play Mode for the ten-wave playthrough.
 

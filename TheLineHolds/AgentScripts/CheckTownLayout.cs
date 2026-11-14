@@ -12,7 +12,7 @@ public static class CheckTownLayout
         void Check(bool ok,string reason){if(!ok)throw new Exception(reason);}
         var a=TownLayout.Route(false);var b=TownLayout.Route(true);
         float merge=new BattleRoute(TownLayout.Entrance(false)).Length;
-        Check(merge/a.Length>=.25f && merge/a.Length<=.30f,"Merge fraction: "+merge/a.Length);
+        Check(merge/a.Length>=.10f && merge/a.Length<=.15f,"Merge fraction: "+merge/a.Length);
         Check(Mathf.Abs(a.Length-b.Length)<.001f,"Unequal approach lengths");
         for(float d=merge;d<a.Length;d+=.1f)Check((a.Position(d)-b.Position(d)).magnitude<.001f,"Disconnected shared street");
         var sites=TownLayout.Pads;
@@ -33,6 +33,22 @@ public static class CheckTownLayout
             }
             Check(nearest>=2.47f && coverage>=5f,$"Site {site}: clearance {nearest:F2}, coverage {coverage:F1}");
             min=Mathf.Min(min,nearest);
+        }
+        var game=UnityEngine.Object.FindAnyObjectByType<BattleController>();
+        if(game && game.saintAubin)
+        {
+            var quarter=GameObject.Find("Saint-Aubin • market quarter");
+            Check(quarter!=null,"Missing authored street blocks");
+            var streetPoints=new System.Collections.Generic.List<Vector3>();
+            foreach(var route in new[]{a,b})
+                for(float d=-16;d<=route.Length+.08f;d+=.08f)streetPoints.Add(route.Position(d));
+            foreach(Transform lot in quarter.transform)
+            {
+                if(!lot.name.Contains(" · ") && lot.name!="Mairie" && lot.name!="ParishChurch")continue;
+                var envelope=lot.GetComponentInChildren<MeshRenderer>().bounds;
+                float Gap(Vector3 p){p.y=envelope.center.y;return Vector3.Distance(envelope.ClosestPoint(p),p);}
+                Check(streetPoints.Min(Gap)>=1.41f && sites.Min(Gap)>=1.17f,"Building intrudes on road or site: "+lot.name);
+            }
         }
         var wave=AssetDatabase.LoadAssetAtPath<WaveDefinition>("Assets/TheLineHolds/Data/Waves/Wave1.asset");
         for(int pattern=0;pattern<3;pattern++)

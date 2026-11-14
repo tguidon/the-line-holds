@@ -16,7 +16,7 @@ Press("Saint-Aubin");
 await Wait.Until(()=>Game() && Game().saintAubin && Game().Match!=null,timeoutMs:15000);
 game=Game();game.NewMatch(42);
 var m=game.Match;
-int[] order={4,8,5,9,3,6,7,0,1,2}, roles={0,0,2,1,2,0,1,2,1,0};
+int[] order={4,3,8,5,1,7,6,2,9,0}, roles={0,0,2,1,2,0,1,2,1,0};
 int upgrades=0, tick=0, rearShots=0;
 float depth=0;
 m.Cue+=(cue,p)=>{if(m.Wave==10 && cue=="fire" && p.x>4)rearShots++;};
