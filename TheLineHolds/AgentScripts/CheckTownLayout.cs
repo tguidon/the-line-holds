@@ -47,6 +47,19 @@ public static class CheckTownLayout
                 if(!lot.name.Contains(" · ") && lot.name!="Mairie" && lot.name!="ParishChurch")continue;
                 var envelope=lot.GetComponentInChildren<MeshRenderer>().bounds;
                 float Gap(Vector3 p){p.y=envelope.center.y;return Vector3.Distance(envelope.ClosestPoint(p),p);}
+                if(lot.name=="Mairie")
+                {
+                    var end=a.Position(a.Length);
+                    Check(Mathf.Abs(end.x-lot.position.x)<.02f && Mathf.Abs(end.z-envelope.min.z)<.06f,
+                        "Route misses the central City Hall steps");
+                    Check(Vector3.Dot((end-a.Position(a.Length-.5f)).normalized,Vector3.forward)>.99f,
+                        "Final approach must face the hall entrance");
+                    Check(sites.Min(Gap)>=1.17f,"City Hall intrudes on a build site");
+                    foreach(var point in streetPoints)
+                        if(point.z<end.z-1.45f || Mathf.Abs(point.x-end.x)>1.45f)
+                            Check(Gap(point)>=1.41f,"City Hall obstructs the street before its steps");
+                    continue;
+                }
                 Check(streetPoints.Min(Gap)>=1.41f && sites.Min(Gap)>=1.17f,"Building intrudes on road or site: "+lot.name);
             }
         }

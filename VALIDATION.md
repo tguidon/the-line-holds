@@ -162,3 +162,9 @@ The menu-driven Mac Editor playthrough on the dressed scene (seed 42) completed 
 The revised 50.98 m playable route merges at 7.16 m (14.0%). Both single entrances and the mixed entrance passed the roster check. All ten sites have at least 2.55 m centerline clearance and cover at least 6.1 m of a reachable route with the base MG. The scene check samples the complete street and both approaches against building bounds, including the church and mairie.
 
 With mixed defenses, the revised city finished with 19, 20 and 16 lives on seeds 42, 1944 and 2026. MG-only defenses lost in wave six on all three. The menu-driven ten-wave run finished with 17 lives, 456 kills, three escapes and 19 earned upgrades. The [overview](TheLineHolds/Screenshots/saint-aubin-overview.png) and [fountain square](TheLineHolds/Screenshots/saint-aubin-square.png) show the local revision.
+
+## City Hall and damaged blocks
+
+Both 51.43 m routes turn across the square and meet the center of City Hall’s front steps. The junction is at 13.9%. The building check verifies the alignment and direction at the steps, clearance along the preceding streets and access to all ten sites. The first undefended patrol reached the staircase and its first arrival cost one life. Three smoke emitters were active in Play Mode. The two burning interiors and the collapsed lots can be inspected in the [drapers’ block](TheLineHolds/Screenshots/saint-aubin-ruins.png) and the final approach in the [City Hall patrol frame](TheLineHolds/Screenshots/saint-aubin-square.png).
+
+The menu-driven playthrough finished wave ten with 19 lives, 458 kills, one escape and 20 upgrades. The matched mixed-defense runs finished with 19, 20 and 16 lives on seeds 42, 1944 and 2026. Both offscreen approaches passed the narrow, wide and rotated camera checks.

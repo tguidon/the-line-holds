@@ -55,9 +55,13 @@ namespace TheLineHolds.Editor
 
         internal void Dress()
         {
+            // Local fires in the shell holes, with a cooler, spent ruin on Station Street.
+            TownEmbers.Build(root,new Vector3(-11.35f,.32f,-5.55f),true);
+            TownEmbers.Build(root,new Vector3(-1.27f,.57f,2.94f),true);
+            TownEmbers.Build(root,new Vector3(-.14f,.30f,-6.16f),false);
             Prop("Fountain",9.81f,4.44f,.91f);
             Prop("ProduceStall",10.04f,5.18f,.69f,0);
-            Prop("Handcart",5.08f,4.88f,.61f,-32);
+            Prop("Handcart",4.96f,5.1f,.61f,-32);
             foreach(var p in new[]{new Vector2(-8.1f,1.64f),new Vector2(-2.04f,4.05f),
                 new Vector2(1.31f,-3.1f),new Vector2(8.68f,-3.27f),new Vector2(8.96f,5.00f)})
                 Prop("StreetLamp",p.x,p.y,.79f);

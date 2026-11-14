@@ -77,7 +77,7 @@ To rebuild the scenery, run **The Line Holds → Visuals → Build Winter Forest
 
 ### Saint-Aubin
 
-Two short approaches join at the western gate, 14% into the route. The road passes between attached townhouses, turns around the drapers’ block, and opens onto the fountain square beside the mairie. Each wave can use either lane or both. The briefing shows the enemy roster and keeps the entrance choice hidden. All ten stone-ringed sites accept defenses.
+Two short approaches join at the western gate, 14% into the route. The road passes between attached townhouses, turns around the drapers’ block, and crosses the fountain square to the front steps of City Hall. Each wave can use either lane or both. The briefing shows the enemy roster and keeps the entrance choice hidden. All ten stone-ringed sites accept defenses.
 
 **The Line Holds → Visuals → Build Saint-Aubin** rebuilds the scene in Edit Mode. Regenerate the original buildings, blossom trees and market kit with `Tools/Blender/saint_aubin.py` using the same Blender command as above. Run `CheckTownLayout.All` for route and site clearance, `CheckWinterCampaign.Compare` for the three-map comparison, and `PlaySaintAubin.cs` in Play Mode for the ten-wave playthrough.
 

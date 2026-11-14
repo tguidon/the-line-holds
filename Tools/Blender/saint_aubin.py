@@ -1,4 +1,5 @@
 """Generate the metre-scale Saint-Aubin town kit. Blender -b -P saint_aubin.py -- <repo>."""
+import argparse
 import math
 import random
 import sys
@@ -6,7 +7,11 @@ from pathlib import Path
 import bpy
 from mathutils import Vector
 
-repo = Path(sys.argv[sys.argv.index('--') + 1])
+cli = argparse.ArgumentParser()
+cli.add_argument('repo', type=Path)
+cli.add_argument('--only', nargs='+', help='Export these FBXs and refresh the complete editable library')
+options = cli.parse_args(sys.argv[sys.argv.index('--') + 1:])
+repo = options.repo
 art = repo / 'TheLineHolds/Assets/TheLineHolds/Art/SaintAubin'
 out = art / 'Models'
 out.mkdir(parents=True, exist_ok=True)
@@ -101,6 +106,25 @@ def window(x,y,z,w,h,side,shutters=True):
             for fraction in [-.32,.28]:
                 box(x+shift,y+side*.05,z+h*fraction,w*.35,.016,.029,'sage')
 
+def inscription(text, y, z, size, color):
+    # Bake raised lettering into the pigment mesh so every LOD and build uses the same face.
+    curve=bpy.data.curves.new('Inscription', 'FONT')
+    curve.body=text
+    curve.size=size
+    curve.align_x='CENTER'
+    curve.align_y='CENTER'
+    curve.space_character=1.12
+    curve.extrude=.002
+    letters=bpy.data.objects.new('Lettering',curve)
+    bpy.context.collection.objects.link(letters)
+    evaluated=letters.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    mesh=evaluated.to_mesh()
+    poly([(v.co.x,y-v.co.z,z+v.co.y) for v in mesh.vertices],
+         [tuple(face.vertices) for face in mesh.polygons],color)
+    evaluated.to_mesh_clear()
+    bpy.data.objects.remove(letters,do_unlink=True)
+    bpy.data.curves.remove(curve)
+
 def townhouse(kind):
     hall=kind=='Mairie'
     w,d,h=(2.65,1.36,1.54) if hall else (2.4,1.52,1.48)
@@ -127,22 +151,50 @@ def townhouse(kind):
     box(w*.28,.18,h+.49,.23,.24,.58,'brick')
     box(w*.28,.18,h+.79,.29,.30,.075,'stone')
     if hall:
-        # Open bell chamber, four-sided cap and clock over the entrance.
-        box(0,0,2.04,.57,.55,.47,'cream')
-        for sx in [-1,1]:
-            for sy in [-1,1]:
-                box(sx*.21,sy*.20,2.41,.075,.075,.41,'chalk')
-        beam((0,0,2.47),(0,0,2.26),.07,.145,'gold')
-        poly([(-.38,-.37,2.59),(.38,-.37,2.59),(.38,.37,2.59),(-.38,.37,2.59),(0,0,3.06)],[(0,1,4),(1,2,4),(2,3,4),(3,0,4)],'slate')
-        beam((0,-.281,2.075),(0,-.309,2.075),.162,.162,'dark',20)
-        beam((0,-.309,2.075),(0,-.319,2.075),.139,.139,'linen',20)
-        beam((0,-.327,2.075),(-.068,-.327,2.12),.011,.01,'coal')
-        beam((0,-.327,2.075),(.014,-.327,2.18),.011,.009,'coal')
-        box(0,-d/2-.08,.74,.59,.22,.07,'cream')
-        for i in range(3): box(0,-d/2-.09-.075*i,.044*(3-i),.72+.08*i,.19,.083,'stone')
-        for i,c in enumerate(['flagblue','linen','flagred']):
-            box(w*.46+i*.105,-.42,1.67,.108,.025,.26,c)
-        beam((w*.46-.055,-.42,0),(w*.46-.055,-.42,1.90),.02,.013,'iron')
+        # A projecting pavilion puts the clock, civic balcony and double entry on a
+        # single axis. The broad bottom tread is the movement route's destination.
+        box(0,-.72,.83,1.17,.24,1.66,'chalk')
+        box(0,-.86,.44,.80,.08,.88,'dark')
+        for x in [-.18,.18]:
+            box(x,-.91,.41,.33,.055,.74,'wood')
+            box(x,-.945,.51,.23,.025,.32,'coal')
+        arch(0,-.87,.78,.40,.16)
+        for x in [-.51,.51]:
+            box(x,-.91,.52,.13,.22,.97,'stone')
+            box(x,-.91,.97,.20,.26,.10,'cream')
+        box(0,-.91,1.08,1.36,.47,.12,'stone')
+        box(0,-1.12,1.34,1.28,.07,.07,'cream')
+        for i in range(11):
+            beam(((i-5)*.12,-1.12,1.13),((i-5)*.12,-1.12,1.33),.032,.024,'chalk',6)
+        box(0,-1.153,1.218,.96,.055,.213,'green')
+        inscription('MAIRIE',-1.184,1.22,.202,'linen')
+        window(0,-.845,1.40,.39,.45,-1,False)
+        for i in range(4):
+            box(0,-.88-i*.112,.037*(4-i),1.36+.14*i,.23,.074*(4-i),'stone' if i%2 else 'chalk')
+        # Steep slate pavilion with a circular clock and a shaped zinc lantern.
+        hip(0,-.16,1.68,1.40,1.58,.78,.82,.88,'slate3')
+        box(0,-.16,2.56,.80,.80,.67,'chalk')
+        for y,side in [(-.566,-1),(.246,1)]:
+            beam((0,y,2.58),(0,y+side*.037,2.58),.287,.287,'gold',24)
+            beam((0,y+side*.038,2.58),(0,y+side*.05,2.58),.242,.242,'linen',24)
+            for i in range(12):
+                a=i*math.tau/12
+                beam((.188*math.sin(a),y+side*.056,2.58+.188*math.cos(a)),
+                     (.22*math.sin(a),y+side*.056,2.58+.22*math.cos(a)),.009,.009,'coal',4)
+            for dx,dz in [(-.122,.066),(.069,.17)]:
+                beam((0,y+side*.063,2.58),(dx,y+side*.063,2.58+dz),.018,.011,'coal')
+        box(0,-.16,2.91,.91,.91,.08,'cream')
+        for x in [-.28,.28]:
+            for y in [-.44,.12]:box(x,y,3.10,.087,.087,.34,'stone')
+        beam((0,-.16,3.17),(0,-.16,2.98),.069,.154,'gold')
+        hip(0,-.16,3.25,.85,.85,.28,.44,.44,'slate3')
+        hip(0,-.16,3.53,.45,.45,.31,.10,.10,'zinc')
+        beam((0,-.16,3.82),(0,-.16,4.05),.031,.017,'gold')
+        # Paired hanging tricolours flank the pavilion, facing the incoming street.
+        for x in [-.98,.98]:
+            beam((x,-.69,1.54),(x,-1.02,1.60),.026,.019,'iron')
+            for i,c in enumerate(['flagblue','linen','flagred']):
+                box(x+(i-1)*.099,-1.0,1.31,.10,.033,.52,c)
     elif kind!='Maison':
         for x in [-.75,.75]:
             window(x,-d/2,.46,.64,.4,-1,False)
@@ -184,6 +236,58 @@ def ruins(variant):
         beam((-.85+i*.46,.57,.75+rng.random()*.3),(-.52+i*.41,-.49,.19),.047,.036,'coal',4)
     box(-.82,.41,.80,.25,.27,1.37,'brick')
     box(-.82,.41,1.51,.31,.32,.09,'ash')
+
+def breached_shop():
+    # One end of the shop is still habitable. The break opens onto two floors,
+    # with torn wallpaper, a broken shop window and bare rafters at the ridge.
+    box(0,0,.07,2.36,1.56,.14,'mortar')
+    box(-.67,0,.88,1.04,1.52,1.76,'ochre')
+    roof(-.67,0,1.76,1.08,1.62,.60,True)
+    window(-.69,-.765,1.30,.32,.42,-1)
+    window(-.69,.765,1.30,.32,.42,1)
+    window(-.69,.765,.47,.38,.38,1,False)
+    window(-.71,-.765,.47,.71,.53,-1,False)
+    box(-.68,-.83,.88,1.05,.13,.15,'green')
+    for i in range(6):
+        x=-.064+i*.215
+        top=[1.85,1.76,1.20,1.05,.58,.35][i]
+        box(x,.70,top/2,.216,.14,top,'grey')
+        box(x,.616,top/2,.195,.021,top*.86,'sage')
+        box(x,.69,top+.036,.185,.15,.072,'brick2')
+        if i<3:
+            beam((x,-.71,1.72),(x,0,2.32-i*.055),.042,.033,'coal',4)
+            beam((x,0,2.32-i*.055),(x,.70,1.76),.038,.035,'wood',4)
+        box(x,.37,.87,.20,.70-i*.065,.08,'plank')
+    for x in [.06,.48,1.06]:
+        beam((x,-.59,.86),(x,.66,.89),.048,.034,'coal',4)
+    for x,h in [(.45,.64),(1.09,1.32)]:
+        box(x,-.70,h/2,.14,.14,h,'brick')
+    box(.80,.42,1.04,.28,.27,2.08,'brick')
+    for i in range(34):
+        box(rng.uniform(-.08,1.09),rng.uniform(-.60,.53),rng.uniform(.14,.23),
+            rng.uniform(.09,.21),.11,.08,rng.choice(['brick2','ash','stone','tile']),rng.uniform(-2,2))
+    beam((.20,-.51,.15),(.91,.49,.70),.05,.04,'wood',4)
+
+def bombed_cellar():
+    # A low mound of slates and brick behind the surviving street steps; two
+    # isolated pieces of the rear wall keep the gap in the skyline irregular.
+    box(0,0,.055,2.33,1.55,.11,'ash')
+    for i in range(10):
+        x=-1.05+i*.23
+        for y in [-.69,.69]:
+            courses=(2 if y<0 else 3)+int(4*max(0,math.cos(i*.84)))
+            if y<0 and 3<=i<=5:continue
+            for k in range(courses):
+                box(x,y,.12+k*.13,.225,.145,.125,rng.choice(['brick','mortar','brick2']))
+    for i in range(125):
+        x=rng.uniform(-1.02,1.02);y=rng.uniform(-.61,.61)
+        z=.14+.40*max(0,1-abs(x-.45)-abs(y-.24))*rng.random()
+        box(x,y,z,rng.uniform(.12,.28),rng.uniform(.11,.22),rng.uniform(.07,.15),
+            rng.choice(['slate3','brick','brick2','chalk','mortar','ash']),rng.uniform(-2,2),rng.uniform(-.5,.5))
+    for i in range(3):
+        beam((-.90+i*.19,-.57,.23),(.24+i*.21,.54,.47-i*.06),.051,.037,'coal',4)
+    for i in range(3):
+        box(-.24,-.55+i*.14,.045*(i+1),.54,.16,.09*(i+1),'stone')
 
 def crown(center,radii,color,n=7):
     x,y,z=center;w,d,h=radii
@@ -404,12 +508,13 @@ def save_model(name, build, index):
     bpy.ops.object.select_all(action='DESELECT')
     obj.select_set(True)
     bpy.context.view_layer.objects.active=obj
-    bpy.ops.export_scene.fbx(filepath=str(out/(name+'.fbx')),use_selection=True,axis_forward='-Z',axis_up='Y',apply_unit_scale=True,bake_anim=False,path_mode='STRIP')
+    if not options.only or name in options.only:
+        bpy.ops.export_scene.fbx(filepath=str(out/(name+'.fbx')),use_selection=True,axis_forward='-Z',axis_up='Y',apply_unit_scale=True,bake_anim=False,path_mode='STRIP')
     obj.location.x=index*3.6
 
 kits=[(k,lambda k=k:townhouse(k)) for k in ['Mairie','Mercerie','Boulangerie','Maison']]
 kits += [('BurnedHouse',lambda:ruins(0)),('ShellHouse',lambda:ruins(2)),('AppleTree',orchard),('ProduceStall',stall),('StreetLamp',lamp),('SpringVerge',flowers),('GunSite',gun_site),('Handcart',handcart)]
 kits.extend((name,lambda name=name:urbanhouse(name)) for name in ['Hotel','Arcade','GabledDraper','BrickTenement','RuinFacade'])
-kits.extend([('Fountain',fountain),('ParishChurch',parish)])
+kits.extend([('Fountain',fountain),('ParishChurch',parish),('BreachedShop',breached_shop),('BombedCellar',bombed_cellar)])
 for i,(name,build) in enumerate(kits):save_model(name,build,i)
 bpy.ops.wm.save_as_mainfile(filepath=str(repo/'Tools/Blender/saint_aubin.blend'),compress=True)
